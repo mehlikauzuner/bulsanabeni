@@ -1,0 +1,31 @@
+.doga-page {
+  display: flex;
+  height: 65vh; /* %20 navbar + %15 footer hariç içerik */
+}
+
+.sidebar {
+  background-color: #D8BFD8; /* lila */
+  width: 15%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid #ccc;
+}
+
+.menu-item {
+  padding: 1rem;
+  border-bottom: 1px solid white; /* kutucuk gibi görünüm */
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.menu-item:hover {
+  background-color: #caa9c9;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+}

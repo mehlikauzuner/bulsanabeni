@@ -1,0 +1,25 @@
+.navbar {
+  background-color: pink;
+  height: 20vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-item {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+  color: #ffeaea;
+}
+
+.nav-item.active {
+  text-decoration: underline;
+}

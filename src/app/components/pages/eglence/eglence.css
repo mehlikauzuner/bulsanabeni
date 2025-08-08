@@ -1,0 +1,36 @@
+.doga-page {
+  display: flex;
+  height: 100vh; /* Tüm ekran yüksekliği */
+}
+
+.sidebar {
+  background-color: #aee1cd; /* su yeşili */
+  width: 15%;
+  height: 100vh; /* Tüm ekran */
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid #ccc;
+}
+
+.menu-item {
+  flex: 1; /* Tüm sidebar yüksekliği 5'e eşit bölünsün */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid white; /* Kutucuk efekti */
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+  text-align: center;
+}
+
+.menu-item:hover {
+  background-color: #90d2b7; /* su yeşilinin biraz koyusu */
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  background-color: #f9f9f9;
+}
