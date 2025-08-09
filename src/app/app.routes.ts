@@ -40,20 +40,18 @@ export const routes: Routes = [
   { path: 'eglence', component: Eglence },
   { path: 'sanat', component: Sanat },
   
+ // Seyehat ana sayfa (turuncu dropdown)
+  { path: 'seyehat', component: Seyehat },
+
+  // Seyehat alt sayfalar (kırmızı dropdown)
+  { path: 'seyehat/cruise', component: Cruise },
+  { path: 'seyehat/geziler', component: Geziler },
+  { path: 'seyehat/kulturgezileri', component: Kulturgezileri },
+  { path: 'seyehat/turlar', component: Turlar },
+  { path: 'seyehat/yurtdisi', component: Yurtdisi },
+
   {
-    path: 'seyehat',
-    component: Seyehat,
-    children: [
-      { path: '', redirectTo: 'cruise', pathMatch: 'full' },
-      { path: 'cruise', component: Cruise},
-      { path: 'geziler', component: Geziler },
-      { path: 'kulturgezileri', component: Kulturgezileri },
-      { path: 'turlar', component: Turlar },
-      { path: 'yurtdisi', component: Yurtdisi },
-    ],
-  },
-  {
-    path: 'seyehat',
+    path: 'sanat',
     component: Sanat,
     children: [
       { path: '', redirectTo: 'sanat', pathMatch: 'full' },

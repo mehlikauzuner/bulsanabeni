@@ -1,0 +1,48 @@
+.left-rail.compact-red {
+  position: relative;  /* dropdown'un konum referansı */
+  width: 220px;
+}
+
+.tab-red {
+  background: #b30000;
+  color: #fff;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* dropdown */
+.drop-red {
+  position: absolute;
+  top: 100%;  /* kutunun hemen altı */
+  left: 0;
+  width: 220px;
+  background: #ffb3b3;
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.1);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity .2s ease, transform .2s ease;
+  z-index: 10;
+}
+
+.left-rail.compact-red:hover .drop-red {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.drop-red a {
+  display: block;
+  padding: 10px 14px;
+  text-decoration: none;
+  color: #333;
+}
+.drop-red a:hover {
+  background: rgba(179, 0, 0, 0.18);
+}
