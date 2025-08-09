@@ -1,0 +1,83 @@
+.seyehat-layout {
+  display: flex;
+  gap: 16px;
+  min-height: 70vh;
+}
+
+/* Sol şerit */
+.left-rail {
+  position: relative;
+  width: 220px;
+  padding: 16px;
+  background: #ffd6d6;            /* açık kırmızı arka plan */
+  border-radius: 12px;
+}
+
+.tab {
+  background: #b30000;            /* koyu kırmızı kutucuk */
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 12px 14px;
+  border-radius: 12px;
+  cursor: default;
+}
+
+/* Dropdown kapalıyken */
+.drop {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 8px 0;
+  background: #ffb3b3; /* açık kırmızı */
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.08);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+/* Hover olunca aç */
+.left-rail:hover .drop {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Elemanları sırayla göster (stagger) */
+.drop li {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+.left-rail:hover .drop li { animation: dropIn .22s ease forwards; }
+.drop li:nth-child(1){ animation-delay: 0ms;   }
+.drop li:nth-child(2){ animation-delay: 80ms;  }
+.drop li:nth-child(3){ animation-delay: 160ms; }
+.drop li:nth-child(4){ animation-delay: 240ms; }
+.drop li:nth-child(5){ animation-delay: 320ms; }
+
+@keyframes dropIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.drop a {
+  display: block;
+  padding: 10px 14px;
+  text-decoration: none;
+  color: #333;
+  border-left: 3px solid transparent;
+}
+.drop a:hover,
+.drop a.active {
+  background: rgba(179, 0, 0, 0.18); /* koyu kırmızı tonunda hover */
+  border-left-color: #b30000;        /* koyu kırmızı çizgi */
+  font-weight: 600;
+}
+
+/* Sağ içerik alanı */
+.content {
+  flex: 1;
+  padding: 16px;
+  background: #fff;
+  border-radius: 12px;
+}

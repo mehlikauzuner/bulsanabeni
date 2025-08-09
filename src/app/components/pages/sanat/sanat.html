@@ -1,1 +1,17 @@
-<p>sanat works!</p>
+<div class="sanat-layout">
+  <aside class="left-rail">
+    <div class="tab">Sanat</div>
+
+    <ul class="drop">
+      <li><a routerLink="dans" routerLinkActive="active">Dans</a></li>
+      <li><a routerLink="enstruman" routerLinkActive="active">Enstrüman</a></li>
+      <li><a routerLink="halkoyunlari" routerLinkActive="active">Halk Oyunları</a></li>
+      <li><a routerLink="resim" routerLinkActive="active">Resim</a></li>
+      <li><a routerLink="tasarim" routerLinkActive="active">Tasarım</a></li>
+    </ul>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

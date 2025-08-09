@@ -1,1 +1,17 @@
-<p>seyehat works!</p>
+<div class="seyehat-layout">
+  <aside class="left-rail">
+    <div class="tab">Seyehat</div>
+
+    <ul class="drop">
+      <li><a routerLink="cruise" routerLinkActive="active">Cruise</a></li>
+      <li><a routerLink="geziler" routerLinkActive="active">Geziler</a></li>
+      <li><a routerLink="kulturgezileri" routerLinkActive="active">Kültür Gezileri</a></li>
+      <li><a routerLink="turlar" routerLinkActive="active">Turlar</a></li>
+      <li><a routerLink="yurtdisi" routerLinkActive="active">Yurt Dışı</a></li>
+    </ul>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
