@@ -1,19 +1,99 @@
-<div class="cruise-layout">
-  <!-- Sol tarafta küçük kırmızı kutu -->
-  <aside class="left-rail compact-red">
-    <div class="tab-red">Seyehat</div>
-    <ul class="drop-red">
-      <li><a routerLink="/seyehat/cruise" routerLinkActive="active">Cruise</a></li>
-      <li><a routerLink="/seyehat/geziler">Geziler</a></li>
-      <li><a routerLink="/seyehat/kulturgezileri">Kültür Gezileri</a></li>
-      <li><a routerLink="/seyehat/turlar">Turlar</a></li>
-      <li><a routerLink="/seyehat/yurtdisi">Yurt Dışı</a></li>
-    </ul>
-  </aside>
+<div class="geziler-layout">
 
-  <!-- Sağ tarafta içerik -->
-  <main class="content">
-    <h2>Cruise Sayfası</h2>
-    <p>Buraya grid ve kartlar gelecek.</p>
-  </main>
+  <!-- Sağ %80 -->
+  <section class="charts-area">
+    <div class="charts-grid">
+      <!-- Sabit chart -->
+      <article class="chart-card chart-card--create">
+        <header class="chart-card__title">Anı Yakala</header>
+        <div class="chart-card__media"></div>
+        <footer class="chart-card__footer">
+          <a class= "btn btn--blue-dark" routerLink="/seyehat/cruise/ilan">Yeni İlan Oluştur</a>
+        </footer>
+      </article>
+
+      <!-- Örnek ilan kartları (sonra *ngFor) -->
+      <article class="chart-card chart-card--listing">
+        <header class="chart-card__title">Karadeniz Gezisi</header>
+        <div class="chart-card__media"></div>
+        <footer class="chart-card__footer">
+          <a class="btn btn--dark-pink" routerLink="/seyehat/cruise/detay">Detay Gör</a>
+        </footer>
+      </article>
+
+      <article class="chart-card chart-card--listing">
+        <header class="chart-card__title">Ege Adaları Gezisi</header>
+        <div class="chart-card__media"></div>
+        <footer class="chart-card__footer">
+          <a class="btn btn--dark-pink" routerLink="/seyehat/cruise/detay">Detay Gör</a>
+        </footer>
+      </article>
+
+      <article class="chart-card chart-card--listing">
+        <header class="chart-card__title">Ege Adaları Gezisi</header>
+        <div class="chart-card__media"></div>
+        <footer class="chart-card__footer">
+          <a class="btn btn--dark-pink" routerLink="/seyehat/cruise/detay">Detay Gör</a>
+        </footer>
+      </article>
+
+      <article class="chart-card chart-card--listing">
+        <header class="chart-card__title">Ege Adaları Gezisi</header>
+        <div class="chart-card__media"></div>
+        <footer class="chart-card__footer">
+          <a class="btn btn--dark-pink" routerLink="/seyehat/cruise/detay">Detay Gör</a>
+        </footer>
+      </article>
+
+
+      <article class="chart-card chart-card--listing">
+        <header class="chart-card__title">Ege Adaları Gezisi</header>
+        <div class="chart-card__media"></div>
+        <footer class="chart-card__footer">
+          <a class="btn btn--dark-pink" routerLink="/seyehat/cruise/detay">Detay Gör</a>
+        </footer>
+      </article>
+
+
+
+      <article class="chart-card chart-card--listing">
+        <header class="chart-card__title">Ege Adaları Gezisi</header>
+        <div class="chart-card__media"></div>
+        <footer class="chart-card__footer">
+          <a class="btn btn--dark-pink" routerLink="/seyehat/cruise/detay">Detay Gör</a>
+        </footer>
+      </article>
+
+
+      <article class="chart-card chart-card--listing">
+        <header class="chart-card__title">Ege Adaları Gezisi</header>
+        <div class="chart-card__media"></div>
+        <footer class="chart-card__footer">
+          <a class="btn btn--dark-pink" routerLink="/seyehat/cruise/detay">Detay Gör</a>
+        </footer>
+      </article>
+
+      <article class="chart-card chart-card--listing">
+        <header class="chart-card__title">Ege Adaları Gezisi</header>
+        <div class="chart-card__media"></div>
+        <footer class="chart-card__footer">
+          <a class="btn btn--dark-pink" routerLink="/seyehat/cruise/detay">Detay Gör</a>
+        </footer>
+      </article>
+
+
+
+      <article class="chart-card chart-card--listing">
+        <header class="chart-card__title">Ege Adaları Gezisi</header>
+        <div class="chart-card__media"></div>
+        <footer class="chart-card__footer">
+          <a class="btn btn--dark-pink" routerLink="/seyehat/cruise/detay">Detay Gör</a>
+        </footer>
+      </article>
+     
+
+      <!-- 3 kart daha ekleyebilirsin ki toplam 6 görünsün -->
+    </div>
+  </section>
 </div>
+

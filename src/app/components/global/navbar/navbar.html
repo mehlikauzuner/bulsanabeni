@@ -1,7 +1,55 @@
 <nav class="navbar">
-  <div class="nav-item" routerLink="/doga" routerLinkActive="active">Doğa</div>
-  <div class="nav-item" routerLink="/akademik" routerLinkActive="active">Akademik</div>
-  <div class="nav-item" routerLink="/eglence" routerLinkActive="active">Eğlence</div>
-  <div class="nav-item" routerLink="/sanat" routerLinkActive="active">Sanat</div>
-  <div class="nav-item" routerLink="/seyehat" routerLinkActive="active">Seyehat</div>
+  <div class="nav-left">
+    <div class="nav-item" routerLink="/akademik" routerLinkActive="active">Akademik</div>
+    
+    
+
+    <div class="nav-item dropdown">
+      Seyehat
+      <div class="dropdown-content">
+        <a routerLink="/seyehat/cruise" routerLinkActive="active">Cruise</a>
+        <a routerLink="/seyehat/geziler" routerLinkActive="active">Geziler</a>
+        <a routerLink="/seyehat/kulturgezileri" routerLinkActive="active">Kültür Gezileri</a>
+        <a routerLink="/seyehat/turlar" routerLinkActive="active">Turlar</a>
+        <a routerLink="/seyehat/yurtdisi" routerLinkActive="active">Yurt Dışı</a>
+      </div>
+    </div>
+
+    <div class="nav-item dropdown">
+      Doğa
+      <div class="dropdown-content">
+        <a routerLink="/doga/kamp" routerLinkActive="active">Kamp</a>
+        <a routerLink="/doga/bisiklet" routerLinkActive="active">Bisiklet</a>
+        <a routerLink="/doga/dagcilik" routerLinkActive="active">Dağcılık</a>
+        <a routerLink="/doga/trekking" routerLinkActive="active">Trekking</a>
+        <a routerLink="/doga/yuzme" routerLinkActive="active">Yüzme</a>
+      </div>
+    </div>
+
+    <div class="nav-item dropdown">
+      Sanat
+      <div class="dropdown-content">
+        <a routerLink="/sanat/resim" routerLinkActive="active">Resim</a>
+        <a routerLink="/sanat/tasarim" routerLinkActive="active">Tasarım</a>
+        <a routerLink="/sanat/dans" routerLinkActive="active">Dans</a>
+        <a routerLink="/sanat/enstruman" routerLinkActive="active">Enstrüman</a>
+        <a routerLink="/sanat/halkoyunlari" routerLinkActive="active">Halk Oyunları</a>
+      </div>
+    </div>
+
+    <div class="nav-item dropdown">
+      Eğlence
+      <div class="dropdown-content">
+        <a routerLink="/eglence/dans" routerLinkActive="active">Dans</a>
+        <a routerLink="/eglence/fotograf" routerLinkActive="active">Fotoğraf</a>
+        <a routerLink="/eglence/muzik" routerLinkActive="active">Müzik</a>
+        <a routerLink="/eglence/oyun" routerLinkActive="active">Oyun</a>
+        <a routerLink="/eglence/sinema" routerLinkActive="active">Sinema</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <div class="nav-item" routerLink="/profil" routerLinkActive="active">Profil</div>
+  </div>
 </nav>

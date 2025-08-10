@@ -30,6 +30,8 @@ import { Enstruman } from './components/pages/sanat/kategoriler/enstruman/enstru
 import { Halkoyunlari } from './components/pages/sanat/kategoriler/halkoyunlari/halkoyunlari';
 import { Resim } from './components/pages/sanat/kategoriler/resim/resim';
 import { Tasarim } from './components/pages/sanat/kategoriler/tasarim/tasarim';
+import { Detay } from './components/pages/seyehat/kategoriler/cruise/detay/detay';
+import { Ilan } from './components/pages/seyehat/kategoriler/cruise/ilan/ilan';
 
 
 export const routes: Routes = [
@@ -49,6 +51,13 @@ export const routes: Routes = [
   { path: 'seyehat/kulturgezileri', component: Kulturgezileri },
   { path: 'seyehat/turlar', component: Turlar },
   { path: 'seyehat/yurtdisi', component: Yurtdisi },
+  
+
+ // cruise detay
+  { path: 'seyehat/cruise/detay', component: Detay },
+  { path: 'seyehat/cruise/ilan', component: Ilan },
+  
+
 
   {
     path: 'sanat',

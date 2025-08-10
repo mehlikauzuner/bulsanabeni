@@ -1,0 +1,16 @@
+<div class="ilan-container">
+  <h1>İlan Oluştur</h1>
+  <p class="subtitle">Arkadaşlarını bulmak için etkinlik ilanı ver</p>
+
+  <!-- Başlık Input -->
+  <input
+    type="text"
+    [(ngModel)]="ilanBaslik"
+    maxlength="60"
+    placeholder="Etkinlik başlığını girin (örn: Hafta Sonu Trekking Turu)"
+    required
+  />
+
+  <!-- Karakter sayacı -->
+  <small>{{ ilanBaslik.length }}/60 karakter</small>
+</div>

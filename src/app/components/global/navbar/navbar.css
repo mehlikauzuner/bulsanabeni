@@ -1,25 +1,91 @@
-.navbar {
-  background-color: pink;
-  height: 20vh;
+/* ---- NAVBAR ---- */
+.navbar{
+  background: pink;
+  flex-wrap: nowrap;
+  height: 72px;                 /* 20vh yerine sabit yükseklik */
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;/* sol %80 - sağ %20 ayır */
   align-items: center;
-  gap: 2rem;
+  padding: 0 40px;
+  box-sizing: border-box;
+  z-index: 100;                  /* dropdown üstte kalsın */
+  gap: 0px;
 }
 
-.nav-item {
-  color: white;
+/* Sol ve sağ kolonlar */
+.nav-left{
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  margin-left: 50px;
+  flex: 0 0 80%;                 /* %80 */
+  min-width: 0;
+}
+.nav-right{
+  display: flex;
+  margin-right: 10px;
+  justify-content: flex-end;
+  align-items: center;
+  flex: 0 0 20%;                 /* %20 */
+  transform: translateX(-200px);
+}
+
+/* Temel item */
+.nav-item{
+  color: #fff;
   font-size: 1.5rem;
-  font-weight: bold;
+  font-weight: 800;
   cursor: pointer;
-  transition: all 0.3s ease;
+  position: relative;
+  white-space: nowrap;           /* satır kaymasın */
+  user-select: none;
+  transition: color .2s ease;
+}
+.nav-item:hover{ color:#ffeaea; }
+.nav-item.active{ text-decoration: underline; }
+
+/* Dropdown */
+.dropdown{ position: relative; }
+.dropdown-content{
+  position: absolute;
+  top: 100%;                     /* başlığın altı */
+  left: 0;
+  display: none;                 /* gizli */
+  background: #fff;
+  padding: 8px 0;
+  min-width: 200px;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0,0,0,.15);
+}
+.dropdown:hover .dropdown-content{ display: block; }
+
+/* Dropdown linkleri: mavi/altı çizgiyi kaldır */
+.dropdown-content a{
+  display: block;
+  padding: 10px 14px;
+  color: #333;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border-radius: 8px;
+}
+.dropdown-content a:hover{
+  background: #ffeaea;
+  color: #b30059;
 }
 
-.nav-item:hover {
-  color: #ffeaea;
+/* Navbar ile kartlar arasına boşluk: 
+   navbarın hemen arkasındaki charts alanını aşağı it */
+.navbar + .charts-area{ 
+  margin-top: 24px; 
 }
 
-.nav-item.active {
-  text-decoration: underline;
+/* Küçük ekran düzeni (opsiyonel) */
+@media (max-width: 900px){
+  .navbar{ height: 64px; padding: 0 16px; }
+  .nav-left{ gap: 16px; flex: 1; }
+  .nav-right{ flex: 0 0 auto; }
+  .nav-item{ font-size: 1.1rem; }
 }

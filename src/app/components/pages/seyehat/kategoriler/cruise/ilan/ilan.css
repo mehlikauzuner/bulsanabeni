@@ -1,0 +1,42 @@
+.ilan-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.ilan-container h1 {
+  font-size: 2rem;
+  margin-bottom: 4px;
+  color: #1565c0;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.ilan-container input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.ilan-container input:focus {
+  border-color: #1565c0;
+}
+
+small {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: #999;
+}

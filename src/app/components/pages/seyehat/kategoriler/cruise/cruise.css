@@ -1,48 +1,146 @@
-.left-rail.compact-red {
-  position: relative;  /* dropdown'un konum referansı */
-  width: 220px;
+/* ====== Tema Değişkenleri ====== */
+:host{
+  /* Pembe (liste kartları) */
+  --pink-dark:#b30059;
+  --pink-mid:#ff66a3;
+  --pink-light:#ffb3d9;
+
+  /* Bebe mavisi (İlan Oluştur kartı) */
+  --blue-dark:#1565c0;
+  --blue-mid:#64b5f6;
+  --blue-light:#b3e5ff;
+  --blue-bg:#e3f2ff;
+
+  --card-shadow:0 12px 28px rgba(0,0,0,.08);
 }
 
-.tab-red {
-  background: #b30000;
+/* ====== 20 / 80 Yerleşim ====== */
+.cruise-layout{
+  display:grid;
+  grid-template-columns: 20% 80%;
+  gap:4px;
+  align-items:start;
+  min-height:100vh;
+}
+
+/* ====== Sağ Sütun: Chart alanı ====== */
+.charts-area {
+  align-self: start;
+  margin-top: 40; /* üst boşluk */
+  padding-top: 80px;
+  padding: 0 16px 0 8px;
+}
+
+.charts-grid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)); /* 1 satıra 5 kart */
+  gap: 12px; /* araları biraz daralt */
+  padding-left: 0px;
+}
+
+/* ====== Kart Tasarımı ====== */
+.chart-card{
+  position:relative;
+  border:3px solid transparent;
+  border-radius:16px;
+  padding:10px; /* küçültüldü */
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, var(--pink-light), #ffd1e5) border-box;
+  box-shadow: var(--card-shadow);
+  display:flex;
+  flex-direction:column;
+  gap:8px; /* küçültüldü */
+  min-height: 100px;
+  isolation:isolate;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.chart-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(0,0,0,.1);
+}
+
+.chart-card__title{
+  font-weight:900;
+  letter-spacing:.2px;
+  font-size:14px; /* küçültüldü */
+}
+
+/* Görsel/animasyon alanı */
+.chart-card__media{
+  height: 70px; /* küçültüldü */
+  border-radius:12px;
+  background: linear-gradient(180deg, #fff7fb, #ffe6f2);
+  border: 2px dashed rgba(179,0,89,.18);
+}
+
+/* ====== Varyantlar ====== */
+/* İlan Oluştur (bebe mavisi) */
+.chart-card--create{
+  background:
+    linear-gradient(var(--blue-bg), var(--blue-bg)) padding-box,
+    linear-gradient(135deg, var(--blue-dark), var(--blue-mid)) border-box;
+}
+.chart-card--create .chart-card__title{ color: var(--blue-dark); }
+.chart-card--create .chart-card__media{
+  background: linear-gradient(180deg, #f5fbff, #e6f4ff);
+  border-color: rgba(21,101,192,.22);
+}
+
+/* İlan kartları (pembe) */
+.chart-card--listing{
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, var(--pink-light), #ffd1e5) border-box;
+}
+.chart-card--listing .chart-card__title{ color: var(--pink-mid); }
+.chart-card--listing .chart-card__media{
+  background: linear-gradient(180deg, #ffe9f3, #ffd6ea);
+  border-color: rgba(255,102,163,.28);
+}
+
+/* Butonlar */
+.chart-card__footer{
+  margin-top:auto;
+  display:flex;
+  justify-content:center;
+}
+.btn{
+  width:100%; /* genişletildi */
+  text-align:center;
+  text-decoration:none;
+  font-weight:900;
+  padding:8px 10px; /* küçültüldü */
+  font-size:14px;   /* küçültüldü */
+  border-radius:12px;
+  display:inline-block;
+}
+.btn--blue-dark {
+  background: var(--blue-dark);
   color: #fff;
-  padding: 12px 14px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
+}
+.btn--blue-dark:hover {
+  filter: brightness(.97);
 }
 
-/* dropdown */
-.drop-red {
-  position: absolute;
-  top: 100%;  /* kutunun hemen altı */
-  left: 0;
-  width: 220px;
-  background: #ffb3b3;
-  list-style: none;
-  margin: 0;
-  padding: 8px 0;
-  border-radius: 10px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.1);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-6px);
-  transition: opacity .2s ease, transform .2s ease;
-  z-index: 10;
+.btn--dark-pink{  background: var(--pink-dark);  color:#fff; }
+.btn:hover{ filter: brightness(.97); }
+
+/* ====== Responsive ====== */
+@media (max-width: 1200px){
+  .cruise-layout{ grid-template-columns: 25% 75%; }
+}
+@media (max-width: 1024px){
+  .charts-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px){
+  .cruise-layout{ grid-template-columns: 1fr; }
+  .charts-grid{ grid-template-columns: 1fr; }
 }
 
-.left-rail.compact-red:hover .drop-red {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.drop-red a {
-  display: block;
-  padding: 10px 14px;
-  text-decoration: none;
-  color: #333;
-}
-.drop-red a:hover {
-  background: rgba(179, 0, 0, 0.18);
+body,
+.seyehat-layout,
+.cruise-layout {
+  overflow-x: hidden;
 }

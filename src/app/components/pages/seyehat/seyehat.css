@@ -8,7 +8,7 @@
 .left-rail {
   position: relative;
   width: 220px;
-  padding: 16px;
+  padding: 16px 16px 10px 16px;
   background: #ffe3c2;            /* açık turuncu arka plan */
   border-radius: 12px;
 }
@@ -25,20 +25,23 @@
 
 /* Dropdown kapalıyken */
 .drop {
+  margin-top: 10px;
   list-style: none;
   margin: 8px 0 0;
   padding: 8px 0;
   background: rgba(255,255,255,.6);
   border-radius: 12px;
   box-shadow: 0 10px 24px rgba(0,0,0,.08);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-6px);
   transition: opacity .2s ease, transform .2s ease;
+  opacity: 0; /* başta kapalı */
+}
+.drop.open {
+  opacity: 1; /* açık durumda görünür */
 }
 
 /* Hover olunca aç */
-.left-rail:hover .drop {
+.left-rail:hover .drop,
+.drop:hover {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
@@ -66,6 +69,13 @@
   text-decoration: none;
   color: #333;
   border-left: 3px solid transparent;
+  pointer-events: auto;
+  cursor: pointer;
+}
+a.active {
+  background-color: pink;
+  font-weight: bold;
+  border-radius: 5px;
 }
 .drop a:hover,
 .drop a.active {
