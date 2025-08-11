@@ -37,11 +37,13 @@ import { Projeler } from './components/pages/akademik/projeler/projeler';
 import { Speaking } from './components/pages/akademik/speaking/speaking';
 import { Workshop } from './components/pages/akademik/workshop/workshop';
 import { Yarismalar } from './components/pages/akademik/yarismalar/yarismalar';
+import { Profil } from './components/pages/profil/profil';
 
 
 export const routes: Routes = [
   { path: '', redirectTo: 'doga', pathMatch: 'full' },
 
+  { path: 'profil', component: Profil },
   { path: 'doga', component: Doga },
   { path: 'akademik', component: Akademik },
   { path: 'eglence', component: Eglence },
@@ -62,7 +64,7 @@ export const routes: Routes = [
   { path: 'seyehat/cruise/detay', component: Detay },
   { path: 'seyehat/cruise/ilan', component: Ilan },
   
- { path: 'akademik/fuarlar', component: Fuarlar },
+  { path: 'akademik/fuarlar', component: Fuarlar },
   { path: 'akademik/projeler', component: Projeler },
   { path: 'akademik/speaking', component: Speaking },
   { path: 'akademik/workshop', component: Workshop},

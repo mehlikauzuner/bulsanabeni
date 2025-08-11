@@ -1,1 +1,59 @@
-<p>detay works!</p>
+<div class="page" *ngIf="ilan; else noData">
+  <!-- Üst Bant -->
+  <header class="hero">
+    <div class="hero__grad"></div>
+    <svg class="hero__wave" viewBox="0 0 1440 180" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,64 C240,128 480,0 720,32 C960,64 1200,160 1440,112 L1440,320 L0,320 Z"></path>
+    </svg>
+    <div class="profile">
+      <div class="avatar" aria-hidden="true">👤</div>
+      <div class="who">
+        <div class="name">{{ ilan.user.fullName || 'Kullanıcı' }}</div>
+        <div class="sub" *ngIf="ilan.user.joinedAt">
+          Kayıt Tarihi: {{ ilan.user.joinedAt | date:'d MMMM y' }}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Kart -->
+  <main class="card">
+    <h1 class="title">{{ ilan.title || 'İlan Başlığı' }}</h1>
+    <p class="desc" [class.muted]="!ilan.description">
+      {{ ilan.description || 'Açıklama henüz girilmemiş.' }}
+    </p>
+    <div class="facts">
+      <div class="fact">
+        <svg viewBox="0 0 24 24" class="ic">
+          <path d="M7 2h10a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3zm0 0v4m10-4v4M4 10h16"></path>
+        </svg>
+        <div>
+          <div class="label">Tarih</div>
+          <div class="value">{{ prettyDate }}</div>
+        </div>
+      </div>
+      <div class="fact">
+        <svg viewBox="0 0 24 24" class="ic">
+          <path d="M12 7v5l3 3M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
+        </svg>
+        <div>
+          <div class="label">Saat</div>
+          <div class="value">{{ ilan.time || '-' }}</div>
+        </div>
+      </div>
+      <div class="fact">
+        <svg viewBox="0 0 24 24" class="ic">
+          <path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11Zm0-8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path>
+        </svg>
+        <div>
+          <div class="label">Konum</div>
+          <div class="value">{{ prettyPlace || '-' }}</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<ng-template #noData>
+  <div class="empty">Henüz bir ilan seçilmedi. Lütfen formdan bir ilan oluştur.</div>
+</ng-template>

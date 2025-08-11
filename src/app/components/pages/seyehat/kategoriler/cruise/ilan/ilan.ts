@@ -9,6 +9,8 @@ import { LocalizedString } from '@angular/compiler';
 import localeTr from '@angular/common/locales/tr';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+
 
 
 
@@ -59,7 +61,7 @@ export class Ilan {
   times: string[] = [];
   selectedTime: string | null = null;
 
-  constructor(private dateAdapter: DateAdapter<Date>, private http: HttpClient) {
+  constructor(private dateAdapter: DateAdapter<Date>, private http: HttpClient, private router: Router) {
   this.dateAdapter.setLocale('tr-TR');
 }
 
@@ -206,6 +208,31 @@ createListing() {
   });
 }
 
+
+
+goToDetail() {
+  if (!this.isValid()) return;
+
+  const [hh, mm] = (this.selectedTime || '00:00').split(':').map(Number);
+  const dateISO = this.selectedDate ? new Date(this.selectedDate) : null;
+  if (dateISO) dateISO.setHours(hh, mm || 0, 0, 0);
+
+  // Detay sayfasına götüreceğimiz sade obje
+  const viewPayload = {
+    title: this.title.trim(),
+    description: this.description.trim(),
+    dateISO: dateISO ? dateISO.toISOString() : null,
+    time: this.selectedTime,
+    city: this.selectedCity,
+    district: this.selectedDistrict,
+    user: this.user
+  };
+
+  localStorage.setItem('detaySonIlan', JSON.stringify(viewPayload));
+
+  // Kendi rotana göre güncelle:
+  this.router.navigateByUrl('/seyehat/kategoriler/cruise/detay');
+}
 
 
 }

@@ -1,25 +1,40 @@
-import { Component, OnInit, computed } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+type DetayIlan = {
+  title: string;
+  description: string;
+  dateISO: string | null;
+  time: string | null;
+  city: string | null;
+  district: string | null;
+  user: { fullName: string; joinedAt?: string | Date; avatarUrl?: string };
+};
 
 @Component({
-  selector: 'app-ilan-detay',
+  selector: 'app-detay',
   standalone: true,
-  imports: [CommonModule,],
+  imports: [CommonModule],
   templateUrl: './detay.html',
   styleUrls: ['./detay.css']
 })
 export class Detay implements OnInit {
-  private _ilan: any = null;      // istersen sonra interface’e çeviririz
-  ilan = computed(() => this._ilan);
+  ilan: DetayIlan | null = null;
 
   ngOnInit() {
-    const st = window.history.state as { ilan?: any };
-    if (st?.ilan) {
-      this._ilan = st.ilan;
-      localStorage.setItem('lastIlan', JSON.stringify(this._ilan));
-      return;
-    }
-    const raw = localStorage.getItem('lastIlan');
-    if (raw) this._ilan = JSON.parse(raw);
+    const raw = localStorage.getItem('detaySonIlan');
+    this.ilan = raw ? JSON.parse(raw) : null;
+  }
+
+  get prettyDate(): string {
+    if (!this.ilan?.dateISO) return '-';
+    const d = new Date(this.ilan.dateISO);
+    return d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  get prettyPlace(): string {
+    const c = this.ilan?.city || '';
+    const d = this.ilan?.district || '';
+    return [c, d].filter(Boolean).join(' • ');
   }
 }

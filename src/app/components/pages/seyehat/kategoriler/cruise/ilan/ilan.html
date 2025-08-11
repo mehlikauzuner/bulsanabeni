@@ -120,11 +120,12 @@
   <!-- Yayınla -->
   <div class="actions">
     <button
-      type="button"
-      class="ellipse-btn"
-      (click)="createListing()"
-      [disabled]="loading">
-      {{ loading ? 'Gönderiliyor...' : 'Bul Beni' }}
-    </button>
+  type="button"
+  class="ellipse-btn"
+  (click)="goToDetail()"
+  [disabled]="loading">
+  {{ loading ? 'Gönderiliyor...' : 'Bul Beni' }}
+</button>
+
   </div>
 </div> <!-- create-wrapper kapanışı -->
