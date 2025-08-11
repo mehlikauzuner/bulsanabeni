@@ -1,16 +1,105 @@
-<div class="ilan-container">
-  <h1>İlan Oluştur</h1>
-  <p class="subtitle">Arkadaşlarını bulmak için etkinlik ilanı ver</p>
+<div class="user-bar" *ngIf="user as u">
+  <div class="avatar">
+    <span>{{ (u.fullName || 'U').charAt(0) }}</span>
+  </div>
+  <div class="user-meta">
+    <div class="name">{{ u.fullName }}</div>
+    <div class="sub">Kayıt Tarihi: {{ u.joinedAt | date:'d MMMM y' }}</div>
+  </div>
+</div>
 
-  <!-- Başlık Input -->
+
+<!-- PILL başlık -->
+<div class="pill-title">İlan Başlığı</div>
+
+<!-- Lila panel -->
+<div class="title-panel">
   <input
+    class="title-input"
     type="text"
-    [(ngModel)]="ilanBaslik"
-    maxlength="60"
-    placeholder="Etkinlik başlığını girin (örn: Hafta Sonu Trekking Turu)"
+    [(ngModel)]="title"
+    [attr.maxlength]="maxTitleLen"
     required
+    placeholder="Etkinlik başlığını girin (örn: Hafta Sonu Trekking Turu)"
+    aria-describedby="titleHelp titleCount"
   />
 
-  <!-- Karakter sayacı -->
-  <small>{{ ilanBaslik.length }}/60 karakter</small>
+  <div id="titleHelp" class="hint">Kısa ve net bir başlık yaz.</div>
+  <div id="titleCount" class="char-count">{{ title.length }}/{{ maxTitleLen }}</div>
 </div>
+
+
+
+
+<!-- Açıklama pill -->
+<div class="pill-title">Açıklama</div>
+
+<!-- Lila panel -->
+<div class="desc-panel">
+  <textarea
+    class="desc-input"
+    [(ngModel)]="description"
+    [attr.maxlength]="maxDescLen"
+    rows="4"
+    required
+    placeholder="Etkinlik hakkında detaylı bilgi verin. Nerede, ne zaman, kimlerle, ne yapılacak?"
+    aria-describedby="descHelp descCount"
+  ></textarea>
+
+  <div id="descHelp" class="hint">
+    Katılımcıların doğru beklentiye sahip olması için mümkün olduğunca detay ekleyin.
+  </div>
+  <div id="descCount" class="char-count">{{ description.length }}/{{ maxDescLen }}</div>
+</div>
+
+
+
+<!-- Tarih & Saat pill -->
+<div class="pill-title">Tarih & Saat</div>
+
+<!-- Lila panel -->
+<div class="date-time-panel">
+  <!-- Tarih seçim -->
+  <div class="date-selects">
+<!-- Gün -->
+<select [(ngModel)]="selectedDay" required>
+  <option [ngValue]="null" disabled>Gün</option>
+  <option *ngFor="let day of days"
+          [ngValue]="day"
+          [disabled]="isPastOption(day, selectedMonth, selectedYear, selectedTime)">
+    {{ day }}
+  </option>
+</select>
+
+<!-- Ay -->
+<select [(ngModel)]="selectedMonth" required>
+  <option [ngValue]="null" disabled>Ay</option>
+  <option *ngFor="let month of months"
+          [ngValue]="month"
+          [disabled]="isPastOption(selectedDay, month, selectedYear, selectedTime)">
+    {{ month }}
+  </option>
+</select>
+
+<!-- Yıl -->
+<select [(ngModel)]="selectedYear" required>
+  <option [ngValue]="null" disabled>Yıl</option>
+  <option *ngFor="let year of years"
+          [ngValue]="year"
+          [disabled]="isPastOption(selectedDay, selectedMonth, year, selectedTime)">
+    {{ year }}
+  </option>
+</select>
+
+<!-- Saat -->
+<select [(ngModel)]="selectedTime" required>
+  <option [ngValue]="null" disabled>Saat</option>
+  <option *ngFor="let t of times"
+          [ngValue]="t"
+          [disabled]="isPastOption(selectedDay, selectedMonth, selectedYear, t)">
+    {{ t }}
+  </option>
+</select>
+    
+</div>
+

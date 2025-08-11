@@ -83,9 +83,19 @@
 }
 
 /* Küçük ekran düzeni (opsiyonel) */
-@media (max-width: 900px){
-  .navbar{ height: 64px; padding: 0 16px; }
-  .nav-left{ gap: 16px; flex: 1; }
-  .nav-right{ flex: 0 0 auto; }
-  .nav-item{ font-size: 1.1rem; }
+@media (max-width: 991.98px) {
+  .navbar {
+    padding: 0.5rem 1rem; /* Esnek padding, sabit height yok */
+    height: auto;
+  }
+  .nav-left,
+  .nav-right {
+    flex: 1 1 100%; /* Mobilde tam genişlik */
+    gap: 0.5rem;
+  }
+  .nav-item {
+    font-size: 1rem; /* Biraz küçült */
+    display: block; /* Dikey diziliş */
+    width: 100%;
+  }
 }
