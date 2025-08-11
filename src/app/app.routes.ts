@@ -32,6 +32,11 @@ import { Resim } from './components/pages/sanat/kategoriler/resim/resim';
 import { Tasarim } from './components/pages/sanat/kategoriler/tasarim/tasarim';
 import { Detay } from './components/pages/seyehat/kategoriler/cruise/detay/detay';
 import { Ilan } from './components/pages/seyehat/kategoriler/cruise/ilan/ilan';
+import { Fuarlar } from './components/pages/akademik/fuarlar/fuarlar';
+import { Projeler } from './components/pages/akademik/projeler/projeler';
+import { Speaking } from './components/pages/akademik/speaking/speaking';
+import { Workshop } from './components/pages/akademik/workshop/workshop';
+import { Yarismalar } from './components/pages/akademik/yarismalar/yarismalar';
 
 
 export const routes: Routes = [
@@ -57,7 +62,12 @@ export const routes: Routes = [
   { path: 'seyehat/cruise/detay', component: Detay },
   { path: 'seyehat/cruise/ilan', component: Ilan },
   
-
+ { path: 'akademik/fuarlar', component: Fuarlar },
+  { path: 'akademik/projeler', component: Projeler },
+  { path: 'akademik/speaking', component: Speaking },
+  { path: 'akademik/workshop', component: Workshop},
+  { path: 'akademik/yarismalar', component: Yarismalar },
+  
 
   {
     path: 'sanat',

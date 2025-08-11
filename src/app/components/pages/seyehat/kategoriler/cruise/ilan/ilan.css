@@ -9,6 +9,7 @@
   border-radius: 20px;
   background: #f6ecff;
   box-shadow: none;
+ 
 }
 
 .form-field-wrapper {
@@ -210,3 +211,54 @@ select:invalid {
 option {
   color: #111;
 }
+
+.location-panel{
+  background: var(--lilac);
+  border: 1px solid #e6d9ff;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 22px;
+  display:flex;
+  gap:16px;
+  flex-wrap: wrap;
+}
+.city-field, .district-field{ flex:1; min-width: 260px; }
+
+
+
+/* Tarih & Saat'in altında, sayfanın en altına ortala */
+.actions{
+  margin-top: auto;        /* içeriğe göre alta oturur */
+  padding-top: 24px;
+  display:flex;
+  justify-content:center;
+}
+
+/* Büyük, mavi, elips buton */
+.ellipse-btn{
+  width: min(720px, 95%);  /* ortada geniş */
+  min-height: 80px;        /* büyük boy */
+  padding: 10px 28px;
+
+  background:#4da3ff;      /* mavi */
+  color:#fff;
+  font-weight:900;
+  font-size:24px;
+
+  border:none;
+  border-radius: 999px;    /* elips */
+  cursor:pointer;
+
+  box-shadow: 0 12px 28px rgba(77,163,255,.35);
+  transition: transform .08s ease;
+}
+
+.ellipse-btn:hover{ transform: translateY(-2px); }
+.ellipse-btn:active{ transform: translateY(-1px); }
+.ellipse-btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+
+
+
+
+
+

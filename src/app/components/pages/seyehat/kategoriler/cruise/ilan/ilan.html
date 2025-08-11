@@ -1,22 +1,20 @@
 <div class="create-wrapper">
+  <!-- Kullanıcı çubuğu -->
   <div class="user-bar" *ngIf="user as u">
-    <div class="avatar">
-      <span>{{ (u.fullName || 'U').charAt(0) }}</span>
-    </div>
+    <div class="avatar"><span>{{ (u.fullName || 'U').charAt(0) }}</span></div>
     <div class="user-meta">
       <div class="name">{{ u.fullName }}</div>
       <div class="sub">Kayıt Tarihi: {{ u.joinedAt | date:'d MMMM y' }}</div>
     </div>
   </div>
 
-  <!-- PILL başlık -->
+  <!-- Başlık -->
   <div class="pill-title">İlan Başlığı</div>
-
-  <!-- Lila panel -->
   <div class="title-panel">
     <input
       class="title-input"
       type="text"
+      name="title"
       [(ngModel)]="title"
       [attr.maxlength]="maxTitleLen"
       required
@@ -27,13 +25,12 @@
     <div id="titleCount" class="char-count">{{ title.length }}/{{ maxTitleLen }}</div>
   </div>
 
-  <!-- Açıklama pill -->
+  <!-- Açıklama -->
   <div class="pill-title">Açıklama</div>
-
-  <!-- Lila panel -->
   <div class="desc-panel">
     <textarea
       class="desc-input"
+      name="description"
       [(ngModel)]="description"
       [attr.maxlength]="maxDescLen"
       rows="4"
@@ -47,16 +44,58 @@
     <div id="descCount" class="char-count">{{ description.length }}/{{ maxDescLen }}</div>
   </div>
 
-  <!-- Tarih & Saat pill -->
-  <div class="pill-title">Tarih & Saat</div>
+  <!-- Konum -->
+  <div class="pill-title">Konum</div>
+  <div class="location-panel">
+    <!-- Şehir -->
+    <mat-form-field class="city-field" appearance="outline">
+      <mat-label>Şehir</mat-label>
+      <input
+        matInput
+        name="city"
+        placeholder="Örn: Ankara"
+        [(ngModel)]="cityQuery"
+        (input)="filterCities()"
+        [matAutocomplete]="cityAuto"
+        required
+        aria-autocomplete="list"
+      />
+      <mat-autocomplete #cityAuto="matAutocomplete" (optionSelected)="onCitySelected($event.option.value)">
+        <mat-option *ngFor="let c of filteredCities" [value]="c">{{ c }}</mat-option>
+        <mat-option *ngIf="filteredCities.length === 0" [disabled]="true">Sonuç yok</mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
 
-  <!-- Lila panel -->
+    <!-- İlçe -->
+    <mat-form-field class="district-field" appearance="outline">
+      <mat-label>İlçe</mat-label>
+      <input
+        matInput
+        name="district"
+        placeholder="İlçe yazın"
+        [(ngModel)]="districtQuery"
+        (input)="filterDistricts()"
+        [matAutocomplete]="districtAuto"
+        [disabled]="!selectedCity"
+        required
+        aria-autocomplete="list"
+      />
+      <mat-autocomplete #districtAuto="matAutocomplete" (optionSelected)="onDistrictSelected($event.option.value)">
+        <mat-option *ngFor="let d of filteredDistricts" [value]="d">{{ d }}</mat-option>
+        <mat-option *ngIf="selectedCity && filteredDistricts.length === 0" [disabled]="true">Sonuç yok</mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+
+    <!-- Tarih & Saat -->
+  <div class="pill-title">Tarih & Saat</div>
   <div class="date-time-panel">
     <!-- Tarih (takvim) -->
-    <mat-form-field appearance="outline" class="date-field" style="flex:1">
+    <mat-form-field appearance="outline" class="date-field">
       <mat-label>Tarih</mat-label>
       <input
         matInput
+        name="selectedDate"
         [matDatepicker]="picker"
         [(ngModel)]="selectedDate"
         [min]="minDate"
@@ -68,13 +107,24 @@
     </mat-form-field>
 
     <!-- Saat -->
-    <div class="time-select" style="flex:1; display:flex;">
-      <select [(ngModel)]="selectedTime" required style="flex:1" autocomplete="off">
-        <option [ngValue]="null" disabled [selected]="selectedTime===null">Saat</option>
+    <div class="time-select">
+      <select name="selectedTime" [(ngModel)]="selectedTime" required autocomplete="off">
+        <option [ngValue]="null" disabled selected>Saat</option>
         <option *ngFor="let t of times" [ngValue]="t" [disabled]="isPastTimeOnSelectedDate(t)">
           {{ t }}
         </option>
       </select>
     </div>
   </div>
-</div>
+
+  <!-- Yayınla -->
+  <div class="actions">
+    <button
+      type="button"
+      class="ellipse-btn"
+      (click)="createListing()"
+      [disabled]="loading">
+      {{ loading ? 'Gönderiliyor...' : 'Bul Beni' }}
+    </button>
+  </div>
+</div> <!-- create-wrapper kapanışı -->
