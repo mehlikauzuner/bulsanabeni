@@ -1,14 +1,40 @@
 import { Component, LOCALE_ID } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, registerLocaleData } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatDateFormats, MatNativeDateModule } from '@angular/material/core';
+import { LocalizedString } from '@angular/compiler';
+import localeTr from '@angular/common/locales/tr';
+
+
+
+
+registerLocaleData(localeTr); // <-- local**e**Tr
+
+const TR_DATE_FORMATS: MatDateFormats = {
+  parse:   { dateInput: 'l' },
+  display: {
+    dateInput: 'd MMMM y',     // 11 Ağustos 2025
+    monthYearLabel: 'MMMM y',
+    dateA11yLabel: 'd MMMM y',
+    monthYearA11yLabel: 'MMMM y'
+  }
+};
+
 
 @Component({
   selector: 'app-ilan',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatNativeDateModule],
   templateUrl: './ilan.html',
   styleUrls: ['./ilan.css'],
-  providers: [{ provide: LOCALE_ID, useValue: 'tr-TR' }],
+  providers: [{ provide: LOCALE_ID, useValue: 'tr-TR' }, { provide: MAT_DATE_LOCALE, useValue: 'tr-TR' },
+    { provide: MAT_DATE_FORMATS, useValue: TR_DATE_FORMATS },],
 })
 export class Ilan {
   // kullanıcı bilgisi mock
@@ -22,58 +48,34 @@ export class Ilan {
   description = '';
   maxDescLen = 500;
 
-  // tarih dropdown verileri
-  days: number[] = [];
-  months: string[] = [
-    'Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
-    'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'
-  ];
-  years: number[] = [];
+  // === YENİ: Takvim tarihi ===
+  selectedDate: Date | null = null;
+  minDate = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
 
-  // saat slotları (60 dk)
+  // Saat slotları (60 dk)
   times: string[] = [];
-
-  // Seçili değerler → placeholder görünsün diye null
-  selectedDay: number | null = null;
-  selectedMonth: string | null = null;
-  selectedYear: number | null = null;
   selectedTime: string | null = null;
 
-  today = new Date();
-
-  ngOnInit() {
-    // Gün: 1-31
-    this.days = Array.from({ length: 31 }, (_, i) => i + 1);
-
-    // Yıl: bu yıl ve +1
-    const thisYear = this.today.getFullYear();
-    this.years = [thisYear, thisYear + 1];
-
-    // Saat: 06:00 - 22:00 (60 dk)
-    for (let hour = 6; hour <= 24; hour++) {
-      this.times.push(`${hour.toString().padStart(2, '0')}:00`);
-    }
-
-    // Not: placeholder için varsayılan seçim YAPMIYORUZ.
+  constructor(private dateAdapter: DateAdapter<Date>) {
+    // Material DateAdapter locale
+    this.dateAdapter.setLocale('tr-TR');
   }
 
-  // null güvenli geçmiş kontrolü
-  isPastOption(
-    day?: number | null,
-    month?: string | null,
-    year?: number | null,
-    time?: string | null
-  ): boolean {
-    if (day == null || month == null || year == null || time == null) return false; // seçim tamamlanmadı
-    const monthIndex = this.months.indexOf(month);
-    if (monthIndex < 0) return false;
 
-    const [h, m] = time.split(':').map(Number);
-    const optionDateTime = new Date(year, monthIndex, day, h, m || 0);
+  ngOnInit() {
+    // 06:00–22:00 slotları
+    for (let h = 6; h <= 22; h++) this.times.push(`${h.toString().padStart(2,'0')}:00`);
+  }
 
-    const now = new Date();
-    now.setSeconds(0, 0);
+  // Bugün seçiliyken geçmiş saatleri devre dışı bırak
+  isPastTimeOnSelectedDate(time: string): boolean {
+    if (!this.selectedDate) return false;
+    const today = new Date();
+    if (this.selectedDate.toDateString() !== today.toDateString()) return false;
 
-    return optionDateTime.getTime() <= now.getTime();
+    const [hh, mm] = time.split(':').map(Number);
+    const dt = new Date(this.selectedDate);
+    dt.setHours(hh, mm || 0, 0, 0);
+    return dt.getTime() <= today.getTime();
   }
 }

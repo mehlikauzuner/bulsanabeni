@@ -1,27 +1,23 @@
 .create-wrapper {
-  min-height: calc(100vh - 48px); /* neredeyse tüm sayfa yüksekliği */
+  min-height: calc(100vh - 48px);
   box-sizing: border-box;
-  max-width: 700px;
-  
-  margin: 24px auto; /* ortalamak için */
+  max-width: 720px; /* genişlettim */
+  margin: 24px auto;
   padding: 32px 28px;
 
-  border: 6px solid purple; /* orta kalınlıkta mor çerçeve */
-  border-radius: 20px; /* oval köşeler */
-
-  background: #f6ecff;   /* içerik alanı lila*/
-   /* eski gölgeyi istersen kapat */
+  border: 6px solid purple;
+  border-radius: 20px;
+  background: #f6ecff;
   box-shadow: none;
 }
 
 .form-field-wrapper {
-  border: 3px solid purple;         /* orta kalınlıkta mor çerçeve */
-  border-radius: 12px;              /* köşeler oval */
-  background-color: #f3e6ff;        /* açık mor/lila arka plan */
-  padding: 12px 16px;               /* iç boşluk */
-  margin-bottom: 20px;              /* diğer alanlarla arası */
+  border: 3px solid purple;
+  border-radius: 12px;
+  background-color: #f3e6ff;
+  padding: 12px 16px;
+  margin-bottom: 20px;
 }
-
 
 .page-title {
   margin: 0 0 20px;
@@ -67,135 +63,62 @@
   color: #5a6b7e;
 }
 
-
-:host{
-  --violet:#6c5ce7;   /* mor */
-  --lilac:#f3e8ff;    /* lila */
-  --ink:#0e2a47;
+:host {
+  --violet: #6c5ce7;
+  --lilac: #f3e8ff;
+  --ink: #0e2a47;
 }
 
 /* PILL başlık */
-.pill-title{
-  display:inline-block;
-  padding:10px 18px;
+.pill-title {
+  display: inline-block;
+  padding: 10px 18px;
   background: var(--violet);
-  color:#fff;
-  border-radius:999px;       /* elips */
-  font-weight:800;
-  letter-spacing:.2px;
+  color: #fff;
+  border-radius: 999px;
+  font-weight: 800;
+  letter-spacing: .2px;
   margin: 12px 0 10px;
-  box-shadow: 0 6px 16px rgba(108,92,231,.25);
+  box-shadow: 0 6px 16px rgba(108, 92, 231, .25);
 }
 
-/* Lila panel + input */
-.title-panel{
+/* Başlık paneli */
+.title-panel {
   position: relative;
   background: var(--lilac);
-  border:1px solid #e6d9ff;
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:22px;
-}
-
-.title-input{
-  width:100%;
-  padding:14px 16px;
-  border-radius:10px;
-  border:1px solid #cfd6e4;
-  outline: none;
-  font-size:16px;
-  background:#fff;
-}
-.title-input:focus{
-  border-color:#8b7cf0;
-  box-shadow: 0 0 0 3px rgba(108,92,231,.15);
-}
-
-.hint{
-  margin-top:8px;
-  font-size:12px;
-  color:#5f6b7a;
-}
-
-.char-count{
-  position:absolute;
-  right:12px;
-  bottom:12px;
-  font-size:12px;
-  color:#5f6b7a;
-}
-
-
-/* === Compact & centered tweaks === */
-.create-wrapper{
-  max-width: 560px;          /* 720 -> 560 */
-  margin: 24px auto;         /* ortala ve üst boşluğu kısalt */
-  padding: 20px 18px;        /* iç boşluk daha küçük */
-}
-
-.page-title{
-  font-size: 28px;           /* 40 -> 28 */
-  text-align: center;        /* ortala */
-  margin-bottom: 14px;
-}
-
-/* Kullanıcı çubuğu daha küçük ve ortada */
-.user-bar{
-  justify-content: center;   /* ortala */
-  gap: 12px;
-  padding: 10px 12px;
-  margin-bottom: 18px;
-}
-.avatar{
-  width: 44px; height: 44px; /* 56 -> 44 */
-  font-size: 18px;
-}
-
-/* Başlık etiketi (pill) küçültüldü ve ortalandı */
-.pill-title{
-  display: inline-block;
-  padding: 6px 12px;         /* 10x18 -> 6x12 */
-  font-size: 13px;           /* daha küçük yazı */
-  margin: 6px auto 8px;      /* üstte biraz az boşluk */
-  display: inline-block;           /* kolay ortalama */
-  margin: 6px 0 8px 20px; /* soldan 12px boşluk */
-}
-
-/* Lila panel ve input daha küçük; panel ortada */
-.title-panel{
- background: var(--lilac);
   border: 1px solid #e6d9ff;
-  border-radius: 12px;
-  padding: 6px;
-  margin: 0 0 12px 20px; /* sola biraz boşluk */
-  width: calc(100% - 40px); /* 20px sol + 20px sağ boşluk */
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 22px;
 }
 
-.title-input{
+.title-input {
   width: 100%;
-  padding: 6px 8px; /* yükseklik küçüldü */
-  font-size: 14px;
-  border-radius: 8px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid #cfd6e4;
+  outline: none;
+  font-size: 16px;
+  background: #fff;
 }
-.hint{
-  margin-top: 6px;
-  font-size: 11px;
-}
-.char-count{
-  right: 10px;
-  bottom: 8px;
-  font-size: 11px;
+.title-input:focus {
+  border-color: #8b7cf0;
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, .15);
 }
 
-/* Daha da kompakt görünüm için mobilde biraz daha küçült */
-@media (max-width: 480px){
-  .create-wrapper{ max-width: 92%; padding: 16px 14px; }
-  .page-title{ font-size: 24px; }
-  .avatar{ width: 40px; height: 40px; font-size: 16px; }
-  .title-input{ font-size: 13px; padding: 9px 10px; }
+.hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #5f6b7a;
 }
 
-
+.char-count {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  font-size: 12px;
+  color: #5f6b7a;
+}
 
 /* Açıklama paneli */
 .desc-panel {
@@ -203,16 +126,14 @@
   border: 1px solid #e6d9ff;
   border-radius: 12px;
   padding: 6px;
-  margin: 0 0 12px 20px;
-  width: calc(100% - 40px);
+  margin-bottom: 12px;
 }
-
 
 .desc-input {
   width: 100%;
   padding: 6px 8px;
   font-size: 14px;
-  line-height: 1.4; /* satır aralığını daraltır */
+  line-height: 1.4;
   border-radius: 8px;
 }
 .desc-input:focus {
@@ -220,26 +141,54 @@
   box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
 }
 
-
+/* Tarih & Saat paneli */
 .date-time-panel {
   background: var(--lilac);
   border: 1px solid #e6d9ff;
   border-radius: 14px;
   padding: 14px;
   margin-bottom: 22px;
+
   display: flex;
   gap: 16px;
-  flex-wrap: wrap; /* mobilde alta geçmesi için */
+  align-items: stretch;
+  flex-wrap: nowrap; /* Yan yana kalsın */
 }
 
-.date-selects, .time-select {
-  display: flex;
-  gap: 8px;
+.date-field,
+.time-select {
   flex: 1;
 }
+
+.date-field .mat-mdc-form-field {
+  width: 100%;
+}
+
+.time-select select {
+  width: 100%;
+  height: 56px;
+  padding: 0 12px;
+  border: 1px solid #d9ccff;
+  border-radius: 14px;
+  background: #fff;
+  font-size: 14px;
+}
+
+.time-select select:focus {
+  border-color: #6c5ce7;
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+  outline: none;
+}
+
+/* Mobilde alta geçmesi için */
+@media (max-width: 600px) {
+  .date-time-panel {
+    flex-wrap: wrap; /* Dar ekranda alta geç */
+  }
+}
+
 
 select {
-  flex: 1;
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid #cfd6e4;
@@ -249,13 +198,15 @@ select {
 }
 select:focus {
   border-color: #8b7cf0;
-  box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
 }
 select:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
-select:invalid { color: #9aa4b2; }
-option { color: #111; }
-
+select:invalid {
+  color: #9aa4b2;
+}
+option {
+  color: #111;
+}
