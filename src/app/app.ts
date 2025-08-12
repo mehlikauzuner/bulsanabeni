@@ -1,7 +1,8 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Navbar } from './components/global/navbar/navbar';
 import { Footer } from './components/global/footer/footer';
+import { filter } from 'rxjs';
 
 
 @Component({
@@ -12,4 +13,6 @@ import { Footer } from './components/global/footer/footer';
 })
 export class App {
   protected readonly title = signal('bulbeni');
+  
+
 }

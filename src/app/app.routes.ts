@@ -38,6 +38,7 @@ import { Speaking } from './components/pages/akademik/speaking/speaking';
 import { Workshop } from './components/pages/akademik/workshop/workshop';
 import { Yarismalar } from './components/pages/akademik/yarismalar/yarismalar';
 import { Profil } from './components/pages/profil/profil';
+import { Hesabim } from './components/pages/profil/hesabim/hesabim';
 
 
 export const routes: Routes = [
@@ -71,6 +72,22 @@ export const routes: Routes = [
   { path: 'akademik/yarismalar', component: Yarismalar },
   
 
+
+  { path: 'doga/bisiklet', component: Bisiklet },
+  { path: 'doga/dagcilik', component: Dagcilik },
+  { path: 'doga/kamp', component: Kamp },
+  { path: 'doga/trekking', component: Trekking},
+  { path: 'doga/yuzme', component: Yuzme },
+
+
+  
+  { path: 'eglence/dans', component: Dans },
+  { path: 'eglence/fotograf', component: Fotograf },
+  { path: 'eglence/muzik', component: Muzik },
+  { path: 'eglence/oyun', component: Oyun },
+  { path: 'eglence/sinema', component: Sinema },
+
+
   {
     path: 'sanat',
     component: Sanat,
@@ -83,4 +100,10 @@ export const routes: Routes = [
       { path: 'tasarim', component: Tasarim },
     ],
   },
+
+   // app.routes.ts
+// app.routes.ts
+{ path: 'profil/hesabim', component: Hesabim}
+
+
 ]

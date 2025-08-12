@@ -105,7 +105,7 @@ filteredDistricts: string[] = [];
   this.filteredCities = [...this.cities];
   this.filteredDistricts = [];
     // 06:00–22:00 slotları
-    for (let h = 6; h <= 22; h++) this.times.push(`${h.toString().padStart(2,'0')}:00`);
+  for (let h = 6; h <= 22; h++) this.times.push(`${h.toString().padStart(2,'0')}:00`);
   }
 
   // Bugün seçiliyken geçmiş saatleri devre dışı bırak

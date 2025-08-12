@@ -1,1 +1,67 @@
-<p>profil works!</p>
+<div class="wrap">
+  <div class="card">
+    <h1 class="title">{{ mode() === 'login' ? 'PROFİL' : 'KAYIT OL' }}</h1>
+
+    <p *ngIf="errorMsg()" class="alert">{{ errorMsg() }}</p>
+
+    <!-- LOGIN GÖRÜNÜMÜ -->
+    <form *ngIf="mode() === 'login'" (ngSubmit)="onLogin()" #loginForm="ngForm" novalidate>
+      <label class="field">
+        <span>Kullanıcı adı</span>
+        <input type="text" name="username" [(ngModel)]="loginModel.username" required />
+      </label>
+
+      <label class="field">
+        <span>Şifre</span>
+        <input type="password" name="password" [(ngModel)]="loginModel.password" required />
+      </label>
+
+      <div class="actions">
+        <button type="submit" class="btn primary" [disabled]="isSubmitting()">Login</button>
+        <button type="button" class="btn ghost" (click)="switchTo('register')">Register</button>
+      </div>
+    </form>
+
+    <!-- REGISTER GÖRÜNÜMÜ -->
+    <form *ngIf="mode() === 'register'" (ngSubmit)="onRegister()" #regForm="ngForm" novalidate>
+      <div class="grid">
+        <label class="field">
+          <span>Ad</span>
+          <input type="text" name="firstName" [(ngModel)]="registerModel.firstName" required />
+        </label>
+
+        <label class="field">
+          <span>Soyad</span>
+          <input type="text" name="lastName" [(ngModel)]="registerModel.lastName" required />
+        </label>
+      </div>
+
+      <label class="field">
+        <span>E-posta</span>
+        <input type="email" name="email" [(ngModel)]="registerModel.email" required />
+      </label>
+
+      <label class="field">
+        <span>Şifre</span>
+        <input type="password" name="password" [(ngModel)]="registerModel.password" minlength="6" required />
+      </label>
+
+      <label class="field">
+        <span>Doğum tarihi</span>
+        <input
+  type="date"
+  name="birthDate"
+  [(ngModel)]="registerModel.birthDate"
+  [max]="maxDate"
+  required
+/>
+
+      </label>
+
+      <div class="actions">
+        <button type="submit" class="btn primary" [disabled]="isSubmitting()">Register</button>
+        <button type="button" class="btn ghost" (click)="switchTo('login')">Geri - Login</button>
+      </div>
+    </form>
+  </div>
+</div>
