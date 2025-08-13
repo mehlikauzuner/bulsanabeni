@@ -1,0 +1,36 @@
+:host { --maroon:#7D0026; }
+
+.bar{
+  position: fixed; top:0; left:0; right:0; height:56px;
+  display:grid;
+  grid-template-columns: auto 35% auto auto; /* sol | %35 boşluk | sağ1 | sağ2 */
+  align-items:center;
+  background: var(--maroon);
+  color:#fff;
+  padding: 0 24px;
+  z-index:1000;
+}
+
+/* Linkler */
+.item{
+  display:inline-flex; align-items:center; gap:10px;
+  text-decoration:none; color:#fff; font-weight:600; letter-spacing:.2px;
+  padding:8px 10px; border-radius:10px;
+}
+.item:hover{ background: rgba(255,255,255,.08); }
+
+/* Sol bağlantı */
+.left{ justify-self:start; }
+
+/* Sağ bağlantılar */
+.right{ justify-self:end; margin-left:16px; }
+
+/* Boşluk sütunu */
+.spacer{ height:1px; } /* sadece grid kolonunu tutuyor */
+
+/* İkon */
+.ic{ width:22px; height:22px; display:block; }
+@media (max-width: 640px){
+  .bar{ grid-template-columns: auto 10% auto auto; padding:0 12px; }
+  .item span{ font-size:14px; }
+}
