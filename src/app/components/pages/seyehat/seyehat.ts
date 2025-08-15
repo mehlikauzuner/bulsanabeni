@@ -5,7 +5,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-seyehat',
   standalone: true,
-  imports: [RouterOutlet,CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './seyehat.html',
   styleUrls: ['./seyehat.css']
 })

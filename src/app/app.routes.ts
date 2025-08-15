@@ -21,7 +21,6 @@ import { Muzik } from './components/pages/eglence/kategoriler/muzik/muzik';
 import { Oyun } from './components/pages/eglence/kategoriler/oyun/oyun';
 import { Sinema } from './components/pages/eglence/kategoriler/sinema/sinema';
 import { Cruise } from './components/pages/seyehat/kategoriler/cruise/cruise';
-import { Geziler } from './components/pages/seyehat/kategoriler/geziler/geziler';
 import { Kulturgezileri } from './components/pages/seyehat/kategoriler/kulturgezileri/kulturgezileri';
 import { Turlar } from './components/pages/seyehat/kategoriler/turlar/turlar';
 import { Yurtdisi } from './components/pages/seyehat/kategoriler/yurtdisi/yurtdisi';
@@ -30,7 +29,7 @@ import { Enstruman } from './components/pages/sanat/kategoriler/enstruman/enstru
 import { Halkoyunlari } from './components/pages/sanat/kategoriler/halkoyunlari/halkoyunlari';
 import { Resim } from './components/pages/sanat/kategoriler/resim/resim';
 import { Tasarim } from './components/pages/sanat/kategoriler/tasarim/tasarim';
-import { Detay } from './components/pages/seyehat/kategoriler/cruise/detay/detay';
+
 import { Ilan } from './components/pages/seyehat/kategoriler/cruise/ilan/ilan';
 import { Fuarlar } from './components/pages/akademik/fuarlar/fuarlar';
 import { Projeler } from './components/pages/akademik/projeler/projeler';
@@ -39,6 +38,8 @@ import { Workshop } from './components/pages/akademik/workshop/workshop';
 import { Yarismalar } from './components/pages/akademik/yarismalar/yarismalar';
 import { Profil } from './components/pages/profil/profil';
 import { Hesabim } from './components/pages/profil/hesabim/hesabim';
+import { Detay } from './components/pages/seyehat/kategoriler/cruise/detay/detay';
+import { Geziler } from './components/pages/seyehat/kategoriler/geziler/geziler';
 
 
 export const routes: Routes = [
@@ -62,8 +63,22 @@ export const routes: Routes = [
   
 
  // cruise detay
-  { path: 'seyehat/cruise/detay', component: Detay },
+
   { path: 'seyehat/cruise/ilan', component: Ilan },
+  {
+  path: 'seyehat/cruise/detay/:id',
+  loadComponent: () =>
+    import('./components/pages/seyehat/kategoriler/cruise/detay/detay')
+      .then(m => m.Detay)
+},
+
+ {
+    path: 'seyehat/geziler/detay/:id',
+    loadComponent: () =>
+      import('./components/pages/seyehat/kategoriler/geziler/detay/detay').then(m => m.Detay)
+  },
+
+  { path: 'seyehat/geziler/ilan', component: Ilan },
   
   { path: 'akademik/fuarlar', component: Fuarlar },
   { path: 'akademik/projeler', component: Projeler },

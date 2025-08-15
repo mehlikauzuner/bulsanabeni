@@ -3,7 +3,7 @@ import { Navbar } from "../../global/navbar/navbar";
 
 @Component({
   selector: 'app-hesabim',
-  imports: [Navbar],
+  imports: [],
   templateUrl: './hesabim.html',
   styleUrl: './hesabim.css'
 })
