@@ -1,45 +1,27 @@
-
-export default interface IlanModel {
-  
-  User: {
-    fullName: string;
-    joinedAt: Date;
-  };
-
-  
+// src/app/models/model.ts
+export interface IlanModel {
   title: string;
-  maxTitleLen: number;
   description: string;
-  maxDescLen: number;
+  // ISO "YYYY-MM-DD" olarak saklayacağız
+  eventDate: string;
+  // ŞEHİR/İLÇE tercihen ID ile gönder (en doğrusu)
+  cityId?: number;
+  districtId?: number;
 
-  
-  selectedDate: Date | null;   
-  minDate: Date;              
-  times: string[];             
-  selectedTime: string | null;
-
-  
-  city?: string | null;
-  district?: string | null;
-  selectedCityId?: number | null;
-
-  cityQuery: string;
-  districtQuery: string;
-  selectedCity: string | null;       
-  selectedDistrict: string | null;   
-  filteredCities: { id: number; name: string }[];
-  filteredDistricts: { id: number; name: string }[];
-
-  
-  loading: boolean;
-  errors: Partial<Record<'title' | 'description' | 'date' | 'time', string>>;
-
-
+  // Serbest metin girilecekse backend tarafında tolere etmek istersen:
+  cityName?: string;      // kullanıcı serbest yazarsa
+  districtName?: string;  // kullanıcı serbest yazarsa
 }
 
+/** Backend’ten beklenen tipler (listeleme için) */
+export interface City {
+  id: number;
+  name: string;
+}
 
-// IlanModel'den gerekli alanları alıp API'ye uygun hale getiriyoruz
-export type CreateCruiseRequest = Pick<IlanModel, 'title' | 'description' | 'city' | 'district'> & {
-  dateTime: string;
-  createdBy: string;
-};
+export interface District {
+  id: number;
+  cityId: number;
+  name: string;
+}
+

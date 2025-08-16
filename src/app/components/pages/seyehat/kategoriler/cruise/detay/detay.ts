@@ -1,43 +1,51 @@
-// pages/ilan-detay/ilan-detay.component.ts
-import { Component } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CruiseService } from '../../../../../../services/cruise-service';
-import { DetayModel } from '../../../../../../models/detay-model';
 
 
 @Component({
-  selector: 'app-ilan-detay',
-  standalone: true,
-  imports: [CommonModule, RouterLink],
+  selector: 'app-detay',
+  imports: [],
   templateUrl: './detay.html',
-  styleUrls: ['./detay.css'],
-  providers: [DatePipe]
+  styleUrl: './detay.css'
 })
-export class Detay {
-  loading = true;
-  error: string | null = null;
-  ilan?: DetayModel;
+export class CruiseDetay {
 
-  constructor(
-    private route: ActivatedRoute,
-    private api: CruiseService,
-  ) {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (Number.isNaN(id)) {
-      this.error = 'Geçersiz ilan numarası';
-      this.loading = false;
-      return;
-    }
-    this.api.getById(id).subscribe({
-      next: data => { this.ilan = data; this.loading = false; },
-      error: () => { this.error = 'İlan bulunamadı'; this.loading = false; }
-    });
+}
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+type DetayIlan = {
+  title: string;
+  description: string;
+  dateISO: string | null;
+  time: string | null;
+  city: string | null;
+  district: string | null;
+  user: { fullName: string; joinedAt?: string | Date; avatarUrl?: string };
+};
+
+@Component({
+  selector: 'app-detay',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './detay.html',
+  styleUrls: ['./detay.css']
+})
+export class Detay implements OnInit {
+  ilan: DetayIlan | null = null;
+
+  ngOnInit() {
+    const raw = localStorage.getItem('detaySonIlan');
+    this.ilan = raw ? JSON.parse(raw) : null;
   }
 
-  onBulBeniClick() {
-    // TODO: burada “iletişim/başvuru/katıl” işini yapacak endpoint’i çağır
-    // örn: this.api.attend(this.ilan!.id).subscribe(...)
-    alert('Bul Beni tıklandı!');
+  get prettyDate(): string {
+    if (!this.ilan?.dateISO) return '-';
+    const d = new Date(this.ilan.dateISO);
+    return d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  get prettyPlace(): string {
+    const c = this.ilan?.city || '';
+    const d = this.ilan?.district || '';
+    return [c, d].filter(Boolean).join(' • ');
   }
 }

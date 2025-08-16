@@ -1,176 +1,251 @@
-// src/app/pages/ilan/ilan.component.ts
-import { Component, LOCALE_ID, ViewEncapsulation } from '@angular/core';
-import { CommonModule, registerLocaleData } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatNativeDateModule, DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatDateFormats } from '@angular/material/core';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-
-
-import IlanModel from '../../../../../../models/ilan-model';
+// components/pages/seyehat/kategoriler/cruise/ilan/ilan.ts
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Subject, Subscription, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
+import { IlanModel } from '../../../../../../models/ilan-model';
 import { CruiseService } from '../../../../../../services/cruise-service';
-import { CityService } from '../../../../../../services/city-service';
 
 
 @Component({
-  selector: 'app-ilan',
+  selector: 'app-cruise-ilan',
   standalone: true,
-  imports: [
-    CommonModule, FormsModule,
-    MatDatepickerModule, MatFormFieldModule, MatInputModule,
-    MatNativeDateModule, MatAutocompleteModule
-  ],
+  imports: [CommonModule],
   templateUrl: './ilan.html',
   styleUrls: ['./ilan.css'],
-  providers:[],
 })
-export class Ilan {
-  
-  ilan: IlanModel[] = [this.createEmpty()];
+export class CruiseIlan {
+  constructor(private http: HttpClient, private cruiseService: CruiseService) {
+    // şehir ve ilçe arama akışları
+    const s1 = this.cityQuery$.pipe(
+      map(q => q?.trim() ?? ''),
+      debounceTime(250),
+      distinctUntilChanged(),
+      switchMap(q => {
+        if (!q) { this.cityOptions = []; return of<any[]>([]); }
+        const params = new HttpParams().set('q', q);
+        return this.http.get<any[]>(this.cityApi, { params });
+      }),
+      tap(list => { this.cityOptions = list ?? []; })
+    ).subscribe();
 
-  locationReady = false;
+    const s2 = this.districtQuery$.pipe(
+      map(q => q?.trim() ?? ''),
+      debounceTime(250),
+      distinctUntilChanged(),
+      filter(() => !!this.selectedCityId),
+      switchMap(q => {
+        const params = new HttpParams()
+          .set('cityId', String(this.selectedCityId))
+          .set('q', q);
+        return this.http.get<any[]>(this.districtApi, { params });
+      }),
+      tap(list => { this.districtOptions = list ?? []; })
+    ).subscribe();
 
-  constructor(
-    private dateAdapter: DateAdapter<Date>,
-    private listing: CruiseService,
-    private cityApi: CityService, 
-  ) {
-    this.dateAdapter.setLocale('tr-TR');
-  }
+    this.subs.push(s1, s2);
 
-
-  ngOnInit() {
-    this.locationReady = true;   
-    this.loadCities('');        
-  }
-
-  private today00(): Date { const d = new Date(); d.setHours(0,0,0,0); return d; }
-
-  private buildTimes(): string[] {
-    const out: string[] = [];
-    for (let h = 0; h < 24; h++) out.push(`${h.toString().padStart(2,'0')}:00`);
-    return out;
-
-  }
-  private createEmpty(): IlanModel {
-    return {
-      User: { fullName: '', joinedAt: new Date() },
-      title: '', maxTitleLen: 60,
-      description: '', maxDescLen: 500,
-      selectedDate: null, minDate: this.today00(),
-      times: this.buildTimes(), selectedTime: null,
-      city: null, district: null,
-      cityQuery: '', districtQuery: '',
-      selectedCity: null, selectedDistrict: null,
-      filteredCities: [], filteredDistricts: [],
-      loading: false, errors: {},
-      selectedCityId: null
-    };
-  }
-
-  //Şehir / İlçe 
-  onCityQueryInput(q: string) {
-    if (!this.locationReady) return;           // devre dışı
-    this.ilan[0].cityQuery = q;
-    this.loadCities(q);
-  }
- private loadCities(q: string) {
-  if (!this.locationReady) { this.ilan[0].filteredCities = []; return; }
-
-  this.cityApi.getAllCities().subscribe({
-    next: (list) => {
-      // İstersen burada client-side filtre yaparız (q varsa):
-      const qnorm = (q || '').trim().toLowerCase();
-      this.ilan[0].filteredCities = qnorm
-        ? list.filter(c => c.name.toLowerCase().includes(qnorm))
-        : list;
-    },
-    error: () => this.ilan[0].filteredCities = []
-  });
-}
-
-  onCitySelected(opt: { id:number; name:string }) {
-    if (!this.locationReady) return;           // devre dışı
-    const m = this.ilan[0];
-    
-    m.selectedCityId = opt.id;
-    m.selectedCity   = opt.name;
-    m.city           = opt.name;
-
-    m.cityQuery = opt.name;
-
-    m.selectedDistrict = null; m.district = null; m.districtQuery = '';
-    this.loadDistricts('');
-  }
-
-  onDistrictQueryInput(q: string) {
-    if (!this.locationReady) return;           // devre dışı
-    this.ilan[0].districtQuery = q;
-    this.loadDistricts(q);
-  }
-  private loadDistricts(q: string) {
-  const m = this.ilan[0];
-  if (!this.locationReady) { m.filteredDistricts = []; return; }
-  if (!m.selectedCityId)   { m.filteredDistricts = []; return; }
-
-  this.cityApi.getDistrictsByCity(m.selectedCityId).subscribe({
-    next: (list) => {
-      const qnorm = (q || '').trim().toLowerCase();
-      m.filteredDistricts = qnorm
-        ? list.filter(d => d.name.toLowerCase().includes(qnorm))
-        : list;
-    },
-    error: () => m.filteredDistricts = []
-  });
-}
-
-  onDistrictSelected(opt: { id:number; name:string }) {
-    if (!this.locationReady) return;           // devre dışı
-    const m = this.ilan[0];
-    m.selectedDistrict = opt.name;
-    m.district         = opt.name;
-    m.districtQuery = opt.name;
-  }
-
-  // Saat: bugün seçiliyken geçmiş saatleri kapat
-  isPastTimeOnSelectedDate(time: string): boolean {
-    const s = this.ilan[0];
-    if (!s.selectedDate) return false;
+    // yılları doldur (geçmiş yok)
     const now = new Date();
-    if (s.selectedDate.toDateString() !== now.toDateString()) return false;
-    const [hh, mm] = time.split(':').map(Number);
-    const dt = new Date(s.selectedDate); dt.setHours(hh, mm || 0, 0, 0);
-    return dt.getTime() <= now.getTime();
+    for (let y = now.getFullYear(); y <= now.getFullYear() + this.YEAR_SPAN; y++) {
+      this.years.push(y);
+    }
   }
 
-  // Validasyon & Submit 
-  isValid(): boolean {
-    const s = this.ilan[0];
-    // Konum zorunlu: backend bağlanana kadar buton pasif kalır
-    return !!(s.title?.trim() && s.description?.trim()
-      && s.selectedDate && s.selectedTime && s.selectedCity && s.selectedDistrict);
+  // ========== Title ==========
+  maxTitleLen = 200;
+  title = '';
+  titleTouched = false;
+  get titleLen() { return this.title.length; }
+  get titleInvalid() { return this.titleTouched && !this.title.trim(); }
+  onTitleChange(e: Event) { this.title = (e.target as HTMLInputElement).value; }
+
+  // ========= Description =========
+  maxDescLen = 500;
+  description = '';
+  descriptionTouched = false;
+  get descLen() { return this.description.length; }
+  get descInvalid() { return this.descriptionTouched && !this.description.trim(); }
+  onDescChange(e: Event) { this.description = (e.target as HTMLTextAreaElement).value; }
+
+  // ========= Şehir / İlçe (input + dropdown + search) =========
+  cityInput = '';
+  cityOptions: Array<{ id: number; name: string }> = [];
+  selectedCityId: number | null = null;
+
+  districtInput = '';
+  districtOptions: Array<{ id: number; name: string; cityId: number }> = [];
+  selectedDistrictId: number | null = null;
+
+  private cityQuery$ = new Subject<string>();
+  private districtQuery$ = new Subject<string>();
+  private subs: Subscription[] = [];
+
+  // .NET API uçları — kendi projene göre güncelle
+  private readonly cityApi = 'https://localhost:44345/api/Sehirler/search';
+  private readonly districtApi = 'https://localhost:44345/api/Ilceler/search';
+  private readonly createApi = 'https://localhost:44345/api/Geziler';
+
+  onCityInputChange(e: Event) {
+    const v = (e.target as HTMLInputElement).value;
+    this.cityInput = v;
+    this.selectedCityId = null;
+    // ilçe temizle
+    this.selectedDistrictId = null;
+    this.districtInput = '';
+    this.districtOptions = [];
+    this.districtQuery$.next(''); // önerileri kapat
+    this.cityQuery$.next(v);      // şehir önerileri
   }
-  private buildPayload() {
-    const s = this.ilan[0];
-    const [hh, mm] = (s.selectedTime || '00:00').split(':').map(Number);
-    const when = new Date(s.selectedDate!); when.setHours(hh, mm || 0, 0, 0);
-    return {
-      title: s.title.trim(),
-      description: s.description.trim(),
-      dateTime: when.toISOString(),
-      city: s.selectedCity!, district: s.selectedDistrict!,
-      createdBy: s.User.fullName || 'Anonim'
+  selectCity(c: { id: number; name: string }) {
+    this.selectedCityId = c.id;
+    this.cityInput = c.name;
+    this.cityOptions = [];
+    // ilçe reset
+    this.selectedDistrictId = null;
+    this.districtInput = '';
+    this.districtOptions = [];
+  }
+  clearCity() {
+    this.cityInput = '';
+    this.selectedCityId = null;
+    this.cityOptions = [];
+    this.clearDistrict();
+  }
+
+  onDistrictInputChange(e: Event) {
+    const v = (e.target as HTMLInputElement).value;
+    this.districtInput = v;
+    this.selectedDistrictId = null;
+    if (this.selectedCityId) {
+      this.districtQuery$.next(v);
+    } else {
+      this.districtOptions = [];
+    }
+  }
+  selectDistrict(d: { id: number; name: string }) {
+    this.selectedDistrictId = d.id;
+    this.districtInput = d.name;
+    this.districtOptions = [];
+  }
+  clearDistrict() {
+    this.districtInput = '';
+    this.selectedDistrictId = null;
+    this.districtOptions = [];
+  }
+
+  // ========= Tarih (native date veya yıl→ay→gün dropdown) =========
+  readonly YEAR_SPAN = 5;
+  years: number[] = [];
+  months = [
+    { id: 1,  name: 'Ocak' }, { id: 2,  name: 'Şubat' }, { id: 3,  name: 'Mart' },
+    { id: 4,  name: 'Nisan'},{ id: 5,  name: 'Mayıs' }, { id: 6,  name: 'Haziran' },
+    { id: 7,  name: 'Temmuz'},{ id: 8,  name: 'Ağustos'},{ id: 9,  name: 'Eylül' },
+    { id: 10, name: 'Ekim' }, { id: 11, name: 'Kasım' }, { id: 12, name: 'Aralık' },
+  ];
+  days: number[] = [];
+
+  readonly today = this.toISODate(new Date());
+  minDate = this.today; // geçmiş kapalı
+  eventDate = '';       // ISO "YYYY-MM-DD"
+
+  selectedYear: number | null = null;
+  selectedMonth: number | null = null;
+  selectedDay: number | null = null;
+
+  onDateInputChange(e: Event) {
+    const v = (e.target as HTMLInputElement).value;
+    this.eventDate = (v && v >= this.minDate) ? v : '';
+  }
+  get dateInvalid() { return !this.eventDate || this.eventDate < this.minDate; }
+
+  onYearSelect(y: number) {
+    this.selectedYear = y; this.selectedMonth = null; this.selectedDay = null; this.days = [];
+    this.syncEventDateFromYMD();
+  }
+  onMonthSelect(m: number) {
+    this.selectedMonth = m; this.selectedDay = null;
+    this.days = this.computeDayOptions(this.selectedYear!, this.selectedMonth!);
+    this.syncEventDateFromYMD();
+  }
+  onDaySelect(d: number) { this.selectedDay = d; this.syncEventDateFromYMD(); }
+
+  private toISODate(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+  private daysInMonth(year: number, month: number) { return new Date(year, month, 0).getDate(); }
+  private isPastYMD(y: number, m: number, d: number) {
+    const iso = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    return iso < this.minDate;
+  }
+  private computeDayOptions(year: number, month: number): number[] {
+    const max = this.daysInMonth(year, month), out: number[] = [];
+    for (let d = 1; d <= max; d++) if (!this.isPastYMD(year, month, d)) out.push(d);
+    return out;
+  }
+  private syncEventDateFromYMD() {
+    if (this.selectedYear && this.selectedMonth && this.selectedDay) {
+      const iso = `${this.selectedYear}-${String(this.selectedMonth).padStart(2,'0')}-${String(this.selectedDay).padStart(2,'0')}`;
+      this.eventDate = (iso >= this.minDate) ? iso : '';
+    } else {
+      this.eventDate = '';
+    }
+  }
+
+  // ========= Submit ("Bul Beni" butonu) =========
+  submitting = false;
+  submitError: string | null = null;
+  createdId: number | null = null;
+
+  get formValid(): boolean {
+    const okTitle = !!this.title.trim();
+    const okDesc  = !!this.description.trim() && this.description.length <= this.maxDescLen;
+    const okDate  = !!this.eventDate && !this.dateInvalid;
+    // şehir/ilçe isteğe bağlı; ID ya da isim gidebilir
+    return okTitle && okDesc && okDate;
+  }
+
+  buildPayload(): IlanModel {
+    const p: IlanModel = {
+      title: this.title.trim(),
+      description: this.description.trim(),
+      eventDate: this.eventDate,
     };
+    if (this.selectedCityId) p.cityId = this.selectedCityId;
+    else if (this.cityInput.trim()) p.cityName = this.cityInput.trim();
+
+    if (this.selectedDistrictId) p.districtId = this.selectedDistrictId;
+    else if (this.districtInput.trim()) p.districtName = this.districtInput.trim();
+
+    return p;
   }
-  createListing() {
-    const s = this.ilan[0];
-    if (!this.isValid() || s.loading) return;
-    s.loading = true;
-    this.listing.create(this.buildPayload()).subscribe({
-      next: () => { this.ilan[0] = this.createEmpty(); s.loading = false; alert('İlan oluşturuldu!'); },
-      error: () => { s.loading = false; alert('İlan oluşturulamadı.'); }
+
+  onSubmit() {
+    if (!this.formValid || this.submitting) return;
+    this.submitting = true;
+    this.submitError = null;
+    this.createdId = null;
+
+    const payload = this.buildPayload();
+
+    this.http.post<CruiseService>(this.createApi, payload).subscribe({
+      next: (res) => {
+        // Muhtemel yanıt türlerini normalize et
+        const id =
+          typeof res === 'number' ? res :
+          (res as any)?.id ?? (res as any)?.data?.id ?? null;
+
+        this.createdId = (typeof id === 'number') ? id : null;
+        this.submitting = false;
+      },
+      error: (err) => {
+        this.submitError = (err?.error?.message) || 'Kayıt sırasında bir hata oluştu.';
+        this.submitting = false;
+      }
     });
   }
 }

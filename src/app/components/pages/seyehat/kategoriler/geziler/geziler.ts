@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DetayModel } from '../../../../../models/detay-model';
 import { CruiseService } from '../../../../../services/cruise-service';
+import { GezilerService } from '../../../../../services/geziler-service';
 
 @Component({
   selector: 'app-geziler-list',
@@ -22,12 +23,13 @@ export class Geziler {
   // *ngFor performansı için
   trackById = (i: number, nesne: DetayModel) => nesne.id ?? i;
 
-  constructor(private api: CruiseService) {}
+  constructor(private api: GezilerService) {}
 
   ngOnInit() {
     // Backend’den listeyi çek
-    this.api.list().subscribe({
-      next: (data) => { this.items = data; this.loading = false; },
+    // Backend’den listeyi çek
+    this.api['list']().subscribe({
+      next: (data: DetayModel[]) => { this.items = data; this.loading = false; },
       error: () => { this.error = 'İlanlar yüklenemedi.'; this.loading = false; }
     });
 

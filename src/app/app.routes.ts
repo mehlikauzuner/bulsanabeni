@@ -29,8 +29,6 @@ import { Enstruman } from './components/pages/sanat/kategoriler/enstruman/enstru
 import { Halkoyunlari } from './components/pages/sanat/kategoriler/halkoyunlari/halkoyunlari';
 import { Resim } from './components/pages/sanat/kategoriler/resim/resim';
 import { Tasarim } from './components/pages/sanat/kategoriler/tasarim/tasarim';
-
-import { Ilan } from './components/pages/seyehat/kategoriler/cruise/ilan/ilan';
 import { Fuarlar } from './components/pages/akademik/fuarlar/fuarlar';
 import { Projeler } from './components/pages/akademik/projeler/projeler';
 import { Speaking } from './components/pages/akademik/speaking/speaking';
@@ -38,8 +36,9 @@ import { Workshop } from './components/pages/akademik/workshop/workshop';
 import { Yarismalar } from './components/pages/akademik/yarismalar/yarismalar';
 import { Profil } from './components/pages/profil/profil';
 import { Hesabim } from './components/pages/profil/hesabim/hesabim';
-import { Detay } from './components/pages/seyehat/kategoriler/cruise/detay/detay';
 import { Geziler } from './components/pages/seyehat/kategoriler/geziler/geziler';
+import { GezilerIlan } from './components/pages/seyehat/kategoriler/geziler/ilan/ilan';
+import { CruiseIlan } from './components/pages/seyehat/kategoriler/cruise/ilan/ilan';
 
 
 export const routes: Routes = [
@@ -64,21 +63,10 @@ export const routes: Routes = [
 
  // cruise detay
 
-  { path: 'seyehat/cruise/ilan', component: Ilan },
-  {
-  path: 'seyehat/cruise/detay/:id',
-  loadComponent: () =>
-    import('./components/pages/seyehat/kategoriler/cruise/detay/detay')
-      .then(m => m.Detay)
-},
 
- {
-    path: 'seyehat/geziler/detay/:id',
-    loadComponent: () =>
-      import('./components/pages/seyehat/kategoriler/geziler/detay/detay').then(m => m.Detay)
-  },
-
-  { path: 'seyehat/geziler/ilan', component: Ilan },
+  { path: 'seyehat/cruise/ilan', component: CruiseIlan },
+  
+  { path: 'seyehat/geziler/ilan', component: GezilerIlan },
   
   { path: 'akademik/fuarlar', component: Fuarlar },
   { path: 'akademik/projeler', component: Projeler },

@@ -1,176 +1,363 @@
-// src/app/pages/ilan/ilan.component.ts
-import { Component, LOCALE_ID, ViewEncapsulation } from '@angular/core';
-import { CommonModule, registerLocaleData } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatNativeDateModule, DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatDateFormats } from '@angular/material/core';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+// components/pages/seyehat/kategoriler/geziler/ilan/ilan.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpClient, HttpClientModule, HttpParams } from '@angular/common/http';
+import { map } from 'rxjs/operators';
+import { IlanModel } from '../../../../../../models/ilan-model';
 
-
-import IlanModel from '../../../../../../models/ilan-model';
-import { CruiseService } from '../../../../../../services/cruise-service';
-import { CityService } from '../../../../../../services/city-service';
-
+type City = { id: number; name: string };
+type District = { id: number; name: string; cityId?: number };
 
 @Component({
-  selector: 'app-ilan',
+  selector: 'app-geziler-ilan',
   standalone: true,
-  imports: [
-    CommonModule, FormsModule,
-    MatDatepickerModule, MatFormFieldModule, MatInputModule,
-    MatNativeDateModule, MatAutocompleteModule
-  ],
+  imports: [CommonModule, HttpClientModule],
   templateUrl: './ilan.html',
   styleUrls: ['./ilan.css'],
-  providers:[],
 })
-export class Ilan {
-  
-  ilan: IlanModel[] = [this.createEmpty()];
+export class GezilerIlan implements OnInit {
 
-  locationReady = false;
+  constructor(private http: HttpClient) {}
 
-  constructor(
-    private dateAdapter: DateAdapter<Date>,
-    private listing: CruiseService,
-    private cityApi: CityService, 
-  ) {
-    this.dateAdapter.setLocale('tr-TR');
+  // ===== Başlık =====
+  maxTitleLen = 200;
+  title = '';
+  titleTouched = false;
+  get titleLen() { return this.title.length; }
+  get titleInvalid() { return this.titleTouched && !this.title.trim(); }
+  onTitleChange(e: Event) { this.title = (e.target as HTMLInputElement).value; }
+
+  // ===== Açıklama =====
+  maxDescLen = 500;
+  description = '';
+  descriptionTouched = false;
+  get descLen() { return this.description.length; }
+  get descInvalid() { return this.descriptionTouched && !this.description.trim(); }
+  onDescChange(e: Event) { this.description = (e.target as HTMLTextAreaElement).value; }
+
+  // ===== Tarih & Saat (geçmiş seçilemez) =====
+  readonly YEAR_SPAN = 5;
+  years: number[] = [];
+
+  private readonly today = new Date();
+  private readonly todayYear = this.today.getFullYear();
+  private readonly todayMonth = this.today.getMonth() + 1; // 1..12
+  private readonly todayDay = this.today.getDate();
+
+  monthsAll = [
+    { id: 1, name: 'Ocak' }, { id: 2, name: 'Şubat' }, { id: 3, name: 'Mart' },
+    { id: 4, name: 'Nisan' }, { id: 5, name: 'Mayıs' }, { id: 6, name: 'Haziran' },
+    { id: 7, name: 'Temmuz' }, { id: 8, name: 'Ağustos' }, { id: 9, name: 'Eylül' },
+    { id: 10, name: 'Ekim' }, { id: 11, name: 'Kasım' }, { id: 12, name: 'Aralık' },
+  ];
+  months = this.monthsAll.slice();
+  days: number[] = [];
+
+  selectedYear: number | null = null;
+  selectedMonth: number | null = null;
+  selectedDay: number | null = null;
+
+  hours: number[] = [];
+  selectedHour: number | null = null;
+  onHourChange(e: Event) {
+    const v = (e.target as HTMLSelectElement).value;
+    this.selectedHour = v === '' ? null : +v;
   }
 
+  eventDate = '';      // YYYY-MM-DD
+  dateInvalid = false; // geçmiş tarih listelenmediği için hep false
 
-  ngOnInit() {
-    this.locationReady = true;   
-    this.loadCities('');        
+  private daysInMonth(year: number, month: number) { return new Date(year, month, 0).getDate(); }
+
+  onYearSelect(y: number) {
+    this.selectedYear = y || null;
+    this.selectedMonth = null;
+    this.selectedDay = null;
+    this.days = [];
+
+    if (this.selectedYear == null) {
+      this.months = [];
+    } else if (this.selectedYear === this.todayYear) {
+      this.months = this.monthsAll.filter(m => m.id >= this.todayMonth);
+    } else {
+      this.months = this.monthsAll.slice();
+    }
+    this.syncEventDate();
   }
 
-  private today00(): Date { const d = new Date(); d.setHours(0,0,0,0); return d; }
+  onMonthSelect(m: number) {
+    this.selectedMonth = m || null;
+    this.selectedDay = null;
 
-  private buildTimes(): string[] {
-    const out: string[] = [];
-    for (let h = 0; h < 24; h++) out.push(`${h.toString().padStart(2,'0')}:00`);
-    return out;
-
+    if (this.selectedYear && this.selectedMonth) {
+      const max = this.daysInMonth(this.selectedYear, this.selectedMonth);
+      const startDay = (this.selectedYear === this.todayYear && this.selectedMonth === this.todayMonth)
+        ? this.todayDay
+        : 1;
+      this.days = Array.from({ length: max - startDay + 1 }, (_, i) => startDay + i);
+    } else {
+      this.days = [];
+    }
+    this.syncEventDate();
   }
-  private createEmpty(): IlanModel {
-    return {
-      User: { fullName: '', joinedAt: new Date() },
-      title: '', maxTitleLen: 60,
-      description: '', maxDescLen: 500,
-      selectedDate: null, minDate: this.today00(),
-      times: this.buildTimes(), selectedTime: null,
-      city: null, district: null,
-      cityQuery: '', districtQuery: '',
-      selectedCity: null, selectedDistrict: null,
-      filteredCities: [], filteredDistricts: [],
-      loading: false, errors: {},
-      selectedCityId: null
+
+  onDaySelect(d: number) {
+    this.selectedDay = d || null;
+    this.syncEventDate();
+  }
+
+  private syncEventDate() {
+    if (this.selectedYear && this.selectedMonth && this.selectedDay) {
+      this.eventDate =
+        `${this.selectedYear}-${String(this.selectedMonth).padStart(2,'0')}-${String(this.selectedDay).padStart(2,'0')}`;
+      this.dateInvalid = false;
+      this.buildHours(); // bugünse geçmiş saatleri gizle
+    } else {
+      this.eventDate = '';
+      this.dateInvalid = false;
+      this.buildHours();
+    }
+  }
+
+  private buildHours() {
+    if (
+      this.selectedYear === this.todayYear &&
+      this.selectedMonth === this.todayMonth &&
+      this.selectedDay === this.todayDay
+    ) {
+      const nowHour = new Date().getHours();
+      this.hours = Array.from({ length: 24 - nowHour }, (_, i) => nowHour + i);
+    } else {
+      this.hours = Array.from({ length: 24 }, (_, i) => i);
+    }
+    if (this.selectedHour !== null && !this.hours.includes(this.selectedHour)) {
+      this.selectedHour = null;
+    }
+  }
+
+  // ===== Konum (İki alan: İl ve İlçe, aramalı dropdown) =====
+  private readonly cityApi = 'https://localhost:44345/api/Cities';
+  private readonly districtApi = 'https://localhost:44345/api/Districts';
+
+  cities: City[] = [];
+  districts: District[] = [];
+  private districtCache: Record<number, District[]> = {};
+
+  selectedCityId: number | null = null;
+  selectedDistrictId: number | null = null;
+  selectedCityName = '';
+  selectedDistrictName = '';
+
+  // Arama inputları ve dropdown görünürlükleri
+  citySearch = '';
+  districtSearch = '';
+  showCityDropdown = false;
+  showDistrictDropdown = false;
+
+  loadingCities = false;
+  loadingDistricts = false;
+  locationError: string | null = null;
+
+  // Türkçe normalize
+  private norm(s: string): string {
+    return (s || '')
+      .toLocaleLowerCase('tr-TR')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+
+  get filteredCities(): City[] {
+    const q = this.norm(this.citySearch).trim();
+    if (!q) return this.cities;
+    return this.cities.filter(c => this.norm(c.name).startsWith(q)); // includes istersen değiştir
+  }
+
+  get filteredDistricts(): District[] {
+    // İl seçili değilse hiç göstermeyelim
+    if (!this.selectedCityId) return [];
+    // Temel listeyi seçili il'e göre kısıtla (district.cityId varsa)
+    const base = this.districts.filter(d =>
+      d.cityId == null ? true : d.cityId === this.selectedCityId
+    );
+    const q = this.norm(this.districtSearch).trim();
+    if (!q) return base;
+    return base.filter(d => this.norm(d.name).startsWith(q));
+  }
+
+  // Şehir etkileşimleri
+  onCityFocus() {
+    this.showCityDropdown = true;
+    if (this.cities.length === 0) this.loadCities();
+  }
+  onCityBlur() {
+    // mousedown ile seçimi yakalasın diye küçük gecikme
+    setTimeout(() => this.showCityDropdown = false, 120);
+  }
+  onCityInputChange(e: Event) {
+    this.citySearch = (e.target as HTMLInputElement).value;
+  }
+  selectCity(c: City) {
+    this.selectedCityId = c.id;
+    this.selectedCityName = c.name;
+    this.citySearch = c.name;
+    this.showCityDropdown = false;
+
+    // İlçe alanını TEMİZLE + anlık olarak boş göster
+    this.selectedDistrictId = null;
+    this.selectedDistrictName = '';
+    this.districtSearch = '';
+    this.districts = []; // <-- önceki ilçe listesi görünmesin
+
+    // Seçilen il için ilçeleri yükle
+    this.ensureDistrictsLoaded(c.id);
+  }
+  clearCity() {
+    this.selectedCityId = null;
+    this.selectedCityName = '';
+    this.citySearch = '';
+    this.showCityDropdown = false;
+
+    // İlçe alanını da sıfırla
+    this.selectedDistrictId = null;
+    this.selectedDistrictName = '';
+    this.districts = [];
+    this.districtSearch = '';
+    this.showDistrictDropdown = false;
+  }
+
+  // İlçe etkileşimleri
+  onDistrictFocus() {
+    if (!this.selectedCityId) return;
+    this.showDistrictDropdown = true;
+    this.ensureDistrictsLoaded(this.selectedCityId);
+  }
+  onDistrictBlur() {
+    setTimeout(() => this.showDistrictDropdown = false, 120);
+  }
+  onDistrictInputChange(e: Event) {
+    if (!this.selectedCityId) return;
+    this.districtSearch = (e.target as HTMLInputElement).value;
+  }
+  selectDistrict(d: District) {
+    // === Guard: İl seçilmeden ilçe seçimi engelle ===
+    if (!this.selectedCityId) return;
+
+    this.selectedDistrictId = d.id;
+    this.selectedDistrictName = d.name;
+    this.districtSearch = d.name;
+    this.showDistrictDropdown = false;
+  }
+  clearDistrict() {
+    this.selectedDistrictId = null;
+    this.selectedDistrictName = '';
+    this.districtSearch = '';
+    this.showDistrictDropdown = false;
+  }
+
+  // Veri çekme
+  private loadCities() {
+    this.loadingCities = true;
+    this.locationError = null;
+
+    this.http.get<City[] | { data: City[] }>(this.cityApi)
+      .pipe(map(res => Array.isArray(res) ? res : (res?.data ?? [])))
+      .subscribe({
+        next: list => { this.cities = list ?? []; this.loadingCities = false; },
+        error: () => { this.locationError = 'İller yüklenemedi.'; this.loadingCities = false; }
+      });
+  }
+
+  private ensureDistrictsLoaded(cityId: number) {
+    if (this.districtCache[cityId]) {
+      // cache'ten getirirken de şehir filtresi zaten cache anahtarından sağlanıyor
+      this.districts = this.districtCache[cityId];
+      return;
+    }
+    this.loadDistricts(cityId);
+  }
+
+  private loadDistricts(cityId: number) {
+    this.loadingDistricts = true;
+    this.locationError = null;
+
+    const params = new HttpParams().set('cityId', String(cityId));
+    this.http.get<District[] | { data: District[] }>(this.districtApi, { params })
+      .pipe(map(res => Array.isArray(res) ? res : (res?.data ?? [])))
+      .subscribe({
+        next: list => {
+          // Güvenlik: endpoint tüm ilçeleri yollasa bile burada şehir bazında filtrele
+          let arr = (list ?? []) as District[];
+          if (arr.length && typeof arr[0].cityId !== 'undefined') {
+            arr = arr.filter(d => d.cityId === cityId);
+          }
+          this.districtCache[cityId] = arr;
+          this.districts = arr;
+          this.loadingDistricts = false;
+        },
+        error: () => { this.locationError = 'İlçeler yüklenemedi.'; this.loadingDistricts = false; }
+      });
+  }
+
+  // ===== Submit =====
+  submitting = false;
+  submitError: string | null = null;
+  createdId: number | null = null;
+
+  private readonly createApi = 'https://localhost:44345/api/Geziler';
+
+  get formValid(): boolean {
+    const okTitle = !!this.title.trim();
+    const okDesc  = !!this.description.trim() && this.description.length <= this.maxDescLen;
+    const okDate  = !!this.eventDate && !this.dateInvalid;
+    const okTime  = this.selectedHour !== null;
+    const okCity  = this.selectedCityId !== null;
+    const okDist  = this.selectedDistrictId !== null;
+    return okTitle && okDesc && okDate && okTime && okCity && okDist;
+  }
+
+  private buildPayload(): IlanModel | any {
+    const p: any = {
+      title: this.title.trim(),
+      description: this.description.trim(),
+      eventDate: this.eventDate,
+      eventHour: this.selectedHour,
+      cityId: this.selectedCityId,
+      districtId: this.selectedDistrictId,
     };
+    return p as IlanModel;
   }
 
-  //Şehir / İlçe 
-  onCityQueryInput(q: string) {
-    if (!this.locationReady) return;           // devre dışı
-    this.ilan[0].cityQuery = q;
-    this.loadCities(q);
-  }
- private loadCities(q: string) {
-  if (!this.locationReady) { this.ilan[0].filteredCities = []; return; }
+  onSubmit() {
+    if (!this.formValid || this.submitting) return;
 
-  this.cityApi.getAllCities().subscribe({
-    next: (list) => {
-      // İstersen burada client-side filtre yaparız (q varsa):
-      const qnorm = (q || '').trim().toLowerCase();
-      this.ilan[0].filteredCities = qnorm
-        ? list.filter(c => c.name.toLowerCase().includes(qnorm))
-        : list;
-    },
-    error: () => this.ilan[0].filteredCities = []
-  });
-}
+    this.submitting = true;
+    this.submitError = null;
+    this.createdId = null;
 
-  onCitySelected(opt: { id:number; name:string }) {
-    if (!this.locationReady) return;           // devre dışı
-    const m = this.ilan[0];
-    
-    m.selectedCityId = opt.id;
-    m.selectedCity   = opt.name;
-    m.city           = opt.name;
-
-    m.cityQuery = opt.name;
-
-    m.selectedDistrict = null; m.district = null; m.districtQuery = '';
-    this.loadDistricts('');
-  }
-
-  onDistrictQueryInput(q: string) {
-    if (!this.locationReady) return;           // devre dışı
-    this.ilan[0].districtQuery = q;
-    this.loadDistricts(q);
-  }
-  private loadDistricts(q: string) {
-  const m = this.ilan[0];
-  if (!this.locationReady) { m.filteredDistricts = []; return; }
-  if (!m.selectedCityId)   { m.filteredDistricts = []; return; }
-
-  this.cityApi.getDistrictsByCity(m.selectedCityId).subscribe({
-    next: (list) => {
-      const qnorm = (q || '').trim().toLowerCase();
-      m.filteredDistricts = qnorm
-        ? list.filter(d => d.name.toLowerCase().includes(qnorm))
-        : list;
-    },
-    error: () => m.filteredDistricts = []
-  });
-}
-
-  onDistrictSelected(opt: { id:number; name:string }) {
-    if (!this.locationReady) return;           // devre dışı
-    const m = this.ilan[0];
-    m.selectedDistrict = opt.name;
-    m.district         = opt.name;
-    m.districtQuery = opt.name;
-  }
-
-  // Saat: bugün seçiliyken geçmiş saatleri kapat
-  isPastTimeOnSelectedDate(time: string): boolean {
-    const s = this.ilan[0];
-    if (!s.selectedDate) return false;
-    const now = new Date();
-    if (s.selectedDate.toDateString() !== now.toDateString()) return false;
-    const [hh, mm] = time.split(':').map(Number);
-    const dt = new Date(s.selectedDate); dt.setHours(hh, mm || 0, 0, 0);
-    return dt.getTime() <= now.getTime();
-  }
-
-  // Validasyon & Submit 
-  isValid(): boolean {
-    const s = this.ilan[0];
-    // Konum zorunlu: backend bağlanana kadar buton pasif kalır
-    return !!(s.title?.trim() && s.description?.trim()
-      && s.selectedDate && s.selectedTime && s.selectedCity && s.selectedDistrict);
-  }
-  private buildPayload() {
-    const s = this.ilan[0];
-    const [hh, mm] = (s.selectedTime || '00:00').split(':').map(Number);
-    const when = new Date(s.selectedDate!); when.setHours(hh, mm || 0, 0, 0);
-    return {
-      title: s.title.trim(),
-      description: s.description.trim(),
-      dateTime: when.toISOString(),
-      city: s.selectedCity!, district: s.selectedDistrict!,
-      createdBy: s.User.fullName || 'Anonim'
-    };
-  }
-  createListing() {
-    const s = this.ilan[0];
-    if (!this.isValid() || s.loading) return;
-    s.loading = true;
-    this.listing.create(this.buildPayload()).subscribe({
-      next: () => { this.ilan[0] = this.createEmpty(); s.loading = false; alert('İlan oluşturuldu!'); },
-      error: () => { s.loading = false; alert('İlan oluşturulamadı.'); }
+    const payload = this.buildPayload();
+    this.http.post<any>(this.createApi, payload).subscribe({
+      next: (res) => {
+        const id = typeof res === 'number' ? res : (res?.id ?? res?.data?.id ?? null);
+        this.createdId = (typeof id === 'number') ? id : null;
+        this.submitting = false;
+      },
+      error: (err) => {
+        this.submitError = (err?.error?.message) || 'Kayıt sırasında bir hata oluştu.';
+        this.submitting = false;
+      }
     });
+  }
+
+  // ===== Lifecycle =====
+  ngOnInit(): void {
+    // Yıl listesini bugünden itibaren doldur
+    const nowYear = this.todayYear;
+    for (let y = nowYear; y <= nowYear + this.YEAR_SPAN; y++) this.years.push(y);
+
+    // Başlangıç saat listesi
+    this.buildHours();
+
+    // İller ilk odakta yüklenecek; dilersen burada da başlatabilirsin:
+    // this.loadCities();
   }
 }

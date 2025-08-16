@@ -1,163 +1,140 @@
+<!-- components/pages/seyehat/kategoriler/geziler/ilan/ilan.html -->
+<div class="create-wrapper">
 
-
-<div class="create-wrapper" *ngIf="ilan[0] as m">
-
-  <!-- Kullanıcı (opsiyonel) -->
-  <div class="user-bar">
-    <div class="avatar"><span>{{ (m.User.fullName || 'U').charAt(0) }}</span></div>
-    <div class="user-meta">
-      <div class="name">{{ m.User.fullName || 'Kullanıcı' }}</div>
-      <div class="sub">Kayıt Tarihi: {{ m.User.joinedAt | date:'d MMMM y' }}</div>
-    </div>
+  <!-- ===== Başlık ===== -->
+  <div class="pill">Etkinlik Başlığı</div>
+  <div class="title-panel">
+    <input class="title-input" type="text"
+      [value]="title" [attr.maxlength]="maxTitleLen"
+      placeholder="Etkinlik başlığını girin" aria-describedby="titleCount"
+      [attr.aria-invalid]="titleInvalid"
+      (blur)="titleTouched = true" (input)="onTitleChange($event)"
+      [class.invalid]="titleInvalid" />
+    <div id="titleCount" class="counter">{{ titleLen }}/{{ maxTitleLen }}</div>
+    @if (titleInvalid) { <div class="error">Başlık zorunludur.</div> }
   </div>
 
-  <!-- === Etkinlik Başlığı === -->
-  <h3 class="section-title">Etkinlik Başlığı</h3>
-  <div class="panel">
-    <input
-      class="title-input"
-      type="text"
-      name="title0"
-      [(ngModel)]="m.title"
-      [attr.maxlength]="m.maxTitleLen"
-      [attr.aria-invalid]="!m.title ? true : null"
-      required
-      placeholder="Etkinlik başlığını girin"
-      aria-describedby="titleHelp titleCount"
-      autocomplete="off"
-    />
-    <div id="titleCount" class="char-count">
-      {{ (m.title || '').length }}/{{ m.maxTitleLen }}
-    </div>
+  <!-- ===== Açıklama ===== -->
+  <div class="pill" style="margin-top: 14px;">Açıklama</div>
+  <div class="title-panel">
+    <textarea class="title-input" rows="5"
+      [value]="description" [attr.maxlength]="maxDescLen"
+      placeholder="Etkinlik açıklamasını yazın" aria-describedby="descCount"
+      [attr.aria-invalid]="descInvalid"
+      (blur)="descriptionTouched = true" (input)="onDescChange($event)"
+      [class.invalid]="descInvalid"></textarea>
+    <div id="descCount" class="counter">{{ descLen }}/{{ maxDescLen }}</div>
+    @if (descInvalid) { <div class="error">Açıklama zorunludur.</div> }
   </div>
 
-  <!-- === Açıklama === -->
-  <h3 class="section-title">Açıklama</h3>
-  <div class="panel">
-    <textarea
-      class="desc-input"
-      name="description0"
-      [(ngModel)]="m.description"
-      [attr.maxlength]="m.maxDescLen"
-      rows="4"
-      [attr.aria-invalid]="!m.description ? true : null"
-      required
-      placeholder="Etkinlik hakkında detaylı bilgi verin. Nerede, ne zaman, kimlerle, ne yapılacak?"
-      aria-describedby="descHelp descCount"
-    ></textarea>
-  
-    <div id="descCount" class="char-count">
-      {{ (m.description || '').length }}/{{ m.maxDescLen }}
-    </div>
-  </div>
+  <!-- ===== Tarih & Saat ===== -->
+  <div class="pill" style="margin-top: 14px;">Tarih &amp; Saat</div>
+  <div class="title-panel">
+    <div class="date-time-row">
+      <select class="title-input" [value]="selectedYear ?? ''"
+        (change)="onYearSelect( +$any($event.target).value )">
+        <option value="">Yıl seç</option>
+        @for (y of years; track y) { <option [value]="y">{{ y }}</option> }
+      </select>
 
-  <!-- === Tarih & Saat === -->
-  <h3 class="section-title">Tarih & Saat</h3>
-  <div class="panel date-time-panel">
-    <!-- Tarih -->
-    <mat-form-field appearance="outline" class="date-field">
-      <mat-label>Tarih</mat-label>
-      <input
-        matInput
-        name="date0"
-        [matDatepicker]="picker"
-        [(ngModel)]="m.selectedDate"
-        [min]="m.minDate"
-        placeholder="Tarih seçin"
-        required
-        autocomplete="off"
-      />
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker startView="multi-year" touchUi="true"></mat-datepicker>
-    </mat-form-field>
+      <select class="title-input" [disabled]="!selectedYear"
+        [value]="selectedMonth ?? ''"
+        (change)="onMonthSelect( +$any($event.target).value )">
+        <option value="">Ay seç</option>
+        @for (m of months; track m.id) { <option [value]="m.id">{{ m.name }}</option> }
+      </select>
 
-    <!-- Saat -->
-    <div class="time-select">
-      <select
-        id="time0"
-        name="time0"
-        [(ngModel)]="m.selectedTime"
-        required
-        autocomplete="off"
-        [attr.aria-invalid]="!m.selectedTime ? true : null">
-        <option [ngValue]="null" disabled> Saat </option>
-        <option *ngFor="let t of m.times" [ngValue]="t" [disabled]="isPastTimeOnSelectedDate(t)">
-          {{ t }}
-        </option>
+      <select class="title-input" [disabled]="!selectedMonth"
+        [value]="selectedDay ?? ''"
+        (change)="onDaySelect( +$any($event.target).value )">
+        <option value="">Gün seç</option>
+        @for (d of days; track d) { <option [value]="d">{{ d }}</option> }
+      </select>
+
+      <select class="title-input hour-select"
+        [value]="selectedHour ?? ''" (change)="onHourChange($event)">
+        <option value="">Saat</option>
+        @for (h of hours; track h) { <option [value]="h">{{ (h < 10 ? '0' + h : h) }}:00</option> }
       </select>
     </div>
+
+    @if (eventDate) {
+      <div class="hint">
+        Seçilen: {{ eventDate }}
+        {{ selectedHour !== null ? ((selectedHour! < 10 ? '0'+selectedHour : selectedHour) + ':00') : '' }}
+      </div>
+    }
   </div>
 
-  <!-- === Konum === -->
-  <h3 class="section-title">Konum</h3>
-  <div class="panel location-panel">
+  <!-- ===== Konum (İl + İlçe yan yana, aramalı dropdown) ===== -->
+  <div class="pill" style="margin-top: 14px;">Konum</div>
+  <div class="title-panel">
+    <div class="location-row" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
 
-    <!-- Şehir -->
-    <mat-form-field class="city-field" appearance="outline">
-      <mat-label>Şehir</mat-label>
-      <input
-        matInput
-        name="city0"
-        placeholder="Örn: Ankara"
-        [(ngModel)]="m.cityQuery"
-        (ngModelChange)="onCityQueryInput($event)"
-        [matAutocomplete]="cityAuto"
-        [disabled]="!locationReady"
-        required
-        aria-autocomplete="list"
-        autocomplete="off"
-      />
-      <mat-autocomplete
-        #cityAuto="matAutocomplete"
-        (optionSelected)="onCitySelected($event.option.value)">
-        <mat-option *ngFor="let c of m.filteredCities" [value]="c">
-          {{ c.name }}
-        </mat-option>
-        <mat-option *ngIf="m.filteredCities.length === 0" disabled>
-          Sonuç yok
-        </mat-option>
-      </mat-autocomplete>
-    </mat-form-field>
+      <!-- İl sütunu -->
+      <div style="position:relative;">
+        <label class="field-label">İl</label>
+        <input class="title-input city-input" type="text"
+          [value]="citySearch" placeholder="İl ara veya seç (örn: an...)"
+          (focus)="onCityFocus()" (blur)="onCityBlur()" (input)="onCityInputChange($event)" />
 
-    <!-- İlçe -->
-    <mat-form-field class="district-field" appearance="outline">
-      <mat-label>İlçe</mat-label>
-      <input
-        matInput
-        name="district0"
-        placeholder="İlçe yazın"
-        [(ngModel)]="m.districtQuery"
-        (ngModelChange)="onDistrictQueryInput($event)"
-        [matAutocomplete]="districtAuto"
-        [disabled]="!locationReady || !m.selectedCityId"
-        required
-        aria-autocomplete="list"
-        autocomplete="off"
-      />
-      <mat-autocomplete
-        #districtAuto="matAutocomplete"
-        (optionSelected)="onDistrictSelected($event.option.value)">
-        <mat-option *ngFor="let d of m.filteredDistricts" [value]="d">
-          {{ d.name }}
-        </mat-option>
-        <mat-option *ngIf="m.selectedCityId && m.filteredDistricts.length === 0" disabled>
-          Sonuç yok
-        </mat-option>
-      </mat-autocomplete>
-    </mat-form-field>
+        @if (showCityDropdown) {
+          <ul class="dropdown">
+            @if (loadingCities) {
+              <li class="dropdown-item"><span class="hint">İller yükleniyor…</span></li>
+            }
+            @for (c of filteredCities; track c.id) {
+              <li class="dropdown-item" (mousedown)="selectCity(c)">{{ c.name }}</li>
+            }
+            @if (!loadingCities && filteredCities.length === 0) {
+              <li class="dropdown-item"><span class="hint">Eşleşen il yok.</span></li>
+            }
+          </ul>
+        }
+      </div>
 
+      <!-- İlçe sütunu -->
+      <div style="position:relative;">
+        <label class="field-label">İlçe</label>
+        <input class="title-input district-input" type="text"
+          [value]="districtSearch" [disabled]="!selectedCityId"
+          placeholder="{{ selectedCityId ? 'İlçe ara veya seç' : 'Önce il seçin' }}"
+          (focus)="onDistrictFocus()" (blur)="onDistrictBlur()" (input)="onDistrictInputChange($event)" />
+
+        @if (showDistrictDropdown) {
+          <ul class="dropdown">
+            @if (loadingDistricts) {
+              <li class="dropdown-item"><span class="hint">İlçeler yükleniyor…</span></li>
+            }
+            @for (d of filteredDistricts; track d.id) {
+              <li class="dropdown-item" (mousedown)="selectDistrict(d)">{{ d.name }}</li>
+            }
+            @if (!loadingDistricts && selectedCityId && filteredDistricts.length === 0) {
+              <li class="dropdown-item"><span class="hint">Bu il için eşleşen ilçe yok.</span></li>
+            }
+          </ul>
+        }
+      </div>
+
+    </div>
+
+    @if (locationError) {
+      <div class="error" style="margin-top:8px;">{{ locationError }}</div>
+    }
   </div>
 
- <!-- === Buton === -->
-<div class="actions">
-  <!-- TEST: tıklanabilir mi? -->
-<button
-  class="ellipse-btn ellipse-btn--block"
-  (click)="createListing()"
-  [disabled]="false">
-  Bul Beni
-</button>
+  <!-- ===== Submit ===== -->
+  <div class="actions">
+    <button type="button" class="primary-btn"
+      (click)="onSubmit()"
+      [disabled]="submitting || !formValid"
+      aria-label="Bul Beni - ilanı kaydet">
+      Bul Beni
+    </button>
+  </div>
 
-</div>
+  <!-- ===== Sonuç / Hata ===== -->
+  @if (createdId) { <div class="result">✅ İlan oluşturuldu. ID: {{ createdId }}</div> }
+  @if (submitError) { <div class="error">❌ {{ submitError }}</div> }
 
 </div>

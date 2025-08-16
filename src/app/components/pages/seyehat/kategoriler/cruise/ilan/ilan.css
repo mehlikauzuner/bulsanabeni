@@ -1,176 +1,180 @@
-/* ===== Tema ===== */
-:host{
-  --bg: #f3e8ff;          /* FORM ARKA PLAN: AÇIK LİLA */
-  --panel: #f3e8ff;       /* kutu içi daha açık pembe */
-  --primary: #4a148c;     /* KOYU MOR (başlık + buton) */
-  --primary-700:#311b92;  /* daha koyu mor (gradient ikinci ton) */
-  --primary-100:#d1c4e9;  /* açık mor vurgular */
-  --text:#1f1f1f;
-  --muted:#6b7280;
-  --border:#f8bbd0;
-  --white:#fff;
+:host {
+  --border: #6a00ff;
+  --bg: #f4eaff;
+  --panel: #f6ecff;
+  --text: #331b6b;
+  --hint: #8a6bb8;
+  --danger: #e53935;
+  --success: #2e7d32;
 }
 
-/* Sayfa/kart */
-.create-wrapper{
-  max-width: 780px;
+/* Sayfa kapsayıcı */
+.create-wrapper {
+  max-width: 720px;
   margin: 24px auto;
-  padding: 22px 22px 28px;
-  background: var(--bg); /* açık lila */
-  border: 4px solid var(--primary);
+  padding: 28px;
+  background: var(--bg);
+  border: 6px solid var(--border);
   border-radius: 20px;
-  box-shadow: 0 10px 20px rgba(74,20,140,.12);
-  color: var(--text);
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
 }
 
-/* Kullanıcı çubuğu */
-.user-bar{
-  display:flex; align-items:center; gap:14px;
-  background: var(--white);
-  border-radius: 14px;
-  padding: 14px 16px;
-  box-shadow: 0 6px 16px rgba(74,20,140,.10);
-  margin-bottom: 16px;
-}
-.avatar{
-  width:44px; height:44px; border-radius:50%;
-  background: var(--primary);
-  display:grid; place-items:center;
-  color:#fff; font-weight:700; font-size:18px;
-}
-.user-meta .name{ font-weight:700; }
-.user-meta .sub{ color:var(--muted); font-size:13px; margin-top:2px; }
-
-/* Bölüm başlıkları — MOR ARKA PLAN + BEYAZ YAZI */
-.section-title{
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--white) !important;
-  background: var(--primary) !important;
-  padding: 6px 14px;
-  border-radius: 999px;
+/* Mor “pill” başlık */
+.pill {
   display: inline-block;
-  margin: 20px 0 12px;
-  letter-spacing: 0.2px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+  font-weight: 700;
+  color: #fff;
+  background: #6b2bd9;
+  padding: 8px 14px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+  font-size: 14px;
 }
 
-/* Eski pill-title uyumu */
-.pill-title{
-  display:inline-block;
-  background: var(--primary) !important;
-  color: var(--white) !important;
-  padding:6px 12px;
-  border-radius:999px;
-  font-weight:700;
-  font-size:13px;
-  margin:18px 0 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.10);
+/* Panel kutu */
+.title-panel {
+  position: relative;
+  background: var(--panel);
+  border: 2px solid #d9c8ff;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
 }
 
-/* SADECE buton alanındaki küçük başlığı gizle */
-.actions .pill-title,
-.actions .section-title{
-  display:none !important;
+/* Input & textarea */
+.title-input {
+  width: 100%;
+  border: 2px solid #d9c8ff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
+  outline: none;
+  background: #fff;
+  color: var(--text);
+  box-sizing: border-box;
+}
+.title-input:focus {
+  border-color: #8a6bff;
+  box-shadow: 0 0 0 3px rgba(138, 107, 255, 0.15);
+}
+.title-input.invalid {
+  border-color: var(--danger);
 }
 
-/* Giriş alanı kapsayıcılarının çerçevesini kaldır */
-.title-panel,
-.desc-panel,
-.date-time-panel,   /* düzeltildi: -time-panel -> .date-time-panel */
-.location-panel{
-  background:transparent !important;
-  border:none !important;
-  box-shadow:none !important;
-  border-radius:0 !important;
-  padding:0 !important;
+/* Sayaç ve hatalar */
+.counter {
+  text-align: right;
+  font-size: 12px;
+  color: var(--hint);
+  margin-top: 6px;
+}
+.error {
+  margin-top: 6px;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 600;
+}
+.hint {
+  margin-top: 6px;
+  color: var(--hint);
+  font-size: 12px;
 }
 
-/* Düz inputlar */
-.title-input,
-.desc-input{
-  width:100%;
-  border:2px solid var(--border);
-  background:#fff;
-  border-radius:12px;
-  padding:12px 14px;
-  font-size:15px;
-  outline:none;
-  transition: border-color .15s ease, box-shadow .15s ease;
+/* Dropdown listesi */
+.dropdown {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  background: #fff;
+  border: 1px solid #d9c8ff;
+  border-radius: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  z-index: 5;
 }
-.title-input:focus,
-.desc-input:focus{
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(74,20,140,.18);
+.dropdown-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.15s;
 }
-/* düzeltildi: .desc-in.dateput -> .desc-input */
-.desc-input{ min-height:120px; resize: vertical; }
-
-/* Yardım ve sayaç */
-.hint{ color:var(--muted); font-size:12px; margin-top:8px; }
-.char-count{ color:var(--muted); font-size:12px; margin-top:6px; text-align:right; }
-
-/* Tarih & Saat grid */
-.date-time-panel{
-  margin-top:8px;
-  display:grid;
-  grid-template-columns: 1.2fr .8fr;
-  gap:12px;
-}
-.date-field{ width:100%; background:#fff; border-radius:12px; }
-
-/* Saat select */
-.time-select select{
-  width:100%;
-  border:2px solid var(--border);
-  background:#fff;
-  border-radius:12px;
-  padding:12px 14px;
-  font-size:15px;
-  outline:none;
-  transition: border-color .15s ease, box-shadow .15s ease;
-  appearance: none;
-}
-.time-select select:focus{
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(74,20,140,.18);
+.dropdown-item:hover {
+  background: #f0e8ff;
 }
 
-/* Konum grid */
-.location-panel{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:12px;
+/* Temizle butonu */
+.clear-btn {
+  margin-top: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: #555;
+  background: #eee;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
 }
-.city-field, .district-field{ width:100%; background:#fff; border-radius:12px; }
+.clear-btn:hover {
+  background: #ddd;
+}
 
-/* Disabled görünümü */
-[disabled], .time-select select:disabled{
-  cursor:not-allowed; opacity:.7;
+/* Üçlü dropdown (yıl→ay→gün) */
+.triple-row {
+  display: flex;
+  gap: 8px;
+}
+.triple-row select {
+  flex: 1;
 }
 
-/* Bul Beni butonu */
-.actions{ 
-  margin-top:18px;
-  text-align:center;
+/* Butonlar */
+.actions {
+  text-align: right;
+  margin-top: 20px;
 }
-.ellipse-btn{
-  padding:14px 22px;
-  border:none; outline:none;
-  border-radius:999px;
-  font-weight:700; font-size:16px;
-  color:#fff;
-  background: linear-gradient(135deg, var(--primary), var(--primary-700));
-  box-shadow: 0 10px 20px rgba(74,20,140,.28), 0 2px 6px rgba(74,20,140,.22) inset;
-  cursor:pointer;
-  transition: transform .08s ease, box-shadow .15s ease, opacity .15s;
+.primary-btn {
+  background: #6b2bd9;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
 }
-.ellipse-btn--block{ width:100%; }
-.ellipse-btn:hover{ transform: translateY(-1px); }
-.ellipse-btn:active{ transform: translateY(0); box-shadow: 0 6px 12px rgba(74,20,140,.28); }
-.ellipse-btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+.primary-btn:hover:not([disabled]) {
+  background: #5a23b8;
+}
+.primary-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Sonuç mesajları */
+.result {
+  margin-top: 12px;
+  color: var(--success);
+  font-size: 14px;
+  font-weight: 600;
+}
 
 /* Responsive */
-@media (max-width: 640px){
-  .create-wrapper{ padding:16px; }
+@media (max-width: 480px) {
+  .create-wrapper {
+    padding: 18px;
+  }
+  .title-input {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+  .pill {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
 }
