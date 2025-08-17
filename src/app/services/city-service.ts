@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
+import { City, District } from '../models/ilan-model';
 
-export interface City { id: number; name: string; }
-export interface District { id: number; name: string; cityId: number; }
+
 
 const CITIES_URL = 'https://localhost:44345/api/Cities';
 const DISTRICTS_URL = 'https://localhost:44345/api/Districts';

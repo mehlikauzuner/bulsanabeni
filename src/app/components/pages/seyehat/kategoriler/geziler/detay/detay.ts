@@ -2,7 +2,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
 import { DetayModel } from '../../../../../../models/detay-model';
 import { GezilerService } from '../../../../../../services/geziler-service';
 
@@ -10,9 +9,8 @@ import { GezilerService } from '../../../../../../services/geziler-service';
 @Component({
   selector: 'app-geziler-detay',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule,],
   templateUrl: './detay.html',
-  // İlan sayfasındaki stilleri yeniden kullanıyoruz:
   styleUrls: ['../ilan/ilan.css'],
 })
 export class GezilerDetay implements OnInit {
@@ -21,7 +19,7 @@ export class GezilerDetay implements OnInit {
     private geziler: GezilerService
   ) {}
   
-  ilan: DetayModel | null = null;   // <-- Detay verisini burada tutacağız
+  ilan: DetayModel | null = null;   //  Detay verisi
   loading = false;
   error: string | null = null;
 
@@ -38,14 +36,14 @@ export class GezilerDetay implements OnInit {
   // Görünüm yardımcıları
   get dateText(): string {
     if (!this.ilan?.date) return '—';
-    // ISO string bekliyoruz, yoksa stringi olduğu gibi bırak.
+    
     const d = new Date(this.ilan.date);
     return isNaN(d.getTime())
       ? this.ilan.date
       : d.toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
   }
   get timeText(): string {
-    // "HH:mm:ss" -> "HH:mm"
+  
     const t = this.ilan?.time ?? '';
     if (!t) return '—';
     return t.slice(0, 5);
@@ -75,7 +73,6 @@ export class GezilerDetay implements OnInit {
 
     this.geziler.getIlanById(id).subscribe({
       next: (res) => {
-        // Servis DetayModel’e normalize ediyor
         this.ilan = res;
         this.loading = false;
       },
