@@ -70,7 +70,7 @@ export const routes: Routes = [
   
   { path: 'seyehat/geziler/ilan', component: GezilerIlan },
 
- { path: 'geziler/:id', component: GezilerDetay },
+ { path: 'seyehat/geziler/:id', component: GezilerDetay },
   
   { path: 'akademik/fuarlar', component: Fuarlar },
   { path: 'akademik/projeler', component: Projeler },

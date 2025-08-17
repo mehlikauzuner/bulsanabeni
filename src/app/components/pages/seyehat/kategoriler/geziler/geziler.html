@@ -1,24 +1,32 @@
 <div class="page-wrap">
- 
+  @if (error) {
+    <div class="alert error">❌ {{ error }}</div>
+  }
+  @if (loading) {
+    <div class="alert hint">Yükleniyor…</div>
+  }
+
   <div class="cards-grid">
     <!-- Sabit: Yeni ilan kartı -->
     <div class="card new-card">
       <h3 class="card-title">Anı Yakala</h3>
-      <div class="thumb thumb-new"></div>
+      <div class="thumb"></div>
       <div class="card-actions">
-        <button class="btn-primary" type="button" (click)="goCreate()">
-          Yeni İlan Oluştur
+        <!-- Pembe, Detay Gör ile aynı stil -->
+        <button class="btn-secondary" type="button" (click)="goCreate()">
+          İlan Oluştur
         </button>
       </div>
     </div>
 
-    <!-- DB’den gelen ilan kartları (sadece başlık + placeholder + buton) -->
+    <!-- DB’den gelen ilan kartları -->
     @for (i of ilanlar; track i.id) {
       <div class="card">
         <h3 class="card-title">{{ i.title }}</h3>
         <div class="thumb"></div>
         <div class="card-actions">
-          <button class="btn-secondary" type="button" (click)="goDetail(i.id)">
+          <button class="btn-secondary" type="button"
+                  [routerLink]="['/seyehat/geziler', i.id]">
             Detay Gör
           </button>
         </div>

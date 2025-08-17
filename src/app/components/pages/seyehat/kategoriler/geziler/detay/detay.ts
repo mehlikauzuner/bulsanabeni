@@ -3,8 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
-import { GezilerService } from '../../../../../../services/geziler-service';
 import { DetayModel } from '../../../../../../models/detay-model';
+import { GezilerService } from '../../../../../../services/geziler-service';
 
 
 @Component({
@@ -58,9 +58,10 @@ export class GezilerDetay implements OnInit {
     return c || d;
   }
 
-  ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (!id) {
+   ngOnInit(): void {
+    const raw = this.route.snapshot.paramMap.get('id');
+    const id = raw ? parseInt(raw, 10) : NaN;
+    if (Number.isNaN(id) || id <= 0) {
       this.error = 'Geçersiz ilan numarası.';
       return;
     }
@@ -72,13 +73,14 @@ export class GezilerDetay implements OnInit {
     this.error = null;
     this.ilan = null;
 
-    this.geziler.getIlan(id).subscribe({
+    this.geziler.getIlanById(id).subscribe({
       next: (res) => {
+        // Servis DetayModel’e normalize ediyor
         this.ilan = res;
         this.loading = false;
       },
       error: (err) => {
-        console.error('[GezilerDetay] load error:', err);
+        console.error('[GezilerDetay] GET error:', err);
         this.error = err?.error?.message || 'İlan bilgileri alınamadı.';
         this.loading = false;
       }

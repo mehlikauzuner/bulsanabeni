@@ -1,0 +1,46 @@
+/* ========== Kullanıcı barı ========== */
+.user-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.user-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: #efe7ff; color: #6a00ff; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.user-meta { display: flex; flex-direction: column; }
+.user-name { font-weight: 700; }
+.user-id   { font-size: 12px; color: #7a6ea6; }
+
+/* ========== Yardımcı spacing ========== */
+.pill-sp { margin-top: 14px; }
+.field-label-sp { margin-bottom: 6px; }
+.text-pre { white-space: pre-wrap; }
+
+/* ========== Bilgiler satırı: Konum / Tarih / Saat (YAN YANA) ========== */
+.info-row {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* Görüntü amaçlı kutular; önceki select okları/arka planını kapat */
+.display-field {
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
+  background-image: none !important;
+  background-position: initial !important;
+  background-size: 0 !important;
+  background-repeat: no-repeat !important;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 14px; /* rahat nefes */
+}
+
+/* (İstemezsen kaldır) Çok dar ekranlarda bile üç sütunu korumak için medya kuralı YOK.
+   Eğer taşıyor gibi görünürse, paneli yatay kaydırılabilir yapmak için şunları ekleyebilirsin:
+   .title-panel { overflow-x: auto; }  */

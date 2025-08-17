@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { DetayModel } from '../../../../../models/detay-model';
 import { GezilerService } from '../../../../../services/geziler-service';
+import { DetayModel } from '../../../../../models/detay-model';
+
 
 @Component({
   selector: 'app-geziler',
@@ -16,6 +17,10 @@ export class Geziler implements OnInit {
   error: string | null = null;
   ilanlar: DetayModel[] = [];
 
+  // 5 sütun x 2 satır = 10 kart; ilk kart sabit olduğundan 9 ilan göster
+  readonly perPage = 9;
+  page = 1;
+
   constructor(private svc: GezilerService, private router: Router) {}
 
   ngOnInit(): void { this.fetch(); }
@@ -24,30 +29,23 @@ export class Geziler implements OnInit {
     this.loading = true;
     this.error = null;
     this.svc.getAllIlanlar().subscribe({
-      next: (list: any[]) => {
-        this.ilanlar = (list ?? []).map(this.normalizeItem);
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('[GezilerListe] load error:', err);
-        this.error = err?.error?.message || 'İlanlar alınamadı.';
-        this.loading = false;
-      }
+      next: (list) => { this.ilanlar = list ?? []; this.loading = false; },
+      error: (err) => { this.error = err?.error?.message || 'İlanlar alınamadı.'; this.loading = false; }
     });
   }
 
-  private normalizeItem = (raw: any): DetayModel => ({
-    id: raw.id ?? raw.Id,
-    userId: raw.userId ?? raw.UserId ?? 0,
-    title: raw.title ?? raw.Title ?? '',
-    description: raw.description ?? raw.Description ?? '',
-    date: raw.date ?? raw.Date ?? '',
-    time: raw.time ?? raw.Time ?? '',
-    city: raw.city ?? raw.City ?? '',
-    district: raw.district ?? raw.District ?? '',
-  });
+  get visibleIlanlar(): DetayModel[] {
+    const start = (this.page - 1) * this.perPage;
+    return this.ilanlar.slice(start, start + this.perPage);
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil((this.ilanlar?.length || 0) / this.perPage));
+  }
+
+  prev() { if (this.page > 1) this.page--; }
+  next() { if (this.page < this.totalPages) this.page++; }
 
   goCreate() { this.router.navigate(['/seyehat/geziler/ilan']); }
-  goDetail(id: number) { this.router.navigate(['/seyehat/geziler', id]); }
-  trackById = (_: number, item: DetayModel) => item.id;
+  // goDetail kaldırıldı
 }

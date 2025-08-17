@@ -1,67 +1,61 @@
-<p>detay works!</p>
 <!-- components/pages/seyehat/kategoriler/geziler/detay/detay.html -->
 <div class="create-wrapper">
 
   <!-- Yükleniyor / Hata -->
   @if (loading) {
-    <div class="title-panel">
+    <div class="title-panel" aria-live="polite">
       <div class="hint">Yükleniyor…</div>
     </div>
   }
   @if (error) {
-    <div class="title-panel">
+    <div class="title-panel" aria-live="assertive">
       <div class="error">❌ {{ error }}</div>
     </div>
   }
 
   @if (!loading && !error && ilan) {
 
-    <!-- ===== İlan Sahibi Bilgisi ===== -->
-    <div class="user-bar">
+    <!-- ===== İlan Sahibi ===== -->
+    <div class="title-panel user-bar">
       <div class="user-avatar">{{ ownerInitial }}</div>
       <div class="user-meta">
         <div class="user-name">{{ ownerName }}</div>
-        <div class="user-email">İlan No: {{ ilan.id }}</div>
+        <div class="user-id">İlan No: {{ ilan.id }}</div>
       </div>
     </div>
 
     <!-- ===== Başlık ===== -->
     <div class="pill">Başlık</div>
     <div class="title-panel">
-      <div class="title-input" style="border:none; padding:0; box-shadow:none;">
+      <div class="title-input display-field">
         {{ ilan.title }}
       </div>
     </div>
 
     <!-- ===== Açıklama ===== -->
-    <div class="pill" style="margin-top: 14px;">Açıklama</div>
+    <div class="pill pill-sp">Açıklama</div>
     <div class="title-panel">
-      <div class="title-input" style="border:none; padding:0; box-shadow:none; white-space:pre-wrap;">
+      <div class="title-input display-field text-pre">
         {{ ilan.description }}
       </div>
     </div>
 
     <!-- ===== Konum / Tarih / Saat (aynı satır) ===== -->
-    <div class="pill" style="margin-top: 14px;">Bilgiler</div>
+    <div class="pill pill-sp">Bilgiler</div>
     <div class="title-panel">
-      <div class="date-time-row">
-        <div class="title-input" style="border:none; padding:0; box-shadow:none;">
-          <div class="field-label" style="margin-bottom:6px;">Konum</div>
+      <div class="info-row">
+        <div class="title-input display-field">
+          <div class="field-label field-label-sp">Konum</div>
           <div>{{ locationText }}</div>
         </div>
-
-        <div class="title-input" style="border:none; padding:0; box-shadow:none;">
-          <div class="field-label" style="margin-bottom:6px;">Tarih</div>
+        <div class="title-input display-field">
+          <div class="field-label field-label-sp">Tarih</div>
           <div>{{ dateText }}</div>
         </div>
-
-        <div class="title-input" style="border:none; padding:0; box-shadow:none;">
-          <div class="field-label" style="margin-bottom:6px;">Saat</div>
+        <div class="title-input display-field">
+          <div class="field-label field-label-sp">Saat</div>
           <div>{{ timeText }}</div>
         </div>
-
-        <!-- boşluk dengesi için (4 sütun grid’i korumak adına) -->
-        <div class="title-input" style="border:none; padding:0; box-shadow:none;"></div>
       </div>
     </div>
 
