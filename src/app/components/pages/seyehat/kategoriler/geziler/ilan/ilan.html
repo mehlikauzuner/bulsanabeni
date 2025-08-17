@@ -150,8 +150,18 @@
     </button>
   </div>
 
-  <!-- ===== Sonuç / Hata ===== -->
-  @if (createdId) { <div class="result">✅ İlan oluşturuldu. ID: {{ createdId }}</div> }
-  @if (submitError) { <div class="error">❌ {{ submitError }}</div> }
+<!-- ===== Sonuç / Hata ===== -->
+<div class="status-area" aria-live="polite">
+  @if (createdId) {
+    <div class="celebrate" role="status">
+      🎉 YOL ARKADAŞINI BULMAYA BİR ADIM DAHA YAKLAŞTIN! 😊
+    </div>
+    <div class="result" role="status">
+      ✅ İlan oluşturuldu. ID: {{ createdId }}
+    </div>
+  }
 
+  @if (submitError) {
+    <div class="error" role="alert">❌ {{ submitError }}</div>
+  }
 </div>

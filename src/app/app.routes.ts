@@ -39,6 +39,8 @@ import { Hesabim } from './components/pages/profil/hesabim/hesabim';
 import { Geziler } from './components/pages/seyehat/kategoriler/geziler/geziler';
 import { GezilerIlan } from './components/pages/seyehat/kategoriler/geziler/ilan/ilan';
 import { CruiseIlan } from './components/pages/seyehat/kategoriler/cruise/ilan/ilan';
+import { GezilerDetay } from './components/pages/seyehat/kategoriler/geziler/detay/detay';
+
 
 
 export const routes: Routes = [
@@ -67,6 +69,8 @@ export const routes: Routes = [
   { path: 'seyehat/cruise/ilan', component: CruiseIlan },
   
   { path: 'seyehat/geziler/ilan', component: GezilerIlan },
+
+ { path: 'geziler/:id', component: GezilerDetay },
   
   { path: 'akademik/fuarlar', component: Fuarlar },
   { path: 'akademik/projeler', component: Projeler },

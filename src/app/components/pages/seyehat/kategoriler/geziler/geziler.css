@@ -1,128 +1,129 @@
-/* ===== Tema (sadece bu component) ===== */
-:host{
-  --ink:#1f1f1f;
-  --card:#fff;
+:host {
+  --pink1: #ffd6e7;
+  --pink2: #ffe8f1;
+  --pinkBtn: #c10059;
+  --pinkBtnHover: #a8004c;
 
-  --pink:#d81b60;        /* koyu pembe (buton & başlık)  */
-  --pink-700:#ad1457;
-  --border-pink:#f8bbd0; /* pembe çerçeve                 */
+  --blueCardBorder: #1e66d6;
+  --blueBtn: #1f67d7;
+  --blueBtnShadow: rgba(31, 103, 215, 0.35);
 
-  --blue:#1976d2;        /* yeni ilan kartı için mavi     */
-  --blue-700:#0d47a1;
-  --border-blue:#64b5f6; /* mavi çerçeve                  */
-
-  --media-bg1:#fff0f6;   /* media alanı lila/pembe degrade */
-  --media-bg2:#fde7f5;
+  --cardShadow: 0 12px 28px rgba(0,0,0,0.08);
+  --text: #2d2342;
+  --hint: #7a6ea6;
 }
 
-/* ===== Grid ===== */
-.grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap:18px;
-  align-items:stretch;
+/* Sayfa kapsayıcı */
+.page-wrap {
+  max-width: 1280px;
+  margin: 24px auto 40px;
+  padding: 0 16px;
+  color: var(--text);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-/* ===== Kart ===== */
-.chart-card{
-  display:flex;
-  flex-direction:column;
-  background: var(--card);
-  border: 3px solid var(--border-pink);
-  border-radius:18px;
-  box-shadow: 0 8px 18px rgba(216,27,96,.12);
-  overflow:hidden;
-  min-height: 230px;
+/* Bilgi kutuları */
+.alert {
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.alert.error { background: #ffe2e0; color: #b00020; }
+.alert.hint  { background: #f4f0ff; color: var(--hint); }
+
+/* Kart grid’i */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 22px;
 }
 
-/* (İsteğe bağlı görsel vurgu) */
-.chart-card--listing{
-  background:
-    radial-gradient(140% 80% at -20% -20%, #fff6fb 0%, transparent 60%) no-repeat,
-    var(--card);
+/* Kartlar */
+.card {
+  background: linear-gradient(180deg, var(--pink2), #fff);
+  border: 3px solid #ffd0e2;
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: var(--cardShadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 220px;
 }
 
-/* ===== Başlık ===== */
-.chart-card__title{
-  font-weight:800;
-  font-size:16px;
-  line-height:1.2;
-  padding:14px 16px 6px;
-  color: var(--pink);
+.card.new-card {
+  border-color: var(--blueCardBorder);
+  background: #eaf3ff;
+  box-shadow: 0 16px 36px var(--blueBtnShadow);
 }
 
-/* ===== Görsel alan (dashed border + degrade) ===== */
-.chart-card__media{
-  margin: 10px 16px;
-  border-radius:12px;
-  border:3px dashed var(--border-pink);
-  background:
-    linear-gradient(135deg, var(--media-bg1) 0%, var(--media-bg2) 60%);
-  aspect-ratio: 16 / 9;
-  overflow:hidden;
-}
-.chart-card__media img{
-  width:100%; height:100%; object-fit:cover; display:block;
+/* Başlık */
+.card-title {
+  font-weight: 800;
+  font-size: 20px;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+  color: var(--text);
+  word-break: break-word;
 }
 
-/* ===== Alt kısım ===== */
-.chart-card__footer{
-  margin-top:auto;
-  padding:12px 16px 16px;
-  display:flex;
-  justify-content:center;
+/* Ortadaki pembe alan (ileride foto için placeholder) */
+.thumb {
+  flex: 1;
+  min-height: 110px;
+  background: linear-gradient(180deg, #ffeaf3, #ffe1ef);
+  border: 3px dashed #ffc3da;
+  border-radius: 16px;
+}
+.thumb-new {
+  background: linear-gradient(180deg, #eef5ff, #e6f0ff);
+  border-color: #b8d4ff;
 }
 
-/* ===== Butonlar ===== */
-.btn{
-  display:inline-block;
-  padding:12px 18px;
-  border:none;
-  border-radius:999px;
-  font-weight:700;
-  font-size:14px;
-  text-decoration:none;
-  cursor:pointer;
-  transition: transform .08s ease, box-shadow .15s ease, opacity .15s;
-  color:#fff;
+/* Kart buton alanı */
+.card-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
 }
 
-/* Koyu pembe */
-.btn--dark-pink{
-  background: linear-gradient(135deg, var(--pink), var(--pink-700));
-  box-shadow: 0 10px 20px rgba(216,27,96,.28), 0 2px 6px rgba(173,20,87,.22) inset;
+/* Butonlar */
+.btn-primary,
+.btn-secondary {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 999px;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  transition: transform .06s ease, box-shadow .15s ease, opacity .15s ease;
 }
-.btn--dark-pink:hover{ transform: translateY(-1px); }
-.btn--dark-pink:active{ transform: translateY(0); box-shadow: 0 6px 12px rgba(216,27,96,.28); }
 
-/* Mavi (Yeni İlan Oluştur) */
-.btn--blue{
-  background: linear-gradient(135deg, var(--blue), var(--blue-700));
-  box-shadow: 0 10px 20px rgba(25,118,210,.28), 0 2px 6px rgba(13,71,161,.22) inset;
+.btn-primary {
+  background: var(--blueBtn);
+  box-shadow: 0 14px 28px var(--blueBtnShadow);
 }
-.btn--blue:hover{ transform: translateY(-1px); }
-.btn--blue:active{ transform: translateY(0); box-shadow: 0 6px 12px rgba(25,118,210,.28); }
+.btn-primary:hover { transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
 
-.btn[disabled]{ opacity:.6; cursor:not-allowed; transform:none; }
-
-/* ===== “Yeni İlan Oluştur” kartını mavi vurgula ===== */
-/* Eğer bu kart her zaman ilk sıradaysa: */
-.grid > .chart-card:first-child{
-  border-color: var(--blue);
-  box-shadow: 0 8px 18px rgba(25,118,210,.18);
+.btn-secondary {
+  background: var(--pinkBtn);
+  box-shadow: 0 14px 28px rgba(193, 0, 89, 0.35);
 }
-.grid > .chart-card:first-child .chart-card__title{ color: var(--blue); }
-.grid > .chart-card:first-child .chart-card__media{ border-color: var(--border-blue); }
+.btn-secondary:hover { background: var(--pinkBtnHover); transform: translateY(-1px); }
+.btn-secondary:active { transform: translateY(0); }
 
-/* Alternatif (daha kesin): HTML’de bu karta .chart-card--create sınıfı ekleyebilirsin
-.chart-card--create{ border-color: var(--blue); box-shadow: 0 8px 18px rgba(25,118,210,.18); }
-.chart-card--create .chart-card__title{ color: var(--blue); }
-.chart-card--create .chart-card__media{ border-color: var(--border-blue); }
-*/
-
-/* ===== Responsive ===== */
-@media (max-width: 640px){
-  .grid{ gap:14px; }
-  .chart-card{ min-height:210px; }
-  .chart-card__title{ font-size:15px; }
+/* Responsive kırılımlar */
+@media (max-width: 1280px) {
+  .cards-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 1024px) {
+  .cards-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 760px) {
+  .cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .cards-grid { grid-template-columns: 1fr; }
 }

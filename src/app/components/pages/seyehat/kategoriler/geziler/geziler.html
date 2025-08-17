@@ -1,35 +1,28 @@
-<section class="grid">
-  <!-- Yeni ilan oluştur kartı -->
-  <article class="chart-card chart-card--listing">
-    <header class="chart-card__title">Anı Yakala</header>
-    <div class="chart-card__media"></div>
-    <footer class="chart-card__footer">
-      <a class="btn btn--blue" [routerLink]="['/seyehat/geziler/ilan']">
-        Yeni İlan Oluştur
-      </a>
-    </footer>
-  </article>
-
-  <!-- Dinamik ilan kartları -->
-  <article
-    class="chart-card chart-card--listing"
-    *ngFor="let item of items; trackBy: trackById">
-
-    <header class="chart-card__title">
-      {{ item.title }}
-    </header>
-
-    <div class="chart-card__media">
-      <div class="chart-card__media"></div>
-
+<div class="page-wrap">
+ 
+  <div class="cards-grid">
+    <!-- Sabit: Yeni ilan kartı -->
+    <div class="card new-card">
+      <h3 class="card-title">Anı Yakala</h3>
+      <div class="thumb thumb-new"></div>
+      <div class="card-actions">
+        <button class="btn-primary" type="button" (click)="goCreate()">
+          Yeni İlan Oluştur
+        </button>
+      </div>
     </div>
 
-    <footer class="chart-card__footer">
-      <a class="btn btn--dark-pink"
-         [routerLink]="['/seyehat/geziler/detay', item.id]">
-          Detay Gör
-      </a>
-    </footer>
-
-  </article>
-</section>
+    <!-- DB’den gelen ilan kartları (sadece başlık + placeholder + buton) -->
+    @for (i of ilanlar; track i.id) {
+      <div class="card">
+        <h3 class="card-title">{{ i.title }}</h3>
+        <div class="thumb"></div>
+        <div class="card-actions">
+          <button class="btn-secondary" type="button" (click)="goDetail(i.id)">
+            Detay Gör
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

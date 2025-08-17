@@ -1,38 +1,53 @@
-// src/app/components/pages/seyehat/kategoriler/geziler/geziler.ts
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { DetayModel } from '../../../../../models/detay-model';
-import { CruiseService } from '../../../../../services/cruise-service';
 import { GezilerService } from '../../../../../services/geziler-service';
 
 @Component({
-  selector: 'app-geziler-list',
+  selector: 'app-geziler',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterModule],
   templateUrl: './geziler.html',
-  styleUrls: ['./geziler.css']
+  styleUrls: ['./geziler.css'],
 })
-export class Geziler {
-  loading = true;
+export class Geziler implements OnInit {
+  loading = false;
   error: string | null = null;
+  ilanlar: DetayModel[] = [];
 
-  // Kartlarda döneceğimiz liste
-  items: DetayModel[] = [];
+  constructor(private svc: GezilerService, private router: Router) {}
 
-  // *ngFor performansı için
-  trackById = (i: number, nesne: DetayModel) => nesne.id ?? i;
+  ngOnInit(): void { this.fetch(); }
 
-  constructor(private api: GezilerService) {}
-
-  ngOnInit() {
-    // Backend’den listeyi çek
-    // Backend’den listeyi çek
-    this.api['list']().subscribe({
-      next: (data: DetayModel[]) => { this.items = data; this.loading = false; },
-      error: () => { this.error = 'İlanlar yüklenemedi.'; this.loading = false; }
+  fetch() {
+    this.loading = true;
+    this.error = null;
+    this.svc.getAllIlanlar().subscribe({
+      next: (list: any[]) => {
+        this.ilanlar = (list ?? []).map(this.normalizeItem);
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('[GezilerListe] load error:', err);
+        this.error = err?.error?.message || 'İlanlar alınamadı.';
+        this.loading = false;
+      }
     });
-
-
   }
+
+  private normalizeItem = (raw: any): DetayModel => ({
+    id: raw.id ?? raw.Id,
+    userId: raw.userId ?? raw.UserId ?? 0,
+    title: raw.title ?? raw.Title ?? '',
+    description: raw.description ?? raw.Description ?? '',
+    date: raw.date ?? raw.Date ?? '',
+    time: raw.time ?? raw.Time ?? '',
+    city: raw.city ?? raw.City ?? '',
+    district: raw.district ?? raw.District ?? '',
+  });
+
+  goCreate() { this.router.navigate(['/seyehat/geziler/ilan']); }
+  goDetail(id: number) { this.router.navigate(['/seyehat/geziler', id]); }
+  trackById = (_: number, item: DetayModel) => item.id;
 }

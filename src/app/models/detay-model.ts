@@ -1,11 +1,11 @@
+// src/app/models/ilan-detail.model.ts
 export interface DetayModel {
-    id: number;
+  id: number;
+  userId: number;
   title: string;
   description: string;
-  dateTime: string;     // ISO (etkinliğin zamanı)
+  date: string;   // ISO datetime string
+  time: string;   // "HH:mm:ss" (veya DB’de string)
   city: string;
   district: string;
-  createdBy: string;    // ilan sahibi adı
-  createdAt: string;    // ilan oluşturulma tarihi (ISO)
-  userAvatarUrl?: string; // varsa
 }

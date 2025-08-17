@@ -176,3 +176,10 @@
 @media (max-width: 640px) {
   .date-time-row { grid-template-columns: 1fr 1fr; } /* Yıl/Ay ve Gün/Saat alt alta */
 }
+
+.celebrate{
+  margin-top:14px;padding:12px 16px;background:#e8fff3;border:2px solid #3ad29f;
+  color:#155f41;border-radius:14px;font-weight:800;text-align:center;
+  box-shadow:0 8px 20px rgba(58,210,159,0.15);
+}
+

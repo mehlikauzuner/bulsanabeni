@@ -24,4 +24,3 @@ export interface District {
   cityId: number;
   name: string;
 }
-
