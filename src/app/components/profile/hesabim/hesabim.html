@@ -1,5 +1,232 @@
-<!-- <app-navbar></app-navbar>
+<!-- src/app/pages/profil/hesabim/hesabim.html -->
+<div class="container my-4 profile-container hesabim-page">
+  <div class="row g-3">
 
-<div style="padding-top:64px;">
- 
-</div> -->
+    <!-- Sol profil özet: sticky + baby-blue (stil styles.css'te) -->
+    <aside class="col-12 col-lg-3 left-rail">
+      <div class="card shadow-sm baby-left-card">
+        <div class="card-body text-center">
+          <div class="avatar mb-3" [attr.data-initials]="user.fullName ? user.fullName.charAt(0) : 'U'"
+>
+            @if (user.fotoUrl) {
+              <img [src]="user.fotoUrl" alt="Profil" />
+            }
+          </div>
+          <h5 class="mb-1">{{ user.fullName }}</h5>
+          <div class="text-muted small mb-2">{{ user.email }}</div>
+
+          <div class="row text-start small">
+            <div class="col-12 mb-1"><strong>Şehir:</strong> {{ user.sehir }}</div>
+            <div class="col-12 mb-1"><strong>Yaş:</strong> {{ user.yas }}</div>
+            <div class="col-12 mb-1">
+              <strong>Ortalama Puan:</strong>
+              <span class="stars">{{ user.puan | number:'1.1-1' }}</span>
+            </div>
+            <div class="col-12 mb-1"><strong>Rozet:</strong> {{ user.rozetSayisi }}</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Sağ alan -->
+    <main class="col-12 col-lg-9">
+      <!-- Sekme barı: hover pembe (CSS), click ile toggle -->
+      <ul class="nav nav-pills baby-nav mb-3">
+        <li class="nav-item">
+          <button class="nav-link" [class.active]="active==='bildirimler'"
+                  (click)="toggleTab('bildirimler')">Bildirimler</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" [class.active]="active==='mesajlar'"
+                  (click)="toggleTab('mesajlar')">Mesajlar</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" [class.active]="active==='rozetler'"
+                  (click)="toggleTab('rozetler')">Rozetler</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" [class.active]="active==='yorumlar'"
+                  (click)="toggleTab('yorumlar')">Yorumlar</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" [class.active]="active==='ara'"
+                  (click)="toggleTab('ara')">Kullanıcı Ara</button>
+        </li>
+        <li class="nav-item ms-auto">
+          <button class="nav-link" [class.active]="active==='ayarlar'"
+                  (click)="toggleTab('ayarlar')">Ayarlar</button>
+        </li>
+      </ul>
+
+      <!-- Başlangıçta boş durum -->
+      @if (!active) {
+        <div class="placeholder-card">
+          <div class="card shadow-sm">
+            <div class="card-body text-muted">
+              Bir sekmeye tıklayarak içeriği aç. Aynı sekmeye tekrar tıklarsan kapanır.
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Bildirimler -->
+      @if (active==='bildirimler') {
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h6 class="mb-3">Bildirimler</h6>
+            @for (b of bildirimler; track b.id) {
+              <div class="notify-item">
+                <span class="dot"></span> {{ b.text }}
+                <span class="ago">{{ b.ago }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Mesajlar -->
+      @if (active==='mesajlar') {
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h6 class="mb-3">Mesajlar</h6>
+            <ul class="list-group list-group-flush">
+              @for (k of mesajKisileri; track k.id) {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span><strong>{{ k.ad }}</strong> — <span class="text-muted">{{ k.son }}</span></span>
+                  <span class="badge bg-light text-dark">{{ k.ago }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
+
+      <!-- Rozetler -->
+      @if (active==='rozetler') {
+        <div class="row g-3">
+          @for (r of rozetler; track $index) {
+            <div class="col-sm-6 col-lg-4">
+              <div class="card badge-card">
+                <div class="card-body">
+                  <div class="badge-icon">★</div>
+                  <div class="badge-text">
+                    <div class="fw-semibold">{{ r.ad }}</div>
+                    <div class="text-muted small">{{ r.aciklama }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Yorumlar -->
+      @if (active==='yorumlar') {
+
+        <!-- Başkasının profili ise yorum yazma kutusu -->
+        @if (!isOwnProfile) {
+          <div class="card shadow-sm mb-3">
+            <div class="card-body">
+              <h6 class="mb-3">Yorum Yaz</h6>
+              <div class="row g-2 align-items-center">
+                <div class="col-sm-3">
+                  <label class="form-label mb-0">Puan</label>
+                  <select class="form-select" [(ngModel)]="newRating">
+                    <option [ngValue]="5">★★★★★ (5)</option>
+                    <option [ngValue]="4">★★★★☆ (4)</option>
+                    <option [ngValue]="3">★★★☆☆ (3)</option>
+                    <option [ngValue]="2">★★☆☆☆ (2)</option>
+                    <option [ngValue]="1">★☆☆☆☆ (1)</option>
+                  </select>
+                </div>
+                <div class="col-sm-7">
+                  <label class="form-label mb-0">Yorum</label>
+                  <input class="form-control" [(ngModel)]="newComment" placeholder="Kısa bir yorum yaz..." />
+                </div>
+                <div class="col-sm-2 d-grid">
+                  <label class="form-label mb-0 invisible">Gönder</label>
+                  <button class="btn btn-primary" (click)="addComment()">Gönder</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h6 class="mb-3">Gelen Yorumlar</h6>
+            @for (y of yorumlar; track $index) {
+              <div class="review">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="fw-semibold">{{ y.yazar }}</div>
+                  <div class="starline">★★★★★</div>
+                  <span class="text-muted small">{{ y.tarih }}</span>
+                </div>
+                <div class="mt-1">{{ y.metin }}</div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Kullanıcı Ara -->
+      @if (active==='ara') {
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h6 class="mb-3">Kullanıcı Ara</h6>
+
+            <div class="mb-3">
+              <input class="form-control" [(ngModel)]="q" (input)="onQuery()" placeholder="İsim veya şehir ara..." />
+            </div>
+
+            @if (results.length > 0){
+              <ul class="list-group list-group-flush">
+                @for (u of results; track u.id) {
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><strong>{{ u.name }}</strong> — <span class="text-muted">{{ u.city }}</span></span>
+                    <button class="btn btn-sm btn-outline-primary" (click)="openProfile(u.id)">Profili Gör</button>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <div class="text-muted">Sonuç bulunamadı.</div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Ayarlar -->
+      @if (active==='ayarlar') {
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h6 class="mb-3">Ayarlar</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Ad Soyad</label>
+                <input class="form-control" [(ngModel)]="user.fullName" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">E-posta</label>
+                <input class="form-control" [(ngModel)]="user.email" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Şehir</label>
+                <input class="form-control" [(ngModel)]="user.sehir" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Yaş</label>
+                <input type="number" class="form-control" [(ngModel)]="user.yas" />
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <small class="text-muted">Değişiklikler backend gelince kaydedilecek (mock)</small>
+              <button class="btn btn-outline-danger" (click)="logout()">Çıkış Yap</button>
+            </div>
+          </div>
+        </div>
+      }
+
+    </main>
+  </div>
+</div>

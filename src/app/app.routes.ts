@@ -35,11 +35,11 @@ import { Speaking } from './components/pages/akademik/speaking/speaking';
 import { Workshop } from './components/pages/akademik/workshop/workshop';
 import { Yarismalar } from './components/pages/akademik/yarismalar/yarismalar';
 import { Profil } from './components/pages/profil/profil';
-import { Hesabim } from './components/pages/profil/hesabim/hesabim';
 import { Geziler } from './components/pages/seyehat/kategoriler/geziler/geziler';
 import { GezilerIlan } from './components/pages/seyehat/kategoriler/geziler/ilan/ilan';
 import { CruiseIlan } from './components/pages/seyehat/kategoriler/cruise/ilan/ilan';
 import { GezilerDetay } from './components/pages/seyehat/kategoriler/geziler/detay/detay';
+import { Hesabim } from './components/profile/hesabim/hesabim';
 
 
 
