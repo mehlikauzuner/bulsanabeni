@@ -2,66 +2,230 @@
   <div class="card">
     <h1 class="title">{{ mode() === 'login' ? 'PROFİL' : 'KAYIT OL' }}</h1>
 
-    <p *ngIf="errorMsg()" class="alert">{{ errorMsg() }}</p>
+    @if (errorMsg()) {
+      <p class="alert">{{ errorMsg() }}</p>
+    }
 
-    <!-- LOGIN GÖRÜNÜMÜ -->
-    <form *ngIf="mode() === 'login'" (ngSubmit)="onLogin()" #loginForm="ngForm" novalidate>
-      <label class="field">
-        <span>Kullanıcı adı</span>
-        <input type="text" name="username" [(ngModel)]="loginModel.username" required />
-      </label>
+   @if (mode() === 'login') {
+  <form (ngSubmit)="onLogin()" #loginForm="ngForm" novalidate autocomplete="on">
 
-      <label class="field">
-        <span>Şifre</span>
-        <input type="password" name="password" [(ngModel)]="loginModel.password" required />
-      </label>
+    <!-- E-POSTA -->
+    <label class="field" [class.invalid]="email_login.invalid && (email_login.dirty || email_login.touched)">
+      <span>E-posta</span>
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="loginModel.email"
+        #email_login="ngModel"
+        required
+        autocomplete="email"
+      />
+      @if (email_login.errors && (email_login.dirty || email_login.touched)) {
+        <small class="hint">
+          @if (email_login.errors['required']) { E-posta zorunlu. }
+          @if (email_login.errors['email'])    { Geçerli bir e-posta gir. }
+        </small>
+      }
+    </label>
 
-      <div class="actions">
-        <button type="submit" class="btn primary" [disabled]="isSubmitting()">Login</button>
-        <button type="button" class="btn ghost" (click)="switchTo('register')">Register</button>
-      </div>
-    </form>
+    <!-- ŞİFRE -->
+    <label class="field" [class.invalid]="password_login.invalid && (password_login.dirty || password_login.touched)">
+      <span>Şifre</span>
+      <input
+        type="password"
+        name="password"
+        [(ngModel)]="loginModel.password"
+        #password_login="ngModel"
+        required
+        minlength="8"
+        maxlength="15"
+        autocomplete="current-password"
+      />
+      @if (password_login.errors && (password_login.dirty || password_login.touched)) {
+        <small class="hint">
+          @if (password_login.errors['required']) { Şifre zorunlu. }
+          @if (password_login.errors['minlength'] || password_login.errors['maxlength']) { Şifre 8–15 karakter olmalı. }
+          @if (password_login.errors['pattern']) { En az 1 harf + 1 rakam içermeli, boşluk içeremez. }
+        </small>
+      }
+    </label>
 
-    <!-- REGISTER GÖRÜNÜMÜ -->
-    <form *ngIf="mode() === 'register'" (ngSubmit)="onRegister()" #regForm="ngForm" novalidate>
-      <div class="grid">
-        <label class="field">
-          <span>Ad</span>
-          <input type="text" name="firstName" [(ngModel)]="registerModel.firstName" required />
+    <div class="actions">
+      <button type="submit" class="btn primary" [disabled]="isSubmitting() || loginForm.invalid">
+        {{ isSubmitting() ? 'Giriş yapılıyor…' : 'Login' }}
+      </button>
+      <button type="button" class="btn ghost" (click)="switchTo('register')" [disabled]="isSubmitting()">Register</button>
+    </div>
+  </form>
+}
+
+
+
+    <!-- ============== REGISTER ============== -->
+    @if (mode() === 'register') {
+      <form
+        (ngSubmit)="onRegister()"
+        #regForm="ngForm"
+        novalidate
+        autocomplete="on"
+      >
+        <div class="grid">
+          <label class="field" [class.invalid]="firstName.invalid && (firstName.dirty || firstName.touched)">
+            <span>Ad</span>
+            <input
+              type="text"
+              name="firstName"
+              [(ngModel)]="registerModel.firstName"
+              #firstName="ngModel"
+              required
+              minlength="2"
+              maxlength="30"
+              autocomplete="given-name"
+            />
+            @if (firstName.errors && (firstName.dirty || firstName.touched)) {
+              <small class="hint">
+                @if (firstName.errors['required']) { Ad zorunlu. }
+                @if (firstName.errors['minlength']) { En az 2 karakter. }
+                @if (firstName.errors['maxlength']) { En fazla 30 karakter. }
+              </small>
+            }
+          </label>
+
+          <label class="field" [class.invalid]="lastName.invalid && (lastName.dirty || lastName.touched)">
+            <span>Soyad</span>
+            <input
+              type="text"
+              name="lastName"
+              [(ngModel)]="registerModel.lastName"
+              #lastName="ngModel"
+              required
+              minlength="2"
+              maxlength="30"
+              autocomplete="family-name"
+            />
+            @if (lastName.errors && (lastName.dirty || lastName.touched)) {
+              <small class="hint">
+                @if (lastName.errors['required']) { Soyad zorunlu. }
+                @if (lastName.errors['minlength']) { En az 2 karakter. }
+                @if (lastName.errors['maxlength']) { En fazla 30 karakter. }
+              </small>
+            }
+          </label>
+        </div>
+
+        <label class="field" [class.invalid]="username_reg.invalid && (username_reg.dirty || username_reg.touched)">
+          <span>Kullanıcı adı</span>
+          <input
+            type="text"
+            name="username"
+            [(ngModel)]="registerModel.username"
+            #username_reg="ngModel"
+            required
+            minlength="3"
+            maxlength="20"
+            pattern="^[A-Za-z0-9_.-]{3,20}$"
+            autocomplete="username"
+          />
+          @if (username_reg.errors && (username_reg.dirty || username_reg.touched)) {
+            <small class="hint">
+              @if (username_reg.errors['required']) { Kullanıcı adı zorunlu. }
+              @if (username_reg.errors['minlength']) { En az 3 karakter. }
+              @if (username_reg.errors['maxlength']) { En fazla 20 karakter. }
+              @if (username_reg.errors['pattern'])  { Sadece harf, rakam, . _ - kullanılabilir. }
+            </small>
+          }
         </label>
 
-        <label class="field">
-          <span>Soyad</span>
-          <input type="text" name="lastName" [(ngModel)]="registerModel.lastName" required />
+        <label class="field" [class.invalid]="email.invalid && (email.dirty || email.touched)">
+          <span>E-posta</span>
+          <input
+            type="email"
+            name="email"
+            [(ngModel)]="registerModel.email"
+            #email="ngModel"
+            required
+            autocomplete="email"
+          />
+          @if (email.errors && (email.dirty || email.touched)) {
+            <small class="hint">
+              @if (email.errors['required']) { E-posta zorunlu. }
+              @if (email.errors['email'])    { Geçerli bir e-posta gir. }
+            </small>
+          }
         </label>
-      </div>
 
-      <label class="field">
-        <span>E-posta</span>
-        <input type="email" name="email" [(ngModel)]="registerModel.email" required />
-      </label>
+        <label class="field" [class.invalid]="city.invalid && (city.dirty || city.touched)">
+  <span>Şehir</span>
+  <input
+    type="text"
+    name="city"
+    [(ngModel)]="registerModel.City"
+    #city="ngModel"
+    required
+    minlength="2"
+    maxlength="30"
+    pattern="^[A-Za-zÇĞİÖŞÜçğıöşü\s\-]{2,30}$"
+    autocomplete="address-level2"
+  />
+  @if (city.errors && (city.dirty || city.touched)) {
+    <small class="hint">
+      @if (city.errors['required'])  { Şehir zorunlu. }
+      @if (city.errors['minlength']) { En az 2 karakter. }
+      @if (city.errors['maxlength']) { En fazla 30 karakter. }
+      @if (city.errors['pattern'])   { Sadece harf, boşluk ve - kullanılabilir. }
+    </small>
+  }
+</label>
 
-      <label class="field">
-        <span>Şifre</span>
-        <input type="password" name="password" [(ngModel)]="registerModel.password" minlength="6" required />
-      </label>
 
-      <label class="field">
-        <span>Doğum tarihi</span>
-        <input
-  type="date"
-  name="birthDate"
-  [(ngModel)]="registerModel.birthDate"
-  [max]="maxDate"
-  required
-/>
+        <label class="field" [class.invalid]="password_reg.invalid && (password_reg.dirty || password_reg.touched)">
+          <span>Şifre</span>
+          <input
+            type="password"
+            name="password"
+            [(ngModel)]="registerModel.password"
+            #password_reg="ngModel"
+            required
+            minlength="8"
+            maxlength="15"
+            pattern="^(?=.*[A-Za-z])(?=.*\d)\S{8,15}$"
+            autocomplete="new-password"
+          />
+          @if (password_reg.errors && (password_reg.dirty || password_reg.touched)) {
+            <small class="hint">
+              @if (password_reg.errors['required']) { Şifre zorunlu. }
+              @if (password_reg.errors['minlength'] || password_reg.errors['maxlength']) { 8–15 karakter olmalı. }
+              @if (password_reg.errors['pattern']) { En az 1 harf + 1 rakam içermeli, boşluk içeremez. }
+            </small>
+          }
+        </label>
 
-      </label>
+        <label class="field" [class.invalid]="birthDate.invalid && (birthDate.dirty || birthDate.touched)">
+          <span>Doğum tarihi</span>
+          <input
+            type="date"
+            name="birthDate"
+            [(ngModel)]="registerModel.birthDate"
+            #birthDate="ngModel"
+            [max]="maxDate"
+            required
+            autocomplete="bday"
+          />
+          @if (birthDate.errors && (birthDate.dirty || birthDate.touched)) {
+            <small class="hint">
+              @if (birthDate.errors['required']) { Doğum tarihi zorunlu. }
+              @if (birthDate.errors['max'])      { Gelecek tarih olamaz. }
+            </small>
+          }
+        </label>
 
-      <div class="actions">
-        <button type="submit" class="btn primary" [disabled]="isSubmitting()">Register</button>
-        <button type="button" class="btn ghost" (click)="switchTo('login')">Geri - Login</button>
-      </div>
-    </form>
-  </div>
-</div>
+        <div class="actions">
+          <button type="submit" class="btn primary" [disabled]="isSubmitting() || regForm.invalid">
+            {{ isSubmitting() ? 'Kayıt yapılıyor…' : 'Register' }}
+          </button>
+          <button type="button" class="btn ghost" (click)="switchTo('login')" [disabled]="isSubmitting()">
+            Geri - Login
+          </button>
+        </div>
+      </form>
+    }

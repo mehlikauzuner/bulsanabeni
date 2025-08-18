@@ -245,5 +245,62 @@ export class GezilerIlan implements OnInit {
         this.submitting = false;
       }
     });
+    
   }
+  // --- Kullanıcı kartı için (opsiyonel placeholder) ---
+ilanUser: { fullName: string; joinedAt?: Date | string } | null = { fullName: 'Kullanıcı', joinedAt: new Date() };
+
+// --- Başlık/Açıklama validasyon state ---
+titleTouched = false;
+get titleLen(): number { return this.title.length; }
+get titleInvalid(): boolean { return this.titleTouched && !this.title.trim(); }
+onTitleChange(e: Event) {
+  const v = (e.target as HTMLInputElement).value ?? '';
+  this.title = v;
+}
+
+descriptionTouched = false;
+get descLen(): number { return this.description.length; }
+get descInvalid(): boolean {
+  const empty = !this.description.trim();
+  const over = this.description.length > this.maxDescLen;
+  return this.descriptionTouched && (empty || over);
+}
+onDescChange(e: Event) {
+  const v = (e.target as HTMLTextAreaElement).value ?? '';
+  this.description = v;
+}
+
+// --- Saat seçimi handler'ı ---
+onHourChange(e: Event) {
+  const v = (e.target as HTMLSelectElement).value;
+  this.selectedHour = v === '' ? null : Number(v);
+  this.syncEventDate();
+}
+
+// --- İl/İlçe dropdown event'leri ---
+onCityFocus() {
+  this.showCityDropdown = true;
+  if (!this.cities.length && !this.loadingCities) this.loadCities();
+}
+onCityBlur() { setTimeout(() => this.showCityDropdown = false, 100); }
+onCityInputChange(e: Event) {
+  this.citySearch = (e.target as HTMLInputElement).value ?? '';
+  this.showCityDropdown = true;
+  if (!this.cities.length && !this.loadingCities) this.loadCities();
+}
+
+onDistrictFocus() {
+  if (!this.selectedCityId) return;
+  this.showDistrictDropdown = true;
+  if (!this.districts.length && !this.loadingDistricts) this.loadDistricts(this.selectedCityId);
+}
+onDistrictBlur() { setTimeout(() => this.showDistrictDropdown = false, 100); }
+onDistrictInputChange(e: Event) {
+  if (!this.selectedCityId) return;
+  this.districtSearch = (e.target as HTMLInputElement).value ?? '';
+  this.showDistrictDropdown = true;
+  if (!this.districts.length && !this.loadingDistricts) this.loadDistricts(this.selectedCityId);
+}
+
 }
