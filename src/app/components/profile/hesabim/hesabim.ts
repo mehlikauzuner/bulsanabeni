@@ -65,10 +65,7 @@ export class Hesabim {
     }
   }
 
-  /** Sekme aç/kapat */
-  toggleTab(t: Tab) {
-    this.active = (this.active === t) ? null : t;
-  }
+ 
 
   /** Logout: servisten temizle + profil sayfasına dön */
   logout() {
@@ -80,28 +77,37 @@ export class Hesabim {
 
    // ====== BACKEND'DEN BİLDİRİM ÇEKME (BASIC) ======
   notifications: any[] = [];
-  notiLoading = false;
-  notiLoaded = false;
+notiLoading = false;
+notiLoaded = false;
 
-  private loadNotifications() {
-    const uid = this.currentUserId();
-    if (!uid) return; // login değilse
-    this.notiLoading = true;
+private loadNotifications() {
+  const uid = this.currentUserId();
+  if (!uid) return;
 
-    this.noti.getMy(uid).subscribe({
-      next: (res) => {
-        // API SuccessDataResult dönerse res.data; düz liste dönerse res
-        this.notifications = res?.data ?? res ?? [];
-        this.notiLoading = false;
-        this.notiLoaded = true;
-      },
-      error: () => {
-        this.notifications = [];
-        this.notiLoading = false;
-        this.notiLoaded = true;
-      }
-    });
+  this.notiLoading = true;
+  this.noti.getMyNotification(uid).subscribe({
+    next: (res) => {
+      console.log('noti res:', res);              // ← ŞEKLİNİ GÖR
+      this.notifications = res?.data ?? res ?? []; // data varsa data, yoksa direkt res
+      this.notiLoading = false;
+      this.notiLoaded = true;
+    },
+    error: (err) => {
+      console.error('noti err:', err);
+      this.notifications = [];
+      this.notiLoading = false;
+      this.notiLoaded = true;
+    }
+  });
+}
+
+toggleTab(t: Tab) {
+  this.active = (this.active === t) ? null : t;
+  if (this.active === 'bildirimler' && !this.notiLoaded) {
+    this.loadNotifications();
   }
+}
+
   // --- AŞAĞIDAKİLER şimdilik MOCK; backend bağlayınca bunları API'den dolduracağız ---
 
   user = {

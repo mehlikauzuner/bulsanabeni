@@ -2,12 +2,11 @@
 <div class="container my-4 profile-container hesabim-page">
   <div class="row g-3">
 
-    <!-- Sol profil özet: sticky + baby-blue (stil styles.css'te) -->
+    <!-- Sol profil özet -->
     <aside class="col-12 col-lg-3 left-rail">
       <div class="card shadow-sm baby-left-card">
         <div class="card-body text-center">
-          <div class="avatar mb-3" [attr.data-initials]="user.fullName ? user.fullName.charAt(0) : 'U'"
->
+          <div class="avatar mb-3" [attr.data-initials]="user.fullName ? user.fullName.charAt(0) : 'U'">
             @if (user.fotoUrl) {
               <img [src]="user.fotoUrl" alt="Profil" />
             }
@@ -30,31 +29,25 @@
 
     <!-- Sağ alan -->
     <main class="col-12 col-lg-9">
-      <!-- Sekme barı: hover pembe (CSS), click ile toggle -->
+      <!-- Sekme barı -->
       <ul class="nav nav-pills baby-nav mb-3">
         <li class="nav-item">
-          <button class="nav-link" [class.active]="active==='bildirimler'"
-                  (click)="toggleTab('bildirimler')">Bildirimler</button>
+          <button class="nav-link" [class.active]="active==='bildirimler'" (click)="toggleTab('bildirimler')">Bildirimler</button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" [class.active]="active==='mesajlar'"
-                  (click)="toggleTab('mesajlar')">Mesajlar</button>
+          <button class="nav-link" [class.active]="active==='mesajlar'" (click)="toggleTab('mesajlar')">Mesajlar</button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" [class.active]="active==='rozetler'"
-                  (click)="toggleTab('rozetler')">Rozetler</button>
+          <button class="nav-link" [class.active]="active==='rozetler'" (click)="toggleTab('rozetler')">Rozetler</button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" [class.active]="active==='yorumlar'"
-                  (click)="toggleTab('yorumlar')">Yorumlar</button>
+          <button class="nav-link" [class.active]="active==='yorumlar'" (click)="toggleTab('yorumlar')">Yorumlar</button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" [class.active]="active==='ara'"
-                  (click)="toggleTab('ara')">Kullanıcı Ara</button>
+          <button class="nav-link" [class.active]="active==='ara'" (click)="toggleTab('ara')">Kullanıcı Ara</button>
         </li>
         <li class="nav-item ms-auto">
-          <button class="nav-link" [class.active]="active==='ayarlar'"
-                  (click)="toggleTab('ayarlar')">Ayarlar</button>
+          <button class="nav-link" [class.active]="active==='ayarlar'" (click)="toggleTab('ayarlar')">Ayarlar</button>
         </li>
       </ul>
 
@@ -69,48 +62,31 @@
         </div>
       }
 
-      <!-- Bildirimler -->
-      <div *ngIf="active === 'bildirimler'">
-  <div *ngIf="notiLoading">Yükleniyor…</div>
+      <!-- Bildirimler (sadece kart, tek liste) -->
+      @if (active === 'bildirimler') {
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h6 class="mb-3">Bildirimler</h6>
 
-  <ul *ngIf="!notiLoading && notifications?.length">
-    <li *ngFor="let n of notifications">
-      {{ n.message }} — {{ n.createdAt | date:'short' }}
-    </li>
-  </ul>
-
-  <div *ngIf="!notiLoading && (!notifications || notifications.length === 0)">
-    Bildirimin yok.
-  </div>
-</div>
-
-<!-- Bildirimler Sekmesi -->
-@if (active === 'bildirimler') {
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <h6 class="mb-3">Bildirimler</h6>
-
-      @if (notiLoading) {
-        <div>Yükleniyor…</div>
-      } @else {
-        @if (notifications && notifications.length) {
-          <ul class="list-group list-group-flush">
-            @for (n of notifications; track $index) {
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>{{ n.message }}</span>
-                <span class="badge bg-light text-muted">
-                  {{ n.createdAt | date:'short' }}
-                </span>
-              </li>
+            @if (notiLoading) {
+              <div>Yükleniyor…</div>
+            } @else {
+              @if (notifications && notifications.length) {
+                <ul class="list-group list-group-flush">
+                  @for (n of notifications; track $index) {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>{{ n.message }}</span>
+                      <span class="badge bg-light text-muted">{{ n.createdAt | date:'short' }}</span>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <div class="text-muted">Bildirimin yok.</div>
+              }
             }
-          </ul>
-        } @else {
-          <div class="text-muted">Bildirimin yok.</div>
-        }
+          </div>
+        </div>
       }
-    </div>
-  </div>
-}
 
       <!-- Mesajlar -->
       @if (active==='mesajlar') {
@@ -150,8 +126,6 @@
 
       <!-- Yorumlar -->
       @if (active==='yorumlar') {
-
-        <!-- Başkasının profili ise yorum yazma kutusu -->
         @if (!isOwnProfile) {
           <div class="card shadow-sm mb-3">
             <div class="card-body">
@@ -202,11 +176,9 @@
         <div class="card shadow-sm">
           <div class="card-body">
             <h6 class="mb-3">Kullanıcı Ara</h6>
-
             <div class="mb-3">
               <input class="form-control" [(ngModel)]="q" (input)="onQuery()" placeholder="İsim veya şehir ara..." />
             </div>
-
             @if (results.length > 0){
               <ul class="list-group list-group-flush">
                 @for (u of results; track u.id) {
