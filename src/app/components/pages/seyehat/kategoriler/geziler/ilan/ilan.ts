@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GezilerService } from '../../../../../../services/geziler-service';
-import { City, District } from '../../../../../../models/ilan-model';
+import { AuthService } from '../../../../../../services/auth-service';
+
 
 @Component({
   selector: 'app-geziler-ilan',
@@ -11,7 +12,10 @@ import { City, District } from '../../../../../../models/ilan-model';
   styleUrls: ['./ilan.css'],
 })
 export class GezilerIlan implements OnInit {
-  constructor(private geziler: GezilerService) {}
+  constructor(
+    private geziler: GezilerService,
+    private auth: AuthService
+  ) {}
 
   // ===== Başlık / Açıklama =====
   maxTitleLen = 200;
@@ -33,274 +37,129 @@ export class GezilerIlan implements OnInit {
     { id: 7, name: 'Temmuz' }, { id: 8, name: 'Ağustos' }, { id: 9, name: 'Eylül' },
     { id: 10, name: 'Ekim' }, { id: 11, name: 'Kasım' }, { id: 12, name: 'Aralık' },
   ];
-  months = this.monthsAll.slice();
-  days: number[] = [];
   selectedYear: number | null = null;
   selectedMonth: number | null = null;
   selectedDay: number | null = null;
-  hours: number[] = [];
   selectedHour: number | null = null;
-  eventDate = '';
-  dateInvalid = false;
+  eventDate: string | null = null;
 
-  // ===== Konum =====
-  cities: City[] = [];
-  districts: District[] = [];
+  // ===== Şehir / İlçe =====
+  cities: any[] = [];
+  districts: any[] = [];
   selectedCityId: number | null = null;
+  selectedCityName: string | null = null;
   selectedDistrictId: number | null = null;
-  selectedCityName = '';
-  selectedDistrictName = '';
-  citySearch = '';
-  districtSearch = '';
-  showCityDropdown = false;
-  showDistrictDropdown = false;
-  loadingCities = false;
-  loadingDistricts = false;
-  locationError: string | null = null;
-  private districtCache: Record<number, District[]> = {};
+  selectedDistrictName: string | null = null;
 
-  // ===== Submit =====
-  submitting = false;
-  submitError: string | null = null;
-  createdId: number | null = null;
+  // ===== Flags =====
+  sending = false;
+  sendOk = false;
+  sendErr = false;
 
-  ngOnInit(): void {
-    for (let y = this.todayYear; y <= this.todayYear + this.YEAR_SPAN; y++) this.years.push(y);
-    this.buildHours();
+  ngOnInit() {
+    this.loadYears();
+    this.loadCities();
   }
 
-  // ===== Form kontrolü =====
-  get formValid(): boolean {
-    const okTitle = !!this.title.trim();
-    const okDesc = !!this.description.trim() && this.description.length <= this.maxDescLen;
-    const okDate = !!this.eventDate && !this.dateInvalid;
-    const okTime = this.selectedHour !== null;
-    const okCity = this.selectedCityId !== null;
-    const okDist = this.selectedDistrictId !== null;
-    return okTitle && okDesc && okDate && okTime && okCity && okDist;
-  }
-
-  // ===== Tarih / Saat metodları =====
-  private daysInMonth(year: number, month: number) {
-    return new Date(year, month, 0).getDate();
-  }
-
-  onYearSelect(y: number) {
-    this.selectedYear = y || null;
-    this.selectedMonth = null;
-    this.selectedDay = null;
-    this.days = [];
-    this.months = this.selectedYear === this.todayYear
-      ? this.monthsAll.filter(m => m.id >= this.todayMonth)
-      : this.monthsAll.slice();
-    this.syncEventDate();
-  }
-
-  onMonthSelect(m: number) {
-    this.selectedMonth = m || null;
-    this.selectedDay = null;
-    if (this.selectedYear && this.selectedMonth) {
-      const max = this.daysInMonth(this.selectedYear, this.selectedMonth);
-      const startDay = (this.selectedYear === this.todayYear && this.selectedMonth === this.todayMonth)
-        ? this.todayDay : 1;
-      this.days = Array.from({ length: max - startDay + 1 }, (_, i) => startDay + i);
-    } else this.days = [];
-    this.syncEventDate();
-  }
-
-  onDaySelect(d: number) {
-    this.selectedDay = d || null;
-    this.syncEventDate();
-  }
-
-  private syncEventDate() {
-    if (this.selectedYear && this.selectedMonth && this.selectedDay) {
-      this.eventDate = `${this.selectedYear}-${String(this.selectedMonth).padStart(2,'0')}-${String(this.selectedDay).padStart(2,'0')}`;
-      this.dateInvalid = false;
-    } else this.eventDate = '';
-    this.buildHours();
-  }
-
-  private buildHours() {
-    if (
-      this.selectedYear === this.todayYear &&
-      this.selectedMonth === this.todayMonth &&
-      this.selectedDay === this.todayDay
-    ) {
-      const nowHour = new Date().getHours();
-      this.hours = Array.from({ length: 24 - nowHour }, (_, i) => nowHour + i);
-    } else {
-      this.hours = Array.from({ length: 24 }, (_, i) => i);
+  loadYears() {
+    for (let i = this.todayYear; i <= this.todayYear + this.YEAR_SPAN; i++) {
+      this.years.push(i);
     }
-    if (this.selectedHour !== null && !this.hours.includes(this.selectedHour)) this.selectedHour = null;
   }
 
-  // ===== Konum metodları =====
-  private norm(s: string): string {
-    return (s || '').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  }
-
-  get filteredCities(): City[] {
-    const q = this.norm(this.citySearch).trim();
-    return !q ? this.cities : this.cities.filter(c => this.norm(c.name).startsWith(q));
-  }
-
-  get filteredDistricts(): District[] {
-    if (!this.selectedCityId) return [];
-    const base = this.districts.filter(d => !d.cityId || d.cityId === this.selectedCityId);
-    const q = this.norm(this.districtSearch).trim();
-    return !q ? base : base.filter(d => this.norm(d.name).startsWith(q));
-  }
-
-  selectCity(c: City) {
-    this.selectedCityId = c.id;
-    this.selectedCityName = c.name;
-    this.citySearch = c.name;
-    this.showCityDropdown = false;
-    this.selectedDistrictId = null;
-    this.selectedDistrictName = '';
-    this.districtSearch = '';
-    this.districts = [];
-    this.loadDistricts(c.id);
-  }
-
-  selectDistrict(d: District) {
-    if (!this.selectedCityId) return;
-    this.selectedDistrictId = d.id;
-    this.selectedDistrictName = d.name;
-    this.districtSearch = d.name;
-    this.showDistrictDropdown = false;
-  }
-
-  private loadCities() {
-    this.loadingCities = true;
+  loadCities() {
     this.geziler.getCities().subscribe({
-      next: list => { this.cities = list ?? []; this.loadingCities = false; },
-      error: () => { this.locationError = 'İller yüklenemedi.'; this.loadingCities = false; }
+      next: data => this.cities = data,
+      error: err => console.error('Şehirler alınamadı', err)
     });
   }
 
-  private loadDistricts(cityId: number) {
-    if (this.districtCache[cityId]) {
-      this.districts = this.districtCache[cityId];
-      return;
-    }
-    this.loadingDistricts = true;
+  onCityChange(cityId: number) {
+    this.selectedCityId = cityId;
+    const city = this.cities.find(c => c.id === cityId);
+    this.selectedCityName = city ? city.name : null;
+
     this.geziler.getDistricts(cityId).subscribe({
-      next: list => {
-        const arr = (list ?? []).filter(d => !d.cityId || d.cityId === cityId);
-        this.districtCache[cityId] = arr;
-        this.districts = arr;
-        this.loadingDistricts = false;
-      },
-      error: () => {
-        this.locationError = 'İlçeler yüklenemedi.';
-        this.loadingDistricts = false;
-      }
+      next: data => this.districts = data,
+      error: err => console.error('İlçeler alınamadı', err)
     });
   }
 
-  // ===== Payload oluşturma =====
-  private buildPayload(): any {
+  onDistrictChange(districtId: number) {
+    this.selectedDistrictId = districtId;
+    const dist = this.districts.find(d => d.id === districtId);
+    this.selectedDistrictName = dist ? dist.name : null;
+  }
+
+  private buildPayload() {
     const hh = this.selectedHour != null ? String(this.selectedHour).padStart(2, '0') : '00';
     const isoDateTime = this.eventDate ? `${this.eventDate}T${hh}:00:00` : null;
 
+    // AuthService’den gelen kullanıcı bilgileri
+    const userName = this.auth.currentUserName() ?? 'Kullanıcı';
+    const userId = this.auth.currentUserId() ?? 0;
+
     return {
-      Title: this.title.trim(),
-      Description: this.description.trim(),
-      Date: isoDateTime,
-      Time: `${hh}:00:00`,
-      City: this.selectedCityName,
-      District: this.selectedDistrictName
+      title: this.title.trim(),
+      description: this.description.trim(),
+      date: isoDateTime,
+      time: `${hh}:00:00`,
+
+      // 🔴 DB’de NOT NULL olan alanlar
+      cityName: this.selectedCityName,
+      district: this.selectedDistrictName,
+      userName: userName,
+
+      // opsiyonel id’ler
+      userId: userId,
+      cityId: this.selectedCityId ?? undefined,
+      districtId: this.selectedDistrictId ?? undefined,
     };
   }
 
-  // ===== Form submit =====
-  onSubmit() {
-    if (!this.formValid || this.submitting) return;
-
-    this.submitting = true;
-    this.submitError = null;
-    this.createdId = null;
+  submitIlan() {
+    if (!this.formValid()) return;
 
     const payload = this.buildPayload();
+    this.sending = true;
+    this.sendOk = false;
+    this.sendErr = false;
+
     this.geziler.createIlan(payload).subscribe({
-      next: (res) => {
-        this.createdId = typeof res === 'number' ? res : (res?.id ?? res?.data?.id ?? null);
-        this.submitting = false;
+      next: () => {
+        this.sending = false;
+        this.sendOk = true;
+        this.resetForm();
       },
-      error: (err) => {
-        const e = err?.error;
-        const msgs: string[] = [];
-        if (typeof e === 'string') msgs.push(e);
-        if (e?.message) msgs.push(e.message);
-        if (e?.title) msgs.push(e.title);
-        if (e?.errors && typeof e.errors === 'object') {
-          Object.keys(e.errors).forEach(key => {
-            const arr = e.errors[key];
-            if (Array.isArray(arr)) arr.forEach(m => msgs.push(`${key}: ${m}`));
-          });
-        }
-        this.submitError = msgs.length ? msgs.join(' | ') : 'Kayıt sırasında bir hata oluştu.';
-        this.submitting = false;
+      error: err => {
+        console.error('İlan gönderilemedi', err);
+        this.sending = false;
+        this.sendErr = true;
       }
     });
-    
   }
-  // --- Kullanıcı kartı için (opsiyonel placeholder) ---
-ilanUser: { fullName: string; joinedAt?: Date | string } | null = { fullName: 'Kullanıcı', joinedAt: new Date() };
 
-// --- Başlık/Açıklama validasyon state ---
-titleTouched = false;
-get titleLen(): number { return this.title.length; }
-get titleInvalid(): boolean { return this.titleTouched && !this.title.trim(); }
-onTitleChange(e: Event) {
-  const v = (e.target as HTMLInputElement).value ?? '';
-  this.title = v;
-}
+  formValid(): boolean {
+    return (
+      this.title.trim().length > 0 &&
+      this.description.trim().length > 0 &&
+      this.selectedCityName != null &&
+      this.selectedDistrictName != null &&
+      this.eventDate != null
+    );
+  }
 
-descriptionTouched = false;
-get descLen(): number { return this.description.length; }
-get descInvalid(): boolean {
-  const empty = !this.description.trim();
-  const over = this.description.length > this.maxDescLen;
-  return this.descriptionTouched && (empty || over);
-}
-onDescChange(e: Event) {
-  const v = (e.target as HTMLTextAreaElement).value ?? '';
-  this.description = v;
-}
-
-// --- Saat seçimi handler'ı ---
-onHourChange(e: Event) {
-  const v = (e.target as HTMLSelectElement).value;
-  this.selectedHour = v === '' ? null : Number(v);
-  this.syncEventDate();
-}
-
-// --- İl/İlçe dropdown event'leri ---
-onCityFocus() {
-  this.showCityDropdown = true;
-  if (!this.cities.length && !this.loadingCities) this.loadCities();
-}
-onCityBlur() { setTimeout(() => this.showCityDropdown = false, 100); }
-onCityInputChange(e: Event) {
-  this.citySearch = (e.target as HTMLInputElement).value ?? '';
-  this.showCityDropdown = true;
-  if (!this.cities.length && !this.loadingCities) this.loadCities();
-}
-
-onDistrictFocus() {
-  if (!this.selectedCityId) return;
-  this.showDistrictDropdown = true;
-  if (!this.districts.length && !this.loadingDistricts) this.loadDistricts(this.selectedCityId);
-}
-onDistrictBlur() { setTimeout(() => this.showDistrictDropdown = false, 100); }
-onDistrictInputChange(e: Event) {
-  if (!this.selectedCityId) return;
-  this.districtSearch = (e.target as HTMLInputElement).value ?? '';
-  this.showDistrictDropdown = true;
-  if (!this.districts.length && !this.loadingDistricts) this.loadDistricts(this.selectedCityId);
-}
-
+  resetForm() {
+    this.title = '';
+    this.description = '';
+    this.selectedCityId = null;
+    this.selectedCityName = null;
+    this.selectedDistrictId = null;
+    this.selectedDistrictName = null;
+    this.selectedYear = null;
+    this.selectedMonth = null;
+    this.selectedDay = null;
+    this.selectedHour = null;
+    this.eventDate = null;
+  }
 }

@@ -20,7 +20,6 @@
       <div class="user-avatar">{{ ownerInitial }}</div>
       <div class="user-meta">
         <div class="user-name">{{ ownerName }}</div>
-        <div class="user-id">İlan No: {{ ilan.id }}</div>
       </div>
     </div>
 
@@ -59,5 +58,21 @@
       </div>
     </div>
 
+
+<button
+  class="found-btn"
+  type="button"
+  (click)="onSeniBuldumClick()"
+  [disabled]="loading || sending || !ilan">
+  {{ sending ? 'Gönderiliyor…' : '💬 Seni buldum' }}
+</button>
+
+@if (sendOk) {
+  <div class="msg ok">Bildirim gönderildi ✅</div>
+}
+
+@if (sendErr) {
+  <div class="msg err">{{ sendErr }}</div>
+}
   }
 </div>

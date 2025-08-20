@@ -2,10 +2,10 @@ export interface IlanModel {
   title: string;
   description: string;
   eventDate: string;
-  cityId?: number;
-  districtId?: number;
-  cityName?: string;      
+  district: string;
+  cityName: string;      
   districtName?: string;  
+  userName?: string
 }
 
 /** Backend’ten beklenen tipler (listeleme için) */

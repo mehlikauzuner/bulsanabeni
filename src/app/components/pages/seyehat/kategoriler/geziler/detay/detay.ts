@@ -11,7 +11,8 @@ import { GezilerService } from '../../../../../../services/geziler-service';
   standalone: true,
   imports: [CommonModule,],
   templateUrl: './detay.html',
-  styleUrls: ['../ilan/ilan.css'],
+  styleUrls: ['./detay.css'],
+
 })
 export class GezilerDetay implements OnInit {
   constructor(
@@ -26,7 +27,7 @@ export class GezilerDetay implements OnInit {
   // Kullanıcı ismi/avatarsız senaryo için basit placeholder (db'den user alanı yoksa)
   get ownerName(): string {
     // İleride backend user join gelirse burayı ilan.ownerName gibi güncelleyebilirsin
-    return this.ilan ? `Kullanıcı #${this.ilan.userId ?? '—'}` : 'Kullanıcı';
+    return this.ilan ? `${this.ilan.userName ?? '—'}` : 'Kullanıcı';
   }
   get ownerInitial(): string {
     const name = this.ownerName?.trim() || 'U';
@@ -83,4 +84,39 @@ export class GezilerDetay implements OnInit {
       }
     });
   }
+
+// sınıf içinde (mevcut alanların yanına)
+sending = false;
+sendOk = false;
+sendErr: string | null = null;
+
+onSeniBuldumClick(): void {
+  if (!this.ilan?.id || !this.ilan?.userId) {
+    this.sendErr = 'İlan bilgisi eksik.';
+    return;
+  }
+
+  this.sending = true;
+  this.sendOk = false;
+  this.sendErr = null;
+
+  const payload = {
+    ilanId: this.ilan.id,
+    receiverUserId: this.ilan.userId
+  };
+
+  this.geziler.notifyFound(payload).subscribe({
+    next: () => {
+      this.sending = false;
+      this.sendOk = true;
+      console.log('[GezilerDetay] Bildirim gönderildi.');
+    },
+    error: (err) => {
+      this.sending = false;
+      this.sendErr = err?.error?.message || 'Bildirim gönderilemedi.';
+      console.error('[GezilerDetay] Bildirim hatası:', err);
+    }
+  });
+}
+
 }

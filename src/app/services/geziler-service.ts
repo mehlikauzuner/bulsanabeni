@@ -10,14 +10,21 @@ export class GezilerService {
   private readonly gezilerApi  = 'https://localhost:44345/api/Geziler';
   private readonly citiesApi   = 'https://localhost:44345/api/Cities';
   private readonly districtsApi= 'https://localhost:44345/api/Districts';
+  private readonly notificationApi = 'https://localhost:44345/api/Notification'; 
+
+   notifyFound(payload: any) {
+  return this.http.post(`${this.notificationApi}/found`, payload); // burada ekle
+}
+
 
   constructor(private http: HttpClient) {}
 
 
-  createIlan(payload: any): Observable<any> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<any>(this.gezilerApi, payload, { headers });
-  }
+createIlan(payload: any) {
+  return this.http.post<any>(this.gezilerApi, payload);
+}
+
+
 
   /** Tüm ilanları listeleme */
   getAllIlanlar(): Observable<DetayModel[]> {
@@ -57,6 +64,7 @@ export class GezilerService {
         id:       toNum(r?.id ?? r?.Id),
         userId:   toNum(r?.userId ?? r?.UserId),
         title:    toStr(r?.title ?? r?.Title),
+        userName: toStr(r?.userName ?? r?.userName),
         description: toStr(r?.description ?? r?.Description),
         date:     toStr(r?.date ?? r?.Date),
         time:     toHHmmss(r?.time ?? r?.Time),
@@ -96,4 +104,6 @@ export class GezilerService {
       })
     );
   }
+
+
 }

@@ -201,28 +201,37 @@ export class CruiseIlan {
   submitError: string | null = null;
   createdId: number | null = null;
 
-  get formValid(): boolean {
-    const okTitle = !!this.title.trim();
-    const okDesc  = !!this.description.trim() && this.description.length <= this.maxDescLen;
-    const okDate  = !!this.eventDate && !this.dateInvalid;
-    // şehir/ilçe isteğe bağlı; ID ya da isim gidebilir
-    return okTitle && okDesc && okDate;
-  }
+ get formValid(): boolean {
+  const okTitle = !!this.title.trim();
+  const okDesc  = !!this.description.trim() && this.description.length <= this.maxDescLen;
+  const okDate  = !!this.eventDate && !this.dateInvalid;
+  const okCity  = !!this.cityInput.trim();
+  const okDist  = !!this.districtInput.trim();
+  return okTitle && okDesc && okDate && okCity && okDist; // <-- il/ilçe zorunlu
+}
+
 
   buildPayload(): IlanModel {
-    const p: IlanModel = {
-      title: this.title.trim(),
-      description: this.description.trim(),
-      eventDate: this.eventDate,
-    };
-    if (this.selectedCityId) p.cityId = this.selectedCityId;
-    else if (this.cityInput.trim()) p.cityName = this.cityInput.trim();
+  const p: IlanModel = {
+    title: this.title.trim(),
+    description: this.description.trim(),
+    eventDate: this.eventDate,
+    cityName: this.cityInput.trim(),           // <-- ZORUNLUYSA
+    district: this.districtInput.trim(),   // <-- ZORUNLUYSA
+    
+  };
 
-    if (this.selectedDistrictId) p.districtId = this.selectedDistrictId;
-    else if (this.districtInput.trim()) p.districtName = this.districtInput.trim();
-
-    return p;
+  if (this.cityInput.trim()) {
+    p.cityName= this.cityInput.trim();      // City gönder
   }
+  if (this.districtInput.trim()) {
+  p.district = this.districtInput.trim();  // backend District sütununa gider
+}
+
+
+  return p;
+}
+
 
   onSubmit() {
     if (!this.formValid || this.submitting) return;
@@ -232,7 +241,8 @@ export class CruiseIlan {
 
     const payload = this.buildPayload();
 
-    this.http.post<CruiseService>(this.createApi, payload).subscribe({
+    this.http.post<CruiseService>(this.createApi, payload)
+.subscribe({
       next: (res) => {
         // Muhtemel yanıt türlerini normalize et
         const id =
@@ -242,10 +252,30 @@ export class CruiseIlan {
         this.createdId = (typeof id === 'number') ? id : null;
         this.submitting = false;
       },
-      error: (err) => {
-        this.submitError = (err?.error?.message) || 'Kayıt sırasında bir hata oluştu.';
-        this.submitting = false;
-      }
+     error: (err) => {
+  console.log('CREATE ILAN ERROR', err);           // <-- ekle
+  console.log('STATUS', err?.status, 'BODY', err?.error); // <-- ekle
+
+  const e = err?.error;
+  const msgs: string[] = [];
+  if (typeof e === 'string') msgs.push(e);
+  if (e?.message) msgs.push(e.message);
+  if (e?.title) msgs.push(e.title);
+  if (e?.detail) msgs.push(e.detail);              // <-- .NET ProblemDetails
+  if (e?.errors && typeof e.errors === 'object') {
+    Object.keys(e.errors).forEach(key => {
+      const arr = e.errors[key];
+      if (Array.isArray(arr)) arr.forEach(m => msgs.push(`${key}: ${m}`));
     });
   }
+  this.submitError = msgs.length ? msgs.join(' | ') :
+    `Hata (HTTP ${err?.status ?? '??'}).`;         // <-- status da yaz
+  this.submitting = false;
+}
+
+
+    });
+    
+  }
+  
 }

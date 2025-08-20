@@ -1,6 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../../services/auth-service';
+
+
 
 type Tab = 'bildirimler' | 'mesajlar' | 'rozetler' | 'yorumlar' | 'ayarlar' | 'ara';
 
@@ -12,17 +16,65 @@ type Tab = 'bildirimler' | 'mesajlar' | 'rozetler' | 'yorumlar' | 'ayarlar' | 'a
   styleUrls: ['./hesabim.css']
 })
 export class Hesabim {
-  // Başlangıçta sağ taraf boş kalsın
+  /** Sağ panel sekmesi */
   active: Tab | null = null;
 
-  // (Mock) Giriş yapan kullanıcı ve profil sahibi
-  currentUserId = 1;
-  profileOwnerId = 2; // TEST: başkasının profili gibi görmek için 2 yap → yorum kutusu açılır
-  isOwnProfile = true;
+  /** Auth durumu (servisten) */
+  isLoggedIn = signal(false);
+  currentUserId = signal<number | null>(null);
 
-  constructor() {
-    this.isOwnProfile = this.currentUserId === this.profileOwnerId;
+  /** Görüntülenen profilin sahibi (route param /profil/:id varsa oradan, yoksa currentUser) */
+  profileOwnerId = signal<number | null>(null);
+
+  /** Bu sayfa kendi profilim mi? */
+  isOwnProfile = computed(() => {
+    const me = this.currentUserId();
+    const owner = this.profileOwnerId();
+    return me != null && owner != null && me === owner;
+  });
+
+  constructor(
+    private auth: AuthService,
+    private route: ActivatedRoute,
+    private router: Router,
+  ) {}
+
+  ngOnInit() {
+    // 1) Login durumunu ve currentUserId'yi servisten canlı takip et
+    this.auth.isLoggedIn$.subscribe(v => {
+      this.isLoggedIn.set(v);
+      this.currentUserId.set(this.auth.currentUserId());
+
+      // Eğer route'tan id gelmediyse ve login olduysak, görüntülenen profil = benim profilim
+      if (!this.route.snapshot.paramMap.get('id') && v) {
+        this.profileOwnerId.set(this.auth.currentUserId());
+      }
+    });
+
+    // 2) /profil/:id parametresi varsa, onu profil sahibi yap
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      const n = Number(idParam);
+      if (!Number.isNaN(n)) this.profileOwnerId.set(n);
+    } else {
+      // İlk yüklemede (login hâlihazırda varsa) kendini ata
+      const uid = this.auth.currentUserId();
+      if (uid != null) this.profileOwnerId.set(uid);
+    }
   }
+
+  /** Sekme aç/kapat */
+  toggleTab(t: Tab) {
+    this.active = (this.active === t) ? null : t;
+  }
+
+  /** Logout: servisten temizle + profil sayfasına dön */
+  logout() {
+    this.auth.logout();
+    this.router.navigateByUrl('/profil');
+  }
+
+  // --- AŞAĞIDAKİLER şimdilik MOCK; backend bağlayınca bunları API'den dolduracağız ---
 
   user = {
     fullName: 'Mehlika Uzuner',
@@ -53,13 +105,11 @@ export class Hesabim {
     { yazar: 'Ayşe', puan: 5, metin: 'Harikaydı, tavsiye ederim!', tarih: '3 gün önce' },
   ];
 
-  
-
   // Yorum yaz (sadece başkasının profilinde)
   newComment = '';
   newRating = 5;
   addComment() {
-    if (this.isOwnProfile) return;
+    if (this.isOwnProfile()) return;
     const txt = this.newComment.trim();
     if (!txt) return;
     this.yorumlar.unshift({
@@ -70,16 +120,6 @@ export class Hesabim {
     });
     this.newComment = '';
     this.newRating = 5;
-  }
-
-  // TAB: tıkla-aç, aynı tab’a tekrar tıkla-kapat
-  toggleTab(t: Tab) {
-    this.active = (this.active === t) ? null : t;
-  }
-
-  // (İstersen ileride logout’u buraya bağlayacağız)
-  logout() {
-    console.log('Logout (mock): token temizle ve /login’e yönlendir');
   }
 
   // --- Ara tabı (mock) ---
@@ -100,7 +140,8 @@ export class Hesabim {
   }
 
   openProfile(id:number){
-    console.log('Profil aç (mock): /profil/' + id);
-    // Gerçekte: this.router.navigate(['/profil', id]);
+    this.router.navigate(['/profil', id]);
   }
+
+  // (İleride: profileOwnerId değişince API'den profil bilgisi çek → this.user = ...)
 }

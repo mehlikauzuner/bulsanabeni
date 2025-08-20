@@ -11,10 +11,10 @@ private readonly postapi= "https://localhost:44345/api/Cruise"
   constructor(private http: HttpClient) {}
 
   /** Yeni ilan oluşturma */
-  createIlan(payload: IlanModel): Observable<any> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<any>(this.postapi, payload, { headers });
-  }
+ createIlan(payload: IlanModel): Observable<any> {
+  return this.http.post<any>(this.postapi, payload);
+}
+
 
   /** İlanları listeleme (opsiyonel) */
   getAllIlanlar(params?: { page?: number; pageSize?: number }): Observable<any[]> {

@@ -4,6 +4,7 @@ import { routes } from './app.routes';
 import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatDateFormats } from '@angular/material/core';
 import { registerLocaleData } from '@angular/common';
 import localeTr from '@angular/common/locales/tr';
+import { HttpInterceptorFn, provideHttpClient, withInterceptors } from '@angular/common/http';
 
 
 const TR_DATE_FORMATS: MatDateFormats = {
@@ -19,12 +20,34 @@ const TR_DATE_FORMATS: MatDateFormats = {
 
 registerLocaleData(localeTr);
 
+
+
+
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const token =
+    localStorage.getItem('token') ??
+    localStorage.getItem('access_token');
+
+  // Hangi isteğe takıldığını görmek için log
+  // (istersen kaldırırsın, şimdilik dursun)
+  console.log('[INT] →', req.method, req.url, 'token?', !!token);
+
+  if (token) {
+    req = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
+  }
+  return next(req);
+};
+
+
+
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     { provide: LOCALE_ID, useValue: 'tr-TR' },
     { provide: MAT_DATE_LOCALE, useValue: 'tr-TR' },
     { provide: MAT_DATE_FORMATS, useValue: TR_DATE_FORMATS},
-
+    
   ],
+
 };

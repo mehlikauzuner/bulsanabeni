@@ -1,6 +1,6 @@
 <nav class="navbar">
   <div class="nav-left">
-
+    <!-- … dropdown menüler aynen … -->
     <div class="nav-item dropdown">
       Seyehat
       <div class="dropdown-content">
@@ -43,9 +43,9 @@
         <a routerLink="/eglence/oyun" routerLinkActive="active">Oyun</a>
         <a routerLink="/eglence/sinema" routerLinkActive="active">Sinema</a>
       </div>
-      </div>
+    </div>
 
-      <div class="nav-item dropdown">
+    <div class="nav-item dropdown">
       Akademik
       <div class="dropdown-content">
         <a routerLink="/akademik/speaking" routerLinkActive="active">Dersler</a>
@@ -55,11 +55,13 @@
         <a routerLink="/akademik/workshops" routerLinkActive="active">Workshops</a>
       </div>
     </div>
-
-
-   </div>
+  </div>
 
   <div class="nav-right">
-    <div class="nav-item" routerLink="/profil" routerLinkActive="active">Profil</div>
+    @if (isLoggedIn()) {
+      <a class="nav-item" routerLink="/profil/hesabim" routerLinkActive="active">Hesabım</a>
+    } @else {
+      <a class="nav-item" routerLink="/profil" routerLinkActive="active">Giriş</a>
+    }
   </div>
 </nav>

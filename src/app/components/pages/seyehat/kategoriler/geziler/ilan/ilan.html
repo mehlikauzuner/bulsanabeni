@@ -1,169 +1,130 @@
 <!-- components/pages/seyehat/kategoriler/geziler/ilan/ilan.html -->
 <div class="create-wrapper">
 
-  <!-- ===== İlan Sahibi Bilgisi ===== -->
-  <div class="user-bar" style="display:flex; align-items:center; margin-bottom:16px;">
-    <div class="avatar"
-         style="width:40px; height:40px; border-radius:50%; background:#6200ee; color:white;
-                display:flex; align-items:center; justify-content:center; font-weight:bold; margin-right:12px;">
-      {{ (ilanUser?.fullName || 'U') | slice:0:1 | uppercase }}
-
-    </div>
-    <div class="user-meta">
-      <div class="name" style="font-weight:600; font-size:14px;">
-        {{ ilanUser?.fullName || 'Kullanıcı Adı' }}
-      </div>
-      <div class="sub" style="font-size:12px; color:gray;">
-       {{ (ilanUser?.joinedAt | date:'d MMM y') || 'Katılım tarihi yok' }}
-
-      </div>
-    </div>
-  </div>
-
   <!-- ===== Başlık ===== -->
   <div class="pill">Etkinlik Başlığı</div>
   <div class="title-panel">
-    <input class="title-input" type="text"
-      [value]="title" [attr.maxlength]="maxTitleLen"
-      placeholder="Etkinlik başlığını girin" aria-describedby="titleCount"
-      [attr.aria-invalid]="titleInvalid"
-      (blur)="titleTouched = true" (input)="onTitleChange($event)"
-      [class.invalid]="titleInvalid" />
-    <div id="titleCount" class="counter">{{ titleLen }}/{{ maxTitleLen }}</div>
-    @if (titleInvalid) { <div class="error">Başlık zorunludur.</div> }
+    <input
+      class="title-input"
+      type="text"
+      [attr.maxlength]="maxTitleLen"
+      [value]="title"
+      (input)="title = ($any($event.target).value || '')"
+      placeholder="Etkinlik başlığını girin" />
+    <div class="counter">{{ (title || '').length }}/{{ maxTitleLen }}</div>
   </div>
 
   <!-- ===== Açıklama ===== -->
-  <div class="pill" style="margin-top: 14px;">Açıklama</div>
+  <div class="pill" style="margin-top:14px;">Açıklama</div>
   <div class="title-panel">
-    <textarea class="title-input" rows="5"
-      [value]="description" [attr.maxlength]="maxDescLen"
-      placeholder="Etkinlik açıklamasını yazın" aria-describedby="descCount"
-      [attr.aria-invalid]="descInvalid"
-      (blur)="descriptionTouched = true" (input)="onDescChange($event)"
-      [class.invalid]="descInvalid"></textarea>
-    <div id="descCount" class="counter">{{ descLen }}/{{ maxDescLen }}</div>
-    @if (descInvalid) { <div class="error">Açıklama zorunludur.</div> }
+    <textarea
+      class="title-input"
+      rows="5"
+      [attr.maxlength]="maxDescLen"
+      [value]="description"
+      (input)="description = ($any($event.target).value || '')"
+      placeholder="Etkinlik açıklamasını yazın"></textarea>
+    <div class="counter">{{ (description || '').length }}/{{ maxDescLen }}</div>
   </div>
 
   <!-- ===== Tarih & Saat ===== -->
-  <div class="pill" style="margin-top: 14px;">Tarih &amp; Saat</div>
+  <div class="pill" style="margin-top:14px;">Tarih &amp; Saat</div>
   <div class="title-panel">
-    <div class="date-time-row">
-      <select class="title-input" [value]="selectedYear ?? ''"
-        (change)="onYearSelect( +$any($event.target).value )">
-        <option value="">Yıl seç</option>
-        @for (y of years; track y) { <option [value]="y">{{ y }}</option> }
-      </select>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+      <!-- Tarih -->
+      <input
+        class="title-input"
+        type="date"
+        [value]="eventDate || ''"
+        (change)="eventDate = ($any($event.target).value || null)" />
 
-      <select class="title-input" [disabled]="!selectedYear"
-        [value]="selectedMonth ?? ''"
-        (change)="onMonthSelect( +$any($event.target).value )">
-        <option value="">Ay seç</option>
-        @for (m of months; track m.id) { <option [value]="m.id">{{ m.name }}</option> }
-      </select>
-
-      <select class="title-input" [disabled]="!selectedMonth"
-        [value]="selectedDay ?? ''"
-        (change)="onDaySelect( +$any($event.target).value )">
-        <option value="">Gün seç</option>
-        @for (d of days; track d) { <option [value]="d">{{ d }}</option> }
-      </select>
-
-      <select class="title-input hour-select"
-        [value]="selectedHour ?? ''" (change)="onHourChange($event)">
+      <!-- Saat (select — 0..23) -->
+      <select
+        class="title-input"
+        [value]="selectedHour ?? ''"
+        (change)="selectedHour = +($any($event.target).value)">
         <option value="">Saat</option>
-        @for (h of hours; track h) { <option [value]="h">{{ (h < 10 ? '0' + h : h) }}:00</option> }
+        <option [value]="0">00:00</option>
+        <option [value]="1">01:00</option>
+        <option [value]="2">02:00</option>
+        <option [value]="3">03:00</option>
+        <option [value]="4">04:00</option>
+        <option [value]="5">05:00</option>
+        <option [value]="6">06:00</option>
+        <option [value]="7">07:00</option>
+        <option [value]="8">08:00</option>
+        <option [value]="9">09:00</option>
+        <option [value]="10">10:00</option>
+        <option [value]="11">11:00</option>
+        <option [value]="12">12:00</option>
+        <option [value]="13">13:00</option>
+        <option [value]="14">14:00</option>
+        <option [value]="15">15:00</option>
+        <option [value]="16">16:00</option>
+        <option [value]="17">17:00</option>
+        <option [value]="18">18:00</option>
+        <option [value]="19">19:00</option>
+        <option [value]="20">20:00</option>
+        <option [value]="21">21:00</option>
+        <option [value]="22">22:00</option>
+        <option [value]="23">23:00</option>
       </select>
     </div>
 
-    @if (eventDate) {
-      <div class="hint">
-        Seçilen: {{ eventDate }}
-        {{ selectedHour !== null ? ((selectedHour! < 10 ? '0'+selectedHour : selectedHour) + ':00') : '' }}
-      </div>
-    }
-  </div>
-
-  <!-- ===== Konum (İl + İlçe yan yana) ===== -->
-  <div class="pill" style="margin-top: 14px;">Konum</div>
-  <div class="title-panel">
-    <div class="location-row" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-
-      <!-- İl sütunu -->
-      <div style="position:relative;">
-        <label class="field-label">İl</label>
-        <input class="title-input city-input" type="text"
-          [value]="citySearch" placeholder="İl ara veya seç"
-          (focus)="onCityFocus()" (blur)="onCityBlur()" (input)="onCityInputChange($event)" />
-
-        @if (showCityDropdown) {
-          <ul class="dropdown">
-            @if (loadingCities) {
-              <li class="dropdown-item"><span class="hint">İller yükleniyor…</span></li>
-            }
-            @for (c of filteredCities; track c.id) {
-              <li class="dropdown-item" (mousedown)="selectCity(c)">{{ c.name }}</li>
-            }
-            @if (!loadingCities && filteredCities.length === 0) {
-              <li class="dropdown-item"><span class="hint">Eşleşen il yok.</span></li>
-            }
-          </ul>
-        }
-      </div>
-
-      <!-- İlçe sütunu -->
-      <div style="position:relative;">
-        <label class="field-label">İlçe</label>
-        <input class="title-input district-input" type="text"
-          [value]="districtSearch" [disabled]="!selectedCityId"
-          placeholder="{{ selectedCityId ? 'İlçe ara veya seç' : 'Önce il seçin' }}"
-          (focus)="onDistrictFocus()" (blur)="onDistrictBlur()" (input)="onDistrictInputChange($event)" />
-
-        @if (showDistrictDropdown) {
-          <ul class="dropdown">
-            @if (loadingDistricts) {
-              <li class="dropdown-item"><span class="hint">İlçeler yükleniyor…</span></li>
-            }
-            @for (d of filteredDistricts; track d.id) {
-              <li class="dropdown-item" (mousedown)="selectDistrict(d)">{{ d.name }}</li>
-            }
-            @if (!loadingDistricts && selectedCityId && filteredDistricts.length === 0) {
-              <li class="dropdown-item"><span class="hint">Bu il için eşleşen ilçe yok.</span></li>
-            }
-          </ul>
-        }
-      </div>
-
+    <div class="hint" *ngIf="eventDate">
+      Seçilen: {{ eventDate }}
+      {{ selectedHour != null ? ((selectedHour < 10 ? '0'+selectedHour : selectedHour)+':00') : '' }}
     </div>
-
-    @if (locationError) {
-      <div class="error" style="margin-top:8px;">{{ locationError }}</div>
-    }
   </div>
 
-  <!-- ===== Submit ===== -->
-  <div class="actions">
-    <button type="button" class="primary-btn"
-      (click)="onSubmit()"
-      [disabled]="submitting || !formValid"
+  <!-- ===== Konum (İl + İlçe) ===== -->
+  <div class="pill" style="margin-top:14px;">Konum</div>
+  <div class="title-panel">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <!-- İl -->
+      <div>
+        <label class="field-label">İl</label>
+        <select
+          class="title-input"
+          [value]="selectedCityId ?? ''"
+          (change)="onCityChange( +($any($event.target).value) )">
+          <option value="">İl seç</option>
+          <option *ngFor="let c of cities" [value]="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+
+      <!-- İlçe -->
+      <div>
+        <label class="field-label">İlçe</label>
+        <select
+          class="title-input"
+          [disabled]="!selectedCityId"
+          [value]="selectedDistrictId ?? ''"
+          (change)="onDistrictChange( +($any($event.target).value) )">
+          <option value="">{{ selectedCityId ? 'İlçe seç' : 'Önce il seçin' }}</option>
+          <option *ngFor="let d of districts" [value]="d.id">{{ d.name }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Gönder ===== -->
+  <div class="actions" style="margin-top:16px;">
+    <button
+      type="button"
+      class="primary-btn"
+      (click)="submitIlan()"
+      [disabled]="sending || !formValid()"
       aria-label="Bul Beni - ilanı kaydet">
       Bul Beni
     </button>
   </div>
 
-<!-- ===== Sonuç / Hata ===== -->
-<div class="status-area" aria-live="polite">
-  @if (createdId) {
-    <div class="celebrate" role="status">
-      🎉 YOL ARKADAŞINI BULMAYA BİR ADIM DAHA YAKLAŞTIN! 😊
-    </div>
-    <div class="result" role="status">
-      ✅ İlan oluşturuldu. ID: {{ createdId }}
-    </div>
-  }
+  <!-- ===== Durum ===== -->
+  <div class="status-area" aria-live="polite" style="margin-top:12px;">
+    <div *ngIf="sending">⏳ Gönderiliyor…</div>
+    <div *ngIf="sendOk" class="celebrate">🎉 İlan oluşturuldu!</div>
+    <div *ngIf="sendErr" class="error">❌ İlan gönderilemedi. Lütfen tekrar deneyin.</div>
+  </div>
 
-  @if (submitError) {
-    <div class="error" role="alert">❌ {{ submitError }}</div>
-  }
 </div>

@@ -1,46 +1,202 @@
-/* ========== Kullanıcı barı ========== */
+:host {
+  --border: #6a00ff;
+  --bg: #f7f3ff;
+  --panel: #ffffff;
+  --text: #2d2342;
+  --hint: #7a6ea6;
+  --danger: #e53935;
+  --success: #2e7d32;
+  --shadow: 0 10px 24px rgba(36, 17, 94, 0.12);
+}
+
+/* Sayfa kapsayıcı */
+.create-wrapper {
+  max-width: 860px;
+  margin: 28px auto;
+  padding: 28px;
+  background: var(--bg);
+  border: 6px solid var(--border);
+  border-radius: 22px;
+  box-shadow: 0 14px 30px rgba(106, 0, 255, 0.12);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--text);
+}
+
+/* === Kullanıcı Bilgisi (sayfanın başında gösterilecek) === */
 .user-bar {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: var(--panel);
+  border: 2px solid #e8dcff;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
 }
+
 .user-avatar {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: #efe7ff; color: #6a00ff; font-weight: 800;
-  display: flex; align-items: center; justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6a00ff, #9a66ff);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
 }
-.user-meta { display: flex; flex-direction: column; }
-.user-name { font-weight: 700; }
-.user-id   { font-size: 12px; color: #7a6ea6; }
 
-/* ========== Yardımcı spacing ========== */
-.pill-sp { margin-top: 14px; }
-.field-label-sp { margin-bottom: 6px; }
-.text-pre { white-space: pre-wrap; }
+.user-meta {
+  display: flex;
+  flex-direction: column;
+}
 
-/* ========== Bilgiler satırı: Konum / Tarih / Saat (YAN YANA) ========== */
-.info-row {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.user-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.user-email {
+  font-size: 13px;
+  color: var(--hint);
+}
+
+/* Bölüm başlığı – pill */
+.pill {
+  display: inline-block;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #6a00ff, #9a66ff);
+  padding: 8px 14px;
+  border-radius: 999px;
+  margin: 6px 0 10px;
+  font-size: 14px;
+}
+
+/* Panel kutu */
+.title-panel {
+  position: relative;
+  background: var(--panel);
+  border: 2px solid #e8dcff;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow);
+}
+
+/* Input & textarea & select */
+.title-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 2px solid #e0d2ff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
+  outline: none;
+  background: #fff;
+  color: var(--text);
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.02s;
+  appearance: none; /* select okunu özelleştirmeye hazır */
+  background-image: linear-gradient(45deg, transparent 50%, #8a6bff 50%),
+                    linear-gradient(135deg, #8a6bff 50%, transparent 50%),
+                    linear-gradient(to right, #e0d2ff, #e0d2ff);
+  background-position: calc(100% - 20px) calc(1em + 2px),
+                       calc(100% - 15px) calc(1em + 2px),
+                       calc(100% - 2.4rem) 50%;
+  background-size: 5px 5px, 5px 5px, 1px 60%;
+  background-repeat: no-repeat;
+}
+.title-input:hover { border-color: #c6b6ff; }
+.title-input:focus {
+  border-color: #8a6bff;
+  box-shadow: 0 0 0 4px rgba(138, 107, 255, 0.15);
+}
+.title-input.invalid { border-color: var(--danger); }
+.title-input:disabled { background-color: #f5f2ff; cursor: not-allowed; }
+
+/* Sayaç, ipucu, hata */
+.counter { text-align: right; font-size: 12px; color: var(--hint); margin-top: 6px; }
+.hint { margin-top: 8px; color: var(--hint); font-size: 12px; }
+.error { margin-top: 8px; color: var(--danger); font-size: 13px; font-weight: 600; }
+
+/* Tarih & Saat aynı satır */
+.date-time-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr; /* Yıl Ay Gün Saat */
+  gap: 10px;
+}
+.hour-select { min-width: 140px; }
+
+/* Konum – İl & İlçe satırları */
+.row {
+  display: flex;
+  align-items: center;
   gap: 12px;
+  margin: 8px 0;
+}
+.field-label {
+  min-width: 56px;
+  font-size: 14px;
+  color: var(--hint);
 }
 
-/* Görüntü amaçlı kutular; önceki select okları/arka planını kapat */
-.display-field {
-  border: none !important;
-  padding: 0 !important;
-  box-shadow: none !important;
-  background: none !important;
-  background-image: none !important;
-  background-position: initial !important;
-  background-size: 0 !important;
-  background-repeat: no-repeat !important;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  padding-right: 14px; /* rahat nefes */
+/* Butonlar */
+.actions { margin-top: 20px; }
+.primary-btn {
+  width: 100%;
+  display: inline-block;
+  background: linear-gradient(135deg, #6a00ff, #9a66ff);
+  color: #fff;
+  border: none;
+  padding: 14px 22px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.06s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  box-shadow: 0 12px 26px rgba(106, 0, 255, 0.22);
+}
+.primary-btn:hover:not([disabled]) {
+  box-shadow: 0 16px 30px rgba(106, 0, 255, 0.28);
+  transform: translateY(-1px);
+}
+.primary-btn:active:not([disabled]) { transform: translateY(0); }
+.primary-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+/* Sonuç mesajları */
+.result { margin-top: 14px; color: var(--success); font-size: 14px; font-weight: 700; }
+
+/* Responsive */
+@media (max-width: 860px) {
+  .create-wrapper { margin: 18px 12px; padding: 20px; }
+}
+@media (max-width: 640px) {
+  .date-time-row { grid-template-columns: 1fr 1fr; } /* Yıl/Ay ve Gün/Saat alt alta */
 }
 
-/* (İstemezsen kaldır) Çok dar ekranlarda bile üç sütunu korumak için medya kuralı YOK.
-   Eğer taşıyor gibi görünürse, paneli yatay kaydırılabilir yapmak için şunları ekleyebilirsin:
-   .title-panel { overflow-x: auto; }  */
+.celebrate{
+  margin-top:14px;padding:12px 16px;background:#e8fff3;border:2px solid #3ad29f;
+  color:#155f41;border-radius:14px;font-weight:800;text-align:center;
+  box-shadow:0 8px 20px rgba(58,210,159,0.15);
+}
+
+.found-btn {
+  display: block;
+  width: 100%;
+  padding: 18px 0;
+  margin-top: 30px;
+  border: none;
+  border-radius: 999px;
+  background-color: #6a00ff;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+}
+
+.msg.ok  { margin-top: 8px; color: #0a7a28; }
+.msg.err { margin-top: 8px; color: #b00020; }
