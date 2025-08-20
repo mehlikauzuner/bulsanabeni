@@ -1,4 +1,3 @@
-
 <div class="create-wrapper">
 
   <!-- Yükleniyor / Hata -->
@@ -7,6 +6,7 @@
       <div class="hint">Yükleniyor…</div>
     </div>
   }
+
   @if (error) {
     <div class="title-panel" aria-live="assertive">
       <div class="error">❌ {{ error }}</div>
@@ -58,21 +58,21 @@
       </div>
     </div>
 
+    <!-- ===== Bildirim Butonu ===== -->
+    <button
+      class="found-btn"
+      type="button"
+      (click)="onSeniBuldum()"
+      [disabled]="loading || sending || !(ilan && ilan.id)">
+      {{ sending ? 'Gönderiliyor…' : '💬 Seni buldum' }}
+    </button>
 
-<button
-  class="found-btn"
-  type="button"
-  (click)="onSeniBuldumClick()"
-  [disabled]="loading || sending || !ilan">
-  {{ sending ? 'Gönderiliyor…' : '💬 Seni buldum' }}
-</button>
+    @if (sendOk) {
+      <div class="msg ok">Bildirim gönderildi ✅</div>
+    }
 
-@if (sendOk) {
-  <div class="msg ok">Bildirim gönderildi ✅</div>
-}
-
-@if (sendErr) {
-  <div class="msg err">{{ sendErr }}</div>
-}
+    @if (sendErr) {
+      <div class="msg err">{{ sendErr }}</div>
+    }
   }
 </div>

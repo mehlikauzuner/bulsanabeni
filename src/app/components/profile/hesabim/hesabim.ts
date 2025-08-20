@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth-service';
+import { NotificationService } from '../../../services/notification-service';
 
 
 
@@ -37,6 +38,7 @@ export class Hesabim {
     private auth: AuthService,
     private route: ActivatedRoute,
     private router: Router,
+    private noti: NotificationService, 
   ) {}
 
   ngOnInit() {
@@ -74,6 +76,32 @@ export class Hesabim {
     this.router.navigateByUrl('/profil');
   }
 
+
+
+   // ====== BACKEND'DEN BİLDİRİM ÇEKME (BASIC) ======
+  notifications: any[] = [];
+  notiLoading = false;
+  notiLoaded = false;
+
+  private loadNotifications() {
+    const uid = this.currentUserId();
+    if (!uid) return; // login değilse
+    this.notiLoading = true;
+
+    this.noti.getMy(uid).subscribe({
+      next: (res) => {
+        // API SuccessDataResult dönerse res.data; düz liste dönerse res
+        this.notifications = res?.data ?? res ?? [];
+        this.notiLoading = false;
+        this.notiLoaded = true;
+      },
+      error: () => {
+        this.notifications = [];
+        this.notiLoading = false;
+        this.notiLoaded = true;
+      }
+    });
+  }
   // --- AŞAĞIDAKİLER şimdilik MOCK; backend bağlayınca bunları API'den dolduracağız ---
 
   user = {
@@ -86,10 +114,7 @@ export class Hesabim {
     fotoUrl: ''
   };
 
-  bildirimler = [
-    { id: 1, text: 'Ayşe ilanına cevap verdi', ago: '2 saat önce' },
-    { id: 2, text: 'Mehmet “seni buldum” dedi', ago: '1 gün önce' },
-  ];
+  
 
   mesajKisileri = [
     { id: 10, ad: 'Ayşe Yılmaz', son: 'Yarın buluşalım mı?', ago: '5 dk' },

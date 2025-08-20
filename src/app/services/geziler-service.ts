@@ -11,13 +11,23 @@ export class GezilerService {
   private readonly citiesApi   = 'https://localhost:44345/api/Cities';
   private readonly districtsApi= 'https://localhost:44345/api/Districts';
   private readonly notificationApi = 'https://localhost:44345/api/Notification'; 
+  
 
-   notifyFound(payload: any) {
-  return this.http.post(`${this.notificationApi}/found`, payload); // burada ekle
-}
 
 
   constructor(private http: HttpClient) {}
+
+  notifyFound(ilanId: number) {
+    const url = `${this.notificationApi}/add`;
+    return this.http.post<any>(url, { ilanId }); // backend diğer alanları kendisi set etmeli
+  }
+
+  /** 2) Alıcının bildirimlerini çek */
+  getMyNotifications(userId: number) {
+    const url = `${this.notificationApi}/GetMyNotifications`;
+    const params = new HttpParams().set('userId', String(userId));
+    return this.http.get<any>(url, { params });
+  }
 
 
 createIlan(payload: any) {

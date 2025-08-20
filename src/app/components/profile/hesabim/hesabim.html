@@ -70,19 +70,47 @@
       }
 
       <!-- Bildirimler -->
-      @if (active==='bildirimler') {
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h6 class="mb-3">Bildirimler</h6>
-            @for (b of bildirimler; track b.id) {
-              <div class="notify-item">
-                <span class="dot"></span> {{ b.text }}
-                <span class="ago">{{ b.ago }}</span>
-              </div>
+      <div *ngIf="active === 'bildirimler'">
+  <div *ngIf="notiLoading">Yükleniyor…</div>
+
+  <ul *ngIf="!notiLoading && notifications?.length">
+    <li *ngFor="let n of notifications">
+      {{ n.message }} — {{ n.createdAt | date:'short' }}
+    </li>
+  </ul>
+
+  <div *ngIf="!notiLoading && (!notifications || notifications.length === 0)">
+    Bildirimin yok.
+  </div>
+</div>
+
+<!-- Bildirimler Sekmesi -->
+@if (active === 'bildirimler') {
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h6 class="mb-3">Bildirimler</h6>
+
+      @if (notiLoading) {
+        <div>Yükleniyor…</div>
+      } @else {
+        @if (notifications && notifications.length) {
+          <ul class="list-group list-group-flush">
+            @for (n of notifications; track $index) {
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ n.message }}</span>
+                <span class="badge bg-light text-muted">
+                  {{ n.createdAt | date:'short' }}
+                </span>
+              </li>
             }
-          </div>
-        </div>
+          </ul>
+        } @else {
+          <div class="text-muted">Bildirimin yok.</div>
+        }
       }
+    </div>
+  </div>
+}
 
       <!-- Mesajlar -->
       @if (active==='mesajlar') {
