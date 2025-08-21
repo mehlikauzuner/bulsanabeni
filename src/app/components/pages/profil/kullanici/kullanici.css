@@ -26,20 +26,40 @@
 }
 
 /* Profil üst blok – ORTADA */
-.profile {
-  margin-top: 8px;
-  display: flex; flex-direction: column; align-items: center; text-align: center;
+.profile{
+  display:flex; flex-direction:column; align-items:center; text-align:center;
 }
-.avatar {
-  width: 110px; height: 110px; border-radius: 50%;
-  background: #183659; display: grid; place-items: center; overflow: hidden;
+/* Bordo kutucuk – kullanıcı adı */
+.username-pill{
+  margin-top: 16px;
+  padding: 12px 28px;
+  min-width: 240px;                        /* küçük kalmasın */
+  background: #8d2140;
+  color: #fff;                             /* beyaz yazı */
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 20px;
+  text-align: center;
+  box-shadow: 0 10px 24px rgba(141,33,64,.35);
 }
-.avatar::after { content: attr(data-initials); font-weight: 800; font-size: 40px; color: #8fb7ff; }
-.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.name { margin-top: 10px; font-size: 28px; font-weight: 800; }
-.city { opacity: .9; }
-.rating { margin-top: 6px; font-weight: 700; }
-.rating small { opacity: .85; }
+/* Daire içi ilk harf */
+
+/* Daire boyutu büyük ve sabit */
+.avatar{
+  width: 160px; height: 160px;            /* büyüttüm */
+  border-radius: 50%;
+  background: #0f2442;
+  display: grid; place-items: center;
+  box-shadow: 0 12px 30px rgba(0,0,0,.45) inset, 0 10px 26px rgba(0,0,0,.28);
+}
+
+/* İçteki harf */
+.avatar .initial{
+  font-size: 68px;                         /* büyük harf */
+  font-weight: 900;
+  line-height: 1;
+  color: #9ec0ff;
+}
 
 /* Tabs */
 .tabs {
@@ -85,6 +105,11 @@
   border-radius: 12px; justify-self: end;
 }
 .primary:disabled { opacity: .6; cursor: not-allowed; }
+
+/* Şehir ve puan */
+.city{ margin-top: 8px; opacity: .95; }
+.rating{ margin-top: 6px; font-weight: 700; }
+.rating small{ opacity: .8; }
 
 /* Erişilebilirlik */
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }

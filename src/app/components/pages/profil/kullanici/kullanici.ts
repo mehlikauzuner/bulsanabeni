@@ -1,120 +1,97 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { BadgeDto, ReviewDto, UserDto } from '../../../../models/kullanici-model';
-
+import { BadgeDto, ReviewDto, UserDto, ProfilDetailDto } from '../../../../models/kullanici-model';
+import { ProfilDetailService } from '../../../../services/kullanici-service';
 
 
 type TabKey = 'rozetler' | 'yorumlar' | 'mesaj';
 
 @Component({
   selector: 'app-kullanici',
-  standalone:true,
-  imports: [CommonModule,RouterModule],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './kullanici.html',
-  styleUrl: './kullanici.css'
+  styleUrls: ['./kullanici.css']   // <-- düzeltildi
 })
 export class Kullanici {
- userId: number = 0;
+  userId = 0;
 
-constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private profil: ProfilDetailService       // <-- servis eklendi
+  ) {}
 
-ngOnInit() {
-  this.bootstrapLoad();
-  this.route.paramMap.subscribe(p => {
-    const id = Number(p.get('id')) || 0;
+  ngOnInit() {
+    // ❌ this.bootstrapLoad();  // kaldır
+    this.route.paramMap.subscribe(p => {
+      const id = Number(p.get('id')) || 0;
+      if (id && id !== this.userId) {
+        this.userId = id;
+        this.loadUser(id);
+      }
+    });
+  }
 
-    // Aynı sayfada arka arkaya farklı profillere tıklayınca burası her seferinde çalışır
-    if (id && id !== this.userId) {
-      this.userId = id;
-      this.loadUser(id);   // ↓ bkz. 3. adım
-    }
-  });
-}
+  private loadUser(id: number) {
+    this.isLoading = true;
+    this.error = null;
 
-private loadUser(id: number) {
-  this.isLoading = true;
-  this.error = null;
-
-  // TODO: backend entegrasyonu
-  // this.users.getById(id).subscribe({
-  //   next: (u) => { this.user = u; this.isLoading = false; },
-  //   error: (err) => { this.error = 'Kullanıcı bulunamadı.'; this.isLoading = false; }
-  // });
-
-  // Şimdilik placeholder:
-  this.user = {
-    id, username: 'Geçici', city: '—', avatarUrl: '', ratingAvg: 0, ratingCount: 0
-  };
-  this.isLoading = false;
-}
-
+    this.profil.getById(id).subscribe({
+      next: (u) => {
+        this.user = u;                  // backend’den gelen gerçek veri
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.error = 'Kullanıcı bulunamadı.';
+        this.isLoading = false;
+      }
+    });
+  }
 
   // UI state
   isLoading = true;
   error: string | null = null;
   activeTab: TabKey = 'rozetler';
 
-  // View model
-  user: UserDto = {
+  // View model (ProfilDetailDto'ya yükselttik)
+  user: ProfilDetailDto = {
     id: 0,
     username: '',
+    email: '',
     city: '',
     avatarUrl: '',
     ratingAvg: 0,
     ratingCount: 0,
+    birthDate: null,
+    bio: null
   };
 
   badges: BadgeDto[] = [];
   reviews: ReviewDto[] = [];
 
+// kullanici.ts
+get displayName(): string {
+  // API userName gönderdiyse de yakala
+  const u: any = this.user as any;
+  return (u.username || u.userName || '').trim();
+}
+
+get initialLetter(): string {
+  const n = this.displayName;
+  return n ? n.charAt(0).toUpperCase() : 'U';
+}
+
+
+
   // Mesaj kutusu
   messageText = '';
   isSending = false;
 
- 
+  setTab(tab: TabKey) { this.activeTab = tab; }
 
-  /** İlk verileri yükle */
-  async bootstrapLoad() {
-    try {
-      this.isLoading = true;
-      this.error = null;
-
-      // 👉 Burayı kendi servis çağrılarınla değiştir
-      this.user = {
-        id: this.userId,
-        username: 'Yaman',
-        city: 'İstanbul',
-        avatarUrl: '',
-        ratingAvg: 4.5,
-        ratingCount: 36,
-      };
-
-      this.badges = [
-        { id: 1, name: 'Başlangıç', icon: '🏅' },
-        { id: 2, name: 'İyi İş', icon: '👍' },
-        { id: 3, name: 'Üst Düzey', icon: '⭐' },
-        { id: 4, name: 'Güvenilir', icon: '✅' },
-      ];
-
-      this.reviews = [
-        { id: 1, author: 'Ali',    when: '2 hafta önce', text: 'Sorunsuz bir alışverişti.' },
-        { id: 2, author: 'Zeynep', when: '3 hafta önce', text: 'Çok kibar ve güvenilir.' },
-        { id: 3, author: 'Ahmet',  when: '1 ay önce',    text: 'Ürün anlatıldığı gibiydi.' },
-      ];
-    } catch (e) {
-      console.error(e);
-      this.error = 'Veriler yüklenemedi.';
-    } finally {
-      this.isLoading = false;
-    }
-  }
-
-  setTab(tab: TabKey) {
-    this.activeTab = tab;
-  }
-
-  /** Mesaj metnini FormsModule olmadan yakala */
   onMessageInput(ev: Event) {
     this.messageText = (ev.target as HTMLTextAreaElement).value ?? '';
   }
@@ -122,14 +99,10 @@ private loadUser(id: number) {
   async sendMessage() {
     const text = (this.messageText || '').trim();
     if (!text) return;
-
     try {
       this.isSending = true;
-      // 👉 Burayı kendi Message/Notification servisinle değiştir
       console.log('Mesaj gönder:', { to: this.userId, text });
       this.messageText = '';
-    } catch (e) {
-      console.error(e);
     } finally {
       this.isSending = false;
     }
@@ -139,4 +112,5 @@ private loadUser(id: number) {
     if (history.length > 1) history.back();
     else this.router.navigateByUrl('/hesabim');
   }
+
 }

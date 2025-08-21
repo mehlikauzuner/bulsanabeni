@@ -7,15 +7,22 @@
       <h1 class="sr-only">Kullanıcı Profili</h1>
     </header>
 
-    <!-- Profil üst blok -->
-    <div class="profile">
-      <div class="avatar" [attr.data-initials]="(user.username || 'U').slice(0,1)">
-        <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" alt="Profil fotoğrafı" />
-      </div>
-      <div class="name">{{ user.username }}</div>
-      <div class="city">{{ user.city }}</div>
-      <div class="rating"><span>★</span> {{ user.ratingAvg }} <small>({{ user.ratingCount }})</small></div>
-    </div>
+<!-- Profil üst blok -->
+<div class="profile">
+  <!-- Daire + span -->
+  <div class="avatar">
+    <span class="initial">{{ initialLetter }}</span>
+  </div>
+
+  <!-- Bordo etiket: kullanıcı adı beyaz -->
+  <div class="username-pill">{{ displayName }}</div>
+
+  <!-- Şehir -->
+  <div class="city">{{ user.city }}</div>
+
+  <div class="rating"><span>★</span> {{ user.ratingAvg ?? 0 }} <small>({{ user.ratingCount ?? 0 }})</small></div>
+</div>
+
 
     <!-- Tabs -->
     <nav class="tabs">

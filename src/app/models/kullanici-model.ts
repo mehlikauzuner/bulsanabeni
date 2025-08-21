@@ -19,3 +19,13 @@ export interface ReviewDto {
   when: string;
   text: string;
 }
+
+
+
+export interface ProfilDetailDto extends UserDto {
+  email: string;
+  birthDate?: string | null;
+  bio?: string | null;
+  // avatarUrl, city, ratingAvg, ratingCount zaten UserDto'dan geliyor
+}
+
