@@ -1,0 +1,65 @@
+
+<div class="page">
+  <section class="card">
+    <!-- Header -->
+    <header class="header">
+      <button class="back" (click)="goBack()" aria-label="Geri">⟵</button>
+      <h1 class="sr-only">Kullanıcı Profili</h1>
+    </header>
+
+    <!-- Profil üst blok -->
+    <div class="profile">
+      <div class="avatar" [attr.data-initials]="(user.username || 'U').slice(0,1)">
+        <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" alt="Profil fotoğrafı" />
+      </div>
+      <div class="name">{{ user.username }}</div>
+      <div class="city">{{ user.city }}</div>
+      <div class="rating"><span>★</span> {{ user.ratingAvg }} <small>({{ user.ratingCount }})</small></div>
+    </div>
+
+    <!-- Tabs -->
+    <nav class="tabs">
+      <button [class.active]="activeTab==='rozetler'" (click)="setTab('rozetler')">Rozetler</button>
+      <button [class.active]="activeTab==='yorumlar'" (click)="setTab('yorumlar')">Yorumlar</button>
+      <button [class.active]="activeTab==='mesaj'"     (click)="setTab('mesaj')">Mesaj Gönder</button>
+    </nav>
+
+    <!-- İçerik -->
+    <section class="content">
+      <!-- Rozetler -->
+      <div *ngIf="activeTab==='rozetler'">
+        <div class="badge-row">
+          <div class="badge" *ngFor="let b of badges" [title]="b.name">
+            <div class="icon">{{ b.icon }}</div>
+            <div class="label">{{ b.name }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Yorumlar -->
+      <div *ngIf="activeTab==='yorumlar'">
+        <article class="review" *ngFor="let r of reviews">
+          <div class="review-head">
+            <strong>{{ r.author }}</strong>
+            <span class="when">{{ r.when }}</span>
+          </div>
+          <p class="text">{{ r.text }}</p>
+        </article>
+      </div>
+
+      <!-- Mesaj -->
+      <div *ngIf="activeTab==='mesaj'">
+        <div class="message-box">
+          <textarea
+            [value]="messageText"
+            (input)="onMessageInput($event)"
+            placeholder="Mesaj yaz..."
+          ></textarea>
+          <button class="primary" (click)="sendMessage()" [disabled]="!messageText.trim() || isSending">
+            MESAJ GÖNDER
+          </button>
+        </div>
+      </div>
+    </section>
+  </section>
+</div>

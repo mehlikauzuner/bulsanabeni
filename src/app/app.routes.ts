@@ -40,6 +40,7 @@ import { GezilerIlan } from './components/pages/seyehat/kategoriler/geziler/ilan
 import { CruiseIlan } from './components/pages/seyehat/kategoriler/cruise/ilan/ilan';
 import { GezilerDetay } from './components/pages/seyehat/kategoriler/geziler/detay/detay';
 import { Hesabim } from './components/profile/hesabim/hesabim';
+import { Kullanici } from './components/pages/profil/kullanici/kullanici';
 
 
 
@@ -108,9 +109,9 @@ export const routes: Routes = [
     ],
   },
 
-   // app.routes.ts
-// app.routes.ts
-{ path: 'profil/hesabim', component: Hesabim}
+  
+{ path: 'profil/hesabim', component: Hesabim},
+{ path: 'profil/hesabim/kullanici/:id', component: Kullanici }
 
 
 ]

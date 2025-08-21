@@ -21,6 +21,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   birthDate: string; // yyyy-mm-dd
+  city:string;
 }
 
 export interface RegisterResponse {
@@ -31,6 +32,12 @@ export interface RegisterResponse {
     fullName: string;
     email: string;
   };
+}
+
+export interface UserSearch {
+  id: number;
+  userName: string;   // backend'deki JSON'la birebir aynı
+  city: string | null;
 }
 
 export interface ApiError {

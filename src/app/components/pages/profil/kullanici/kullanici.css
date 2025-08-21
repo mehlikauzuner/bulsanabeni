@@ -1,0 +1,96 @@
+/* Arka plan: koyu lacivert */
+.page {
+  min-height: 100vh;
+  background: #0b1e3a;
+  display: grid;
+  place-items: start center;
+  padding: 24px;
+}
+
+/* İç kart: açık mavi */
+.card {
+  width: min(900px, 100%);
+  background: #2a4f80;
+  color: #eaf2ff;
+  border-radius: 22px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  padding: 16px 20px 24px;
+}
+
+/* Header */
+.header { display: flex; align-items: center; }
+.back {
+  appearance: none; border: none; cursor: pointer;
+  width: 36px; height: 36px; border-radius: 10px;
+  background: #1e3e66; color: #eaf2ff; font-size: 20px;
+}
+
+/* Profil üst blok – ORTADA */
+.profile {
+  margin-top: 8px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.avatar {
+  width: 110px; height: 110px; border-radius: 50%;
+  background: #183659; display: grid; place-items: center; overflow: hidden;
+}
+.avatar::after { content: attr(data-initials); font-weight: 800; font-size: 40px; color: #8fb7ff; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.name { margin-top: 10px; font-size: 28px; font-weight: 800; }
+.city { opacity: .9; }
+.rating { margin-top: 6px; font-weight: 700; }
+.rating small { opacity: .85; }
+
+/* Tabs */
+.tabs {
+  margin-top: 16px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  background: #224772; padding: 6px; border-radius: 12px;
+}
+.tabs button {
+  appearance: none; border: none; cursor: pointer;
+  padding: 10px; border-radius: 10px; color: #eaf2ff; background: transparent;
+  font-weight: 700;
+}
+.tabs button.active { background: #1c3e66; }
+
+/* İçerik alanı */
+.content { margin-top: 14px; }
+
+/* Rozetler */
+.badge-row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+.badge {
+  width: 120px; background: #20426e; border-radius: 14px; padding: 10px 12px;
+  display: grid; place-items: center;
+}
+.badge .icon { font-size: 22px; }
+.badge .label { font-size: 12px; opacity: .95; margin-top: 4px; }
+
+/* Yorumlar */
+.review { background: #213f69; border-radius: 12px; padding: 12px; margin-top: 10px; }
+.review-head { display: flex; gap: 10px; align-items: baseline; }
+.review .when { opacity: .85; font-size: 12px; }
+.review .text { margin: 6px 0 0; }
+
+/* Mesaj kutusu – tab İÇİNDE, altta değil */
+.message-box { display: grid; gap: 10px; }
+.message-box textarea {
+  min-height: 110px; resize: vertical;
+  border: 0; border-radius: 12px; padding: 12px; background: #213f69; color: #eaf2ff;
+}
+.primary {
+  appearance: none; border: none; cursor: pointer;
+  background: linear-gradient(180deg, #3e6cc1, #2b5aa8);
+  color: white; font-weight: 800; padding: 12px 18px;
+  border-radius: 12px; justify-self: end;
+}
+.primary:disabled { opacity: .6; cursor: not-allowed; }
+
+/* Erişilebilirlik */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+/* Mobil uyum */
+@media (max-width: 520px) {
+  .name { font-size: 24px; }
+  .badge { width: 100px; }
+}

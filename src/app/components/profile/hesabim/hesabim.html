@@ -1,4 +1,4 @@
-<!-- src/app/pages/profil/hesabim/hesabim.html -->
+<!-- src/app/components/profile/hesabim/hesabim.html -->
 <div class="container my-4 profile-container hesabim-page">
   <div class="row g-3">
 
@@ -6,7 +6,7 @@
     <aside class="col-12 col-lg-3 left-rail">
       <div class="card shadow-sm baby-left-card">
         <div class="card-body text-center">
-          <div class="avatar mb-3" [attr.data-initials]="user.fullName ? user.fullName.charAt(0) : 'U'">
+          <div class="avatar mb-3" [attr.data-initials]="(user.fullName || 'U').charAt(0)">
             @if (user.fotoUrl) {
               <img [src]="user.fotoUrl" alt="Profil" />
             }
@@ -62,27 +62,23 @@
         </div>
       }
 
-      <!-- Bildirimler (sadece kart, tek liste) -->
+      <!-- Bildirimler -->
       @if (active === 'bildirimler') {
         <div class="card shadow-sm">
           <div class="card-body">
             <h6 class="mb-3">Bildirimler</h6>
 
-            @if (notiLoading) {
-              <div>Yükleniyor…</div>
+            @if (notifications && notifications.length) {
+              <ul class="list-group list-group-flush">
+                @for (n of notifications; track $index) {
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>{{ n.message }}</span>
+                    <span class="badge bg-light text-muted">{{ n.createdAt | date:'short' }}</span>
+                  </li>
+                }
+              </ul>
             } @else {
-              @if (notifications && notifications.length) {
-                <ul class="list-group list-group-flush">
-                  @for (n of notifications; track $index) {
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      <span>{{ n.message }}</span>
-                      <span class="badge bg-light text-muted">{{ n.createdAt | date:'short' }}</span>
-                    </li>
-                  }
-                </ul>
-              } @else {
-                <div class="text-muted">Bildirimin yok.</div>
-              }
+              <div class="text-muted">Bildirimin yok.</div>
             }
           </div>
         </div>
@@ -176,15 +172,26 @@
         <div class="card shadow-sm">
           <div class="card-body">
             <h6 class="mb-3">Kullanıcı Ara</h6>
+
             <div class="mb-3">
-              <input class="form-control" [(ngModel)]="q" (input)="onQuery()" placeholder="İsim veya şehir ara..." />
+              <input
+                class="form-control"
+                [(ngModel)]="q"
+                (input)="onQuery()"
+                (keyup.enter)="onQuery()"
+                placeholder="İsim veya şehir ara..." />
             </div>
-            @if (results.length > 0){
+
+            @if (results && results.length > 0) {
               <ul class="list-group list-group-flush">
                 @for (u of results; track u.id) {
                   <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span><strong>{{ u.name }}</strong> — <span class="text-muted">{{ u.city }}</span></span>
-                    <button class="btn btn-sm btn-outline-primary" (click)="openProfile(u.id)">Profili Gör</button>
+                    <span><strong>{{ u.userName }}</strong> — <span class="text-muted">{{ u.city }}</span></span>
+                    <button class="btn btn-outline-primary"
+        [routerLink]="['/profil/hesabim/kullanici', u.id]">
+  Profili Gör
+</button>
+
                   </li>
                 }
               </ul>

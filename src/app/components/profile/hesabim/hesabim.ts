@@ -1,9 +1,12 @@
 import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth-service';
 import { NotificationService } from '../../../services/notification-service';
+import { UserService } from '../../../services/user-service';
+import { UserSearch } from '../../../models/auth-model.ts';
+
 
 
 
@@ -12,7 +15,7 @@ type Tab = 'bildirimler' | 'mesajlar' | 'rozetler' | 'yorumlar' | 'ayarlar' | 'a
 @Component({
   selector: 'app-hesabim',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './hesabim.html',
   styleUrls: ['./hesabim.css']
 })
@@ -39,15 +42,13 @@ export class Hesabim {
     private route: ActivatedRoute,
     private router: Router,
     private noti: NotificationService, 
+    private userService: UserService,
   ) {}
 
   ngOnInit() {
-    // 1) Login durumunu ve currentUserId'yi servisten canlı takip et
     this.auth.isLoggedIn$.subscribe(v => {
       this.isLoggedIn.set(v);
       this.currentUserId.set(this.auth.currentUserId());
-
-      // Eğer route'tan id gelmediyse ve login olduysak, görüntülenen profil = benim profilim
       if (!this.route.snapshot.paramMap.get('id') && v) {
         this.profileOwnerId.set(this.auth.currentUserId());
       }
@@ -153,26 +154,24 @@ toggleTab(t: Tab) {
     this.newRating = 5;
   }
 
-  // --- Ara tabı (mock) ---
-  q = '';
-  allUsers = [
-    { id: 2, name: 'Ayşe Yılmaz', city: 'İzmir' },
-    { id: 3, name: 'Mehmet Kaya', city: 'Ankara' },
-    { id: 4, name: 'Ali Demir', city: 'İstanbul' },
-  ];
-  results = this.allUsers;
+  // --- Ara tabı 
+ q = '';
+  results: UserSearch[] = [];
 
   onQuery() {
-    const k = this.q.trim().toLowerCase();
-    this.results = !k ? this.allUsers
-      : this.allUsers.filter(u =>
-          u.name.toLowerCase().includes(k) || (u.city ?? '').toLowerCase().includes(k)
-        );
+    const k = (this.q ?? '').trim();
+    // Metod adın 'SearchUser' ise alttaki satırı ona göre değiştir:
+    this.userService.SearchUser(k, 1, 20).subscribe({
+      next: (users) => this.results = users ?? [],
+      error: () => this.results = []
+    });
   }
 
-  openProfile(id:number){
-    this.router.navigate(['/profil', id]);
-  }
+
+openProfile(id:number){
+  this.router.navigate(['/profil', id]);
+}
+
 
   // (İleride: profileOwnerId değişince API'den profil bilgisi çek → this.user = ...)
 }

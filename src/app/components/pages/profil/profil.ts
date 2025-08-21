@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth-service';
 
-
 type Mode = 'login' | 'register';
 
 @Component({
@@ -27,7 +26,7 @@ export class Profil {
   // Login form
   loginModel = { email: '', password: '' };
 
-  // Register form
+  // Register form (city küçük harf!)
   registerModel = {
     firstName: '',
     lastName: '',
@@ -35,13 +34,12 @@ export class Profil {
     email: '',
     password: '',
     birthDate: '',
-    City: ''
+    city: ''
   };
 
   constructor(private router: Router, private auth: AuthService) {}
 
   ngOnInit() {
-    // Servisten gelen login durumunu canlı takip et
     this.auth.isLoggedIn$.subscribe(v => {
       this.isLoggedIn.set(v);
       this.userId.set(this.auth.currentUserId());
@@ -64,7 +62,7 @@ export class Profil {
       this.errorMsg.set('E-posta ve şifre zorunlu.');
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!this.isValidEmail(email)) {
       this.errorMsg.set('Lütfen geçerli bir e-posta gir.');
       return;
     }
@@ -77,37 +75,42 @@ export class Profil {
 
     this.auth.login({ email, password }).subscribe({
       next: (res) => {
-        console.log('LOGIN SUCCESS, response:', res); // 🔎 gelen cevabı gör
+        console.log('LOGIN SUCCESS, response:', res);
         this.isSubmitting.set(false);
         this.router.navigateByUrl('/profil/hesabim');
       },
       error: (err: Error) => {
-        console.error('LOGIN ERROR', err); // 🔎 hata detayını gör
+        console.error('LOGIN ERROR', err);
         this.isSubmitting.set(false);
         this.errorMsg.set(err.message || 'Giriş başarısız.');
       }
     });
   }
 
-  private isValidPassword(pw: string): boolean {
-    return pw.length >= 8 && pw.length <= 15;
-  }
 
-
+  
   // ====== REGISTER ======
   onRegister() {
-    this.errorMsg.set(null);
-    const { firstName, lastName, username, email, password, birthDate } = this.registerModel;
+    console.log('MODEL:', this.registerModel);
 
-    if (!firstName || !lastName || !username || !email || !password || !birthDate) {
+    this.errorMsg.set(null);
+    const { firstName, lastName, username, email, password, birthDate, city } = this.registerModel;
+
+    const firstNameTrim = (firstName || '').trim();
+    const lastNameTrim  = (lastName  || '').trim();
+    const userNameTrim  = (username  || '').trim();
+    const emailTrim     = (email     || '').trim().toLowerCase();
+    const cityTrim      = (city      || '').trim();
+
+    if (!firstNameTrim || !lastNameTrim || !userNameTrim || !emailTrim || !password || !birthDate || !cityTrim) {
       this.errorMsg.set('Tüm alanlar zorunlu.');
       return;
     }
-    if (!this.isValidUsername(username)) {
-      this.errorMsg.set('Kullanıcı adı 3–20 karakter, harf-rakam-_ . - içerebilir.');
+    if (!this.isValidUsername(userNameTrim)) {
+      this.errorMsg.set('Kullanıcı adı 3–20 karakter olmalı (harf, rakam, _ . -).');
       return;
     }
-    if (!this.isValidEmail(email)) {
+    if (!this.isValidEmail(emailTrim)) {
       this.errorMsg.set('Lütfen geçerli bir e-posta gir.');
       return;
     }
@@ -119,9 +122,23 @@ export class Profil {
       this.errorMsg.set('Doğum tarihi geçersiz (gelecek tarih olamaz, 13+ olmalı).');
       return;
     }
+    if (!this.isValidCity(cityTrim)) {
+      this.errorMsg.set('Bulunduğunuz şehri girmek zorunlu.');
+      return;
+    }
 
     this.isSubmitting.set(true);
-    this.auth.register({ firstName, lastName, username, email, password, birthDate }).subscribe({
+
+    // .NET default camelCase: City -> "city", UserName -> "userName"
+    this.auth.register({
+      firstName: firstNameTrim,
+      lastName:  lastNameTrim,
+      username:  userNameTrim,
+      email:     emailTrim,
+      password,
+      birthDate,        // YYYY-MM-DD
+      city:      cityTrim
+    }).subscribe({
       next: () => {
         this.isSubmitting.set(false);
         this.mode.set('login');
@@ -137,12 +154,19 @@ export class Profil {
   // ====== LOGOUT ======
   onLogout() {
     this.auth.logout();
-    // istersen: this.router.navigateByUrl('/profil'); 
+    // this.router.navigateByUrl('/profil');
   }
 
   // === helpers ===
-  private isValidEmail(e: string) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-  private isValidUsername(u: string) { return /^[a-zA-Z0-9_.-]{3,20}$/.test(u || ''); }
+  private isValidEmail(e: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e || '');
+  }
+  private isValidUsername(u: string) {
+    return /^[a-zA-Z0-9_.-]{3,20}$/.test(u || '');
+  }
+  private isValidPassword(pw: string) {
+    return !!pw && pw.length >= 8 && pw.length <= 15;
+  }
   private isValidBirthDate(d: string) {
     if (!d) return false;
     const today = new Date();
@@ -152,5 +176,9 @@ export class Profil {
     const age = today.getFullYear() - bd.getFullYear()
       - ((today.getMonth() < bd.getMonth() || (today.getMonth() === bd.getMonth() && today.getDate() < bd.getDate())) ? 1 : 0);
     return age >= 13;
+  }
+  private isValidCity(c: string) {
+    return c.length >= 2 && c.length <= 50;
+    // İstersen: return /^[a-zA-ZçğıöşüÇĞİÖŞÜ\s.-]{2,50}$/.test(c);
   }
 }
