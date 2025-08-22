@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { BadgeDto, ReviewDto, UserDto, ProfilDetailDto } from '../../../../models/kullanici-model';
+import { finalize } from 'rxjs/operators';
+import { BadgeDto, ReviewDto, ProfilDetailDto } from '../../../../models/kullanici-model';
 import { ProfilDetailService } from '../../../../services/kullanici-service';
-
+import { AuthService } from '../../../../services/auth-service';
 
 type TabKey = 'rozetler' | 'yorumlar' | 'mesaj';
 
@@ -12,51 +13,22 @@ type TabKey = 'rozetler' | 'yorumlar' | 'mesaj';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './kullanici.html',
-  styleUrls: ['./kullanici.css']   // <-- düzeltildi
+  styleUrls: ['./kullanici.css']
 })
-export class Kullanici {
-  userId = 0;
+export class Kullanici implements OnInit {
+  userId = 0;  // profil sahibinin id'si
+  meId  = 0;   // giriş yapan kullanıcı id'si
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private profil: ProfilDetailService       // <-- servis eklendi
-  ) {}
+  // mesaj alanı
+  messageText = '';
+  isSending = false;
 
-  ngOnInit() {
-    // ❌ this.bootstrapLoad();  // kaldır
-    this.route.paramMap.subscribe(p => {
-      const id = Number(p.get('id')) || 0;
-      if (id && id !== this.userId) {
-        this.userId = id;
-        this.loadUser(id);
-      }
-    });
-  }
-
-  private loadUser(id: number) {
-    this.isLoading = true;
-    this.error = null;
-
-    this.profil.getById(id).subscribe({
-      next: (u) => {
-        this.user = u;                  // backend’den gelen gerçek veri
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error(err);
-        this.error = 'Kullanıcı bulunamadı.';
-        this.isLoading = false;
-      }
-    });
-  }
-
-  // UI state
+  // sayfa durumu
   isLoading = true;
   error: string | null = null;
   activeTab: TabKey = 'rozetler';
 
-  // View model (ProfilDetailDto'ya yükselttik)
+  // View model
   user: ProfilDetailDto = {
     id: 0,
     username: '',
@@ -68,49 +40,109 @@ export class Kullanici {
     birthDate: null,
     bio: null
   };
-
   badges: BadgeDto[] = [];
   reviews: ReviewDto[] = [];
 
-// kullanici.ts
-get displayName(): string {
-  // API userName gönderdiyse de yakala
-  const u: any = this.user as any;
-  return (u.username || u.userName || '').trim();
-}
+  // UI durumları
+  sendOk = false;          // başarı bildirimi
+  showComposer = true;     // yazma kutusu görünür mü
+  private successTimer: any = null;
 
-get initialLetter(): string {
-  const n = this.displayName;
-  return n ? n.charAt(0).toUpperCase() : 'U';
-}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private profil: ProfilDetailService,
+    private auth: AuthService
+  ) {}
 
+  ngOnInit(): void {
+    this.meId = this.auth.currentUserId() ?? Number(localStorage.getItem('userId') || 0);
 
-
-  // Mesaj kutusu
-  messageText = '';
-  isSending = false;
-
-  setTab(tab: TabKey) { this.activeTab = tab; }
-
-  onMessageInput(ev: Event) {
-    this.messageText = (ev.target as HTMLTextAreaElement).value ?? '';
+    this.route.paramMap.subscribe(p => {
+      const id = Number(p.get('id')) || 0;
+      if (id && id !== this.userId) {
+        this.userId = id;
+        this.loadUser(id);
+      }
+    });
   }
 
-  async sendMessage() {
-    const text = (this.messageText || '').trim();
-    if (!text) return;
-    try {
-      this.isSending = true;
-      console.log('Mesaj gönder:', { to: this.userId, text });
-      this.messageText = '';
-    } finally {
-      this.isSending = false;
+  private loadUser(id: number): void {
+    this.isLoading = true;
+    this.error = null;
+
+    this.profil.getById(id)
+      .pipe(finalize(() => (this.isLoading = false)))
+      .subscribe({
+        next: (u: ProfilDetailDto) => { this.user = u; },
+        error: (err) => {
+          console.error('getById error', err);
+          this.error = 'Kullanıcı bulunamadı.';
+        }
+      });
+  }
+
+  get displayName(): string {
+    const u: any = this.user as any;
+    return (u.username || u.userName || '').trim();
+  }
+
+  get initialLetter(): string { return '😎'; }
+
+  setTab(tab: TabKey): void {
+    this.activeTab = tab;
+    if (tab === 'mesaj') {
+      this.showComposer = true;  // Mesaj sekmesine dönünce kutu açılsın
+      this.sendOk = false;       // eski başarı tostu kapansın
     }
   }
 
-  goBack() {
+  onMessageInput(ev: Event): void {
+    this.messageText = (ev.target as HTMLTextAreaElement).value ?? '';
+  }
+
+  sendMessage(): void {
+    const text = (this.messageText || '').trim();
+    if (!text || !this.meId || !this.userId) return;
+
+    this.isSending = true;
+
+    this.profil.send({
+      senderId: this.meId,
+      receiverId: this.userId,
+      content: text,
+      createdAt: new Date().toISOString()
+    })
+    .pipe(finalize(() => (this.isSending = false)))
+    .subscribe({
+      next: () => {
+        this.messageText = '';
+        this.showComposer = false;   // kutuyu kapat
+        this.sendOk = true;          // 🎉 göster
+        if (this.successTimer) clearTimeout(this.successTimer);
+        this.successTimer = setTimeout(() => (this.sendOk = false), 3000);
+      },
+      error: (err) => {
+        console.error('POST ERROR', err);
+      }
+    });
+  }
+
+  newMessage(): void {
+    this.sendOk = false;
+    this.showComposer = true;
+    this.messageText = '';
+  }
+
+  onEnter(ev: KeyboardEvent): void {
+    if (ev.ctrlKey || ev.metaKey) {
+      ev.preventDefault();
+      this.sendMessage();
+    }
+  }
+
+  goBack(): void {
     if (history.length > 1) history.back();
     else this.router.navigateByUrl('/hesabim');
   }
-
 }

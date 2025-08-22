@@ -1,3 +1,6 @@
+<pre style="position:fixed;bottom:80px;right:16px;color:#fff;opacity:.6">
+  sendOk={{sendOk}} tab={{activeTab}}
+</pre>
 
 <div class="page">
   <section class="card">
@@ -7,22 +10,13 @@
       <h1 class="sr-only">Kullanıcı Profili</h1>
     </header>
 
-<!-- Profil üst blok -->
-<div class="profile">
-  <!-- Daire + span -->
-  <div class="avatar">
-    <span class="initial">{{ initialLetter }}</span>
-  </div>
-
-  <!-- Bordo etiket: kullanıcı adı beyaz -->
-  <div class="username-pill">{{ displayName }}</div>
-
-  <!-- Şehir -->
-  <div class="city">{{ user.city }}</div>
-
-  <div class="rating"><span>★</span> {{ user.ratingAvg ?? 0 }} <small>({{ user.ratingCount ?? 0 }})</small></div>
-</div>
-
+    <!-- Profil üst blok -->
+    <div class="profile">
+      <div class="avatar"><span class="initial">{{ initialLetter }}</span></div>
+      <div class="username-pill">{{ displayName }}</div>
+      <div class="city">{{ user.city }}</div>
+      <div class="rating"><span>★</span> {{ user.ratingAvg ?? 0 }} <small>({{ user.ratingCount ?? 0 }})</small></div>
+    </div>
 
     <!-- Tabs -->
     <nav class="tabs">
@@ -56,17 +50,27 @@
 
       <!-- Mesaj -->
       <div *ngIf="activeTab==='mesaj'">
-        <div class="message-box">
+        <div *ngIf="showComposer" class="message-box">
           <textarea
             [value]="messageText"
             (input)="onMessageInput($event)"
-            placeholder="Mesaj yaz..."
-          ></textarea>
-          <button class="primary" (click)="sendMessage()" [disabled]="!messageText.trim() || isSending">
+            (keydown.enter)="sendMessage()"
+            placeholder="Mesaj yaz..."></textarea>
+
+          <button class="primary"
+                  (click)="sendMessage()"
+                  [disabled]="!messageText.trim() || isSending">
             MESAJ GÖNDER
           </button>
         </div>
+
+        <button *ngIf="sendOk && !showComposer"
+                class="primary"
+                (click)="newMessage()">
+          🎉 Mesajınız gönderildi
+        </button>
       </div>
     </section>
   </section>
 </div>
+

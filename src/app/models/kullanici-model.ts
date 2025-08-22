@@ -29,3 +29,19 @@ export interface ProfilDetailDto extends UserDto {
   // avatarUrl, city, ratingAvg, ratingCount zaten UserDto'dan geliyor
 }
 
+export interface MessageDto {
+  id: number;
+  senderId: number;
+  senderName?: string;
+  receiverId: number;
+  receiverName?: string;
+  content: string;
+  createdAt: string; // Date de olabilir
+}
+
+export interface MessageCreate {
+  senderId: number;
+  receiverId: number;
+  content: string;
+  createdAt: string;
+}
