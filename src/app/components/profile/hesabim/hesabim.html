@@ -116,10 +116,12 @@
                 </div>
                 <div class="msg-text">
                   <div class="line-1">
-                    <a class="fw-semibold link-dark text-decoration-none"
-                       (click)="openProfile(m.senderId)">
+                   <a class="fw-semibold link-dark text-decoration-none"
+                     [routerLink]="['/profil/hesabim/kullanici', m.senderId]">
                       {{ m.senderName || ('Kullanıcı #' + m.senderId) }}
-                    </a>
+                   </a>
+
+
                     <span class="text-muted">—</span>
                     <span class="text-muted msg-preview">{{ m.content }}</span>
                   </div>
@@ -129,10 +131,13 @@
 
               <div class="d-flex align-items-center gap-2">
                 <span class="badge bg-light text-muted d-none d-sm-inline">{{ fromNow(m.createdAt) }}</span>
-                <button class="btn btn-outline-primary btn-sm"
-                        (click)="goReply(m.senderId)">
-                  Cevap ver
+                <button type="button" class="btn btn-outline-primary btn-sm"
+                   [routerLink]="['/profil/hesabim/kullanici', m.senderId]"
+                   [queryParams]="{ tab: 'mesaj' }">
+                   Cevap ver
                 </button>
+
+
               </div>
             </li>
           }

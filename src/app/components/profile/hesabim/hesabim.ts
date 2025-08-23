@@ -145,6 +145,8 @@ private loadNotifications() {
     });
   }
 
+  
+
   // [MODIFY] Sekme aç-kapa: mesajlar açılırken inbox’ı bir kez yükle
   toggleTab(t: Tab) {
     this.active = (this.active === t) ? null : t;
@@ -157,11 +159,6 @@ private loadNotifications() {
     }
   }
 
-  // [ADD] Profil sayfasına (cevap vermek için) yönlendir
-  goReply(userId: number) {
-    // profil sayfasında tab query paramını okuyup “mesaj yaz” sekmesini açacaksın
-    this.router.navigate(['/profil', userId], { queryParams: { tab: 'mesaj' } });
-  }
 
   // [ADD - opsiyonel] Zamanı “5 dk / 3 saat / dün” gibi göster
   fromNow(iso: string): string {
@@ -220,8 +217,12 @@ private loadNotifications() {
 
 
 openProfile(id:number){
-  this.router.navigate(['/profil', id]);
+  this.router.navigate(['/profil/hesabim/kullanici', id]);
 }
+goReply(id:number){
+  this.router.navigate(['/profil/hesabim/kullanici', id], { queryParams: { tab:'mesaj' }});
+}
+
 
 
   // (İleride: profileOwnerId değişince API'den profil bilgisi çek → this.user = ...)

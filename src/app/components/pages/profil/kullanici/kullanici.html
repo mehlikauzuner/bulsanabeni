@@ -52,6 +52,7 @@
       <div *ngIf="activeTab==='mesaj'">
         <div *ngIf="showComposer" class="message-box">
           <textarea
+            id="mesajTextarea"
             [value]="messageText"
             (input)="onMessageInput($event)"
             (keydown.enter)="sendMessage()"

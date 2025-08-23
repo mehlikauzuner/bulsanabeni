@@ -65,6 +65,11 @@ export class Kullanici implements OnInit {
         this.loadUser(id);
       }
     });
+
+     this.route.queryParamMap.subscribe(qm => {
+    const tab = (qm.get('tab') || '').toLowerCase();
+    if (tab === 'mesaj') this.setTab('mesaj');
+  });
   }
 
   private loadUser(id: number): void {
