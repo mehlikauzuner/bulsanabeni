@@ -6,6 +6,8 @@ import { AuthService } from '../../../services/auth-service';
 import { NotificationService } from '../../../services/notification-service';
 import { UserService } from '../../../services/user-service';
 import { UserSearch } from '../../../models/auth-model.ts';
+import { MessageDto } from '../../../models/kullanici-model';
+import { MessagesService } from '../../../services/message-service';
 
 
 
@@ -43,6 +45,7 @@ export class Hesabim {
     private router: Router,
     private noti: NotificationService, 
     private userService: UserService,
+    private messagesService: MessagesService
   ) {}
 
   ngOnInit() {
@@ -102,12 +105,6 @@ private loadNotifications() {
   });
 }
 
-toggleTab(t: Tab) {
-  this.active = (this.active === t) ? null : t;
-  if (this.active === 'bildirimler' && !this.notiLoaded) {
-    this.loadNotifications();
-  }
-}
 
   // --- AŞAĞIDAKİLER şimdilik MOCK; backend bağlayınca bunları API'den dolduracağız ---
 
@@ -123,10 +120,64 @@ toggleTab(t: Tab) {
 
   
 
-  mesajKisileri = [
-    { id: 10, ad: 'Ayşe Yılmaz', son: 'Yarın buluşalım mı?', ago: '5 dk' },
-    { id: 11, ad: 'Mehmet Kaya', son: 'Konumu paylaştım', ago: '3 saat' },
-  ];
+    messages: MessageDto[] = [];
+  msgLoading = false;
+  msgLoaded = false;
+
+  // [ADD] Mesajları (Inbox) yükle
+  private loadInbox() {
+    const uid = this.currentUserId();
+    if (!uid) return;
+
+    this.msgLoading = true;
+    this.messagesService.getInbox(uid).subscribe({
+      next: (res) => {
+        this.messages = res ?? [];
+        this.msgLoading = false;
+        this.msgLoaded = true;
+      },
+      error: (err) => {
+        console.error('inbox error:', err);
+        this.messages = [];
+        this.msgLoading = false;
+        this.msgLoaded = true;
+      }
+    });
+  }
+
+  // [MODIFY] Sekme aç-kapa: mesajlar açılırken inbox’ı bir kez yükle
+  toggleTab(t: Tab) {
+    this.active = (this.active === t) ? null : t;
+
+    if (this.active === 'bildirimler' && !this.notiLoaded) {
+      this.loadNotifications();
+    }
+    if (this.active === 'mesajlar' && !this.msgLoaded) {
+      this.loadInbox();
+    }
+  }
+
+  // [ADD] Profil sayfasına (cevap vermek için) yönlendir
+  goReply(userId: number) {
+    // profil sayfasında tab query paramını okuyup “mesaj yaz” sekmesini açacaksın
+    this.router.navigate(['/profil', userId], { queryParams: { tab: 'mesaj' } });
+  }
+
+  // [ADD - opsiyonel] Zamanı “5 dk / 3 saat / dün” gibi göster
+  fromNow(iso: string): string {
+    const d = new Date(iso);
+    const diff = Math.max(0, Date.now() - d.getTime());
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'şimdi';
+    if (m < 60) return `${m} dk`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h} saat`;
+    const days = Math.floor(h / 24);
+    if (days === 1) return 'dün';
+    return `${days} gün`;
+  }
+
+
 
   rozetler = [
     { ad: 'İlk Etkinlik', aciklama: 'İlk etkinliğini tamamladın' },

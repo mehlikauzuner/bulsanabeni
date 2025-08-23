@@ -8,7 +8,6 @@ import { MessageCreate, MessageDto, ProfilDetailDto } from '../models/kullanici-
 export class ProfilDetailService {
   private http = inject(HttpClient);
   private readonly profilApi = 'https://localhost:44345/api/ProfilDetail';
-  private readonly PostApi = 'https://localhost:44345/api/Messages';
   private readonly MessageApi = 'https://localhost:44345/api/Messages';
 
   getById(id: number): Observable<ProfilDetailDto> {

@@ -84,22 +84,66 @@
         </div>
       }
 
-      <!-- Mesajlar -->
-      @if (active==='mesajlar') {
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h6 class="mb-3">Mesajlar</h6>
-            <ul class="list-group list-group-flush">
-              @for (k of mesajKisileri; track k.id) {
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span><strong>{{ k.ad }}</strong> — <span class="text-muted">{{ k.son }}</span></span>
-                  <span class="badge bg-light text-dark">{{ k.ago }}</span>
-                </li>
-              }
-            </ul>
-          </div>
-        </div>
+    <!-- Mesajlar -->
+@if (active==='mesajlar') {
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h6 class="mb-3">Mesajlar</h6>
+
+      <!-- Yükleniyor skeleton -->
+      @if (msgLoading) {
+        <ul class="list-group list-group-flush">
+          @for (i of [1,2,3]; track $index) {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-3 w-100">
+                <div class="msg-avatar skeleton">&nbsp;</div>
+                <div class="flex-grow-1">
+                  <div class="skeleton-line w-75 mb-1"></div>
+                  <div class="skeleton-line w-50"></div>
+                </div>
+                <span class="badge bg-light text-muted">…</span>
+              </div>
+            </li>
+          }
+        </ul>
+      } @else if (messages && messages.length) {
+        <ul class="list-group list-group-flush">
+          @for (m of messages; track m.id) {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-3">
+                <div class="msg-avatar">
+                  {{ (m.senderName || 'U').charAt(0) }}
+                </div>
+                <div class="msg-text">
+                  <div class="line-1">
+                    <a class="fw-semibold link-dark text-decoration-none"
+                       (click)="openProfile(m.senderId)">
+                      {{ m.senderName || ('Kullanıcı #' + m.senderId) }}
+                    </a>
+                    <span class="text-muted">—</span>
+                    <span class="text-muted msg-preview">{{ m.content }}</span>
+                  </div>
+                  <div class="small text-muted">{{ fromNow(m.createdAt) }}</div>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-light text-muted d-none d-sm-inline">{{ fromNow(m.createdAt) }}</span>
+                <button class="btn btn-outline-primary btn-sm"
+                        (click)="goReply(m.senderId)">
+                  Cevap ver
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      } @else {
+        <div class="text-muted">Gelen mesajın yok.</div>
       }
+    </div>
+  </div>
+}
+
 
       <!-- Rozetler -->
       @if (active==='rozetler') {
