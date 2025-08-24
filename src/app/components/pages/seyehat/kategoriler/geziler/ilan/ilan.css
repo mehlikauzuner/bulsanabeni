@@ -124,11 +124,15 @@
 
 /* Tarih & Saat aynı satır */
 .date-time-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr; /* Yıl Ay Gün Saat */
-  gap: 10px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
 }
-.hour-select { min-width: 140px; }
+.date-time-row .field {
+  flex: 1 1 220px; /* yan yana ve dar ekranda alta geçsin */
+}
+
 
 /* Konum – İl & İlçe satırları */
 .row {

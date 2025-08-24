@@ -27,55 +27,34 @@
     <div class="counter">{{ (description || '').length }}/{{ maxDescLen }}</div>
   </div>
 
-  <!-- ===== Tarih & Saat ===== -->
-  <div class="pill" style="margin-top:14px;">Tarih &amp; Saat</div>
-  <div class="title-panel">
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-      <!-- Tarih -->
-      <input
-        class="title-input"
-        type="date"
-        [value]="eventDate || ''"
-        (change)="eventDate = ($any($event.target).value || null)" />
+<div class="date-time-row">
+  <!-- Tarih -->
+  <mat-form-field appearance="fill" class="field">
+  <mat-label>Etkinlik Tarihi</mat-label>
+  <input matInput [matDatepicker]="picker" [(ngModel)]="eventDate" placeholder="gg.aa.yyyy">
+  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-datepicker #picker></mat-datepicker>
+</mat-form-field>
 
-      <!-- Saat (select — 0..23) -->
-      <select
-        class="title-input"
-        [value]="selectedHour ?? ''"
-        (change)="selectedHour = +($any($event.target).value)">
-        <option value="">Saat</option>
-        <option [value]="0">00:00</option>
-        <option [value]="1">01:00</option>
-        <option [value]="2">02:00</option>
-        <option [value]="3">03:00</option>
-        <option [value]="4">04:00</option>
-        <option [value]="5">05:00</option>
-        <option [value]="6">06:00</option>
-        <option [value]="7">07:00</option>
-        <option [value]="8">08:00</option>
-        <option [value]="9">09:00</option>
-        <option [value]="10">10:00</option>
-        <option [value]="11">11:00</option>
-        <option [value]="12">12:00</option>
-        <option [value]="13">13:00</option>
-        <option [value]="14">14:00</option>
-        <option [value]="15">15:00</option>
-        <option [value]="16">16:00</option>
-        <option [value]="17">17:00</option>
-        <option [value]="18">18:00</option>
-        <option [value]="19">19:00</option>
-        <option [value]="20">20:00</option>
-        <option [value]="21">21:00</option>
-        <option [value]="22">22:00</option>
-        <option [value]="23">23:00</option>
-      </select>
-    </div>
 
-    <div class="hint" *ngIf="eventDate">
-      Seçilen: {{ eventDate }}
-      {{ selectedHour != null ? ((selectedHour < 10 ? '0'+selectedHour : selectedHour)+':00') : '' }}
-    </div>
-  </div>
+  <!-- Saat (dropdown) -->
+  <mat-form-field appearance="fill" class="field">
+    <mat-label>Saat</mat-label>
+    <mat-select [(ngModel)]="selectedTime" placeholder="Saat seç">
+      <mat-option *ngFor="let t of timeOptions" [value]="t">{{ t }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<!-- (isteğe bağlı) seçilen birleşik ISO önizleme -->
+<!-- <div>{{ combinedIso }}</div> -->
+
+
+
+
+
+
+
 
   <!-- ===== Konum (İl + İlçe) ===== -->
   <div class="pill" style="margin-top:14px;">Konum</div>

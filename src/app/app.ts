@@ -3,6 +3,10 @@ import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/ro
 import { Navbar } from './components/global/navbar/navbar';
 import { Footer } from './components/global/footer/footer';
 import { filter } from 'rxjs';
+import { defineLocale } from 'ngx-bootstrap/chronos';
+import { trLocale } from 'ngx-bootstrap/locale';
+defineLocale('tr', trLocale);
+
 
 
 @Component({

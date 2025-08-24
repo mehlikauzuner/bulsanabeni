@@ -6,7 +6,7 @@ import { AuthService } from '../../../services/auth-service';
 import { NotificationService } from '../../../services/notification-service';
 import { UserService } from '../../../services/user-service';
 import { UserSearch } from '../../../models/auth-model.ts';
-import { MessageDto } from '../../../models/kullanici-model';
+import { MessageDto, ProfilDetailDto } from '../../../models/kullanici-model';
 import { MessagesService } from '../../../services/message-service';
 
 
@@ -48,26 +48,71 @@ export class Hesabim {
     private messagesService: MessagesService
   ) {}
 
-  ngOnInit() {
-    this.auth.isLoggedIn$.subscribe(v => {
-      this.isLoggedIn.set(v);
-      this.currentUserId.set(this.auth.currentUserId());
-      if (!this.route.snapshot.paramMap.get('id') && v) {
-        this.profileOwnerId.set(this.auth.currentUserId());
-      }
-    });
+ ngOnInit() {
+  // login durumu
+  this.auth.isLoggedIn$.subscribe(v => {
+    this.isLoggedIn.set(v);
+    this.currentUserId.set(this.auth.currentUserId());
+  });
 
-    // 2) /profil/:id parametresi varsa, onu profil sahibi yap
-    const idParam = this.route.snapshot.paramMap.get('id');
-    if (idParam) {
-      const n = Number(idParam);
-      if (!Number.isNaN(n)) this.profileOwnerId.set(n);
-    } else {
-      // İlk yüklemede (login hâlihazırda varsa) kendini ata
-      const uid = this.auth.currentUserId();
-      if (uid != null) this.profileOwnerId.set(uid);
+  // ⬇️ ÖNEMLİ: /profil/:id değişince profili yeniden yükle
+  this.route.paramMap.subscribe(map => {
+    const idStr = map.get('id');
+    const id = idStr ? Number(idStr) : this.auth.currentUserId();
+    if (!id || Number.isNaN(id)) return;
+
+    if (this.profileOwnerId() !== id) {
+      this.profileOwnerId.set(id);
+      this.loadProfile();          // profili çek
+      // mesajar sekmesindeyse inbox'ı da tazele
+      if (this.active === 'mesajlar') { this.msgLoaded = false; this.loadInbox(); }
     }
-  }
+  });
+
+  // (opsiyonel) ?tab=mesaj gelirse otomatik Mesajlar sekmesini aç
+  this.route.queryParamMap.subscribe(q => {
+    const tab = q.get('tab');
+    if (tab === 'mesaj') this.active = 'mesajlar';
+  });
+}
+
+
+
+private loadProfile() {
+  const ownerId = this.profileOwnerId();
+  if (!ownerId) return;
+  
+
+  this.userLoading = true;
+  this.userService.getProfileDetail(ownerId).subscribe({
+    next: (d: any) => {
+      const name = d.username ?? d.userName ?? '';
+      const city = d.city ?? d.City ?? '';
+      const avatar = d.avatarUrl ?? d.AvatarUrl ?? '';
+      const ratingAvg = d.ratingAvg ?? d.RatingAvg ?? 0;
+      const ratingCount = d.ratingCount ?? d.RatingCount ?? 0;
+
+      this.user = {
+        fullName: name,
+        email: d.email ?? d.Email ?? '',
+        sehir: city,
+        yas: this.calcAge(d.birthDate ?? d.BirthDate) ?? 0,
+        puan: ratingAvg,
+        rozetSayisi: ratingCount,   // ayrı bir rozet alanın varsa sonra değiştiririz
+        fotoUrl: avatar
+      };
+
+      this.userLoading = false;
+      this.userLoaded = true;
+    },
+    error: (err) => {
+      console.error('profile error:', err);
+      this.userLoading = false;
+      this.userLoaded = true;
+    }
+  });
+}
+
 
  
 
@@ -106,7 +151,8 @@ private loadNotifications() {
 }
 
 
-  // --- AŞAĞIDAKİLER şimdilik MOCK; backend bağlayınca bunları API'den dolduracağız ---
+  userLoading = false;
+  userLoaded  = false;
 
   user = {
     fullName: 'Mehlika Uzuner',
@@ -118,6 +164,16 @@ private loadNotifications() {
     fotoUrl: ''
   };
 
+    private calcAge(birth?: string | null): number | null {
+    if (!birth) return null;
+    const b = new Date(birth);
+    if (Number.isNaN(b.getTime())) return null;
+    const now = new Date();
+    let age = now.getFullYear() - b.getFullYear();
+    const m = now.getMonth() - b.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < b.getDate())) age--;
+    return age;
+  }
   
 
     messages: MessageDto[] = [];

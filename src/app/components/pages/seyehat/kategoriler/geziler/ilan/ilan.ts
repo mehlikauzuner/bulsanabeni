@@ -1,13 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule }     from '@angular/material/select';
+import { MatIconModule }       from '@angular/material/icon';
+
+
+
 import { GezilerService } from '../../../../../../services/geziler-service';
 import { AuthService } from '../../../../../../services/auth-service';
-
 
 @Component({
   selector: 'app-geziler-ilan',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule,MatDatepickerModule, MatInputModule, MatNativeDateModule,
+    MatSelectModule, MatIconModule],
   templateUrl: './ilan.html',
   styleUrls: ['./ilan.css'],
 })
@@ -18,30 +27,46 @@ export class GezilerIlan implements OnInit {
   ) {}
 
   // ===== Başlık / Açıklama =====
-  maxTitleLen = 200;
+  readonly maxTitleLen = 200;
+  readonly maxDescLen = 500;
   title = '';
-  maxDescLen = 500;
   description = '';
 
-  // ===== Tarih & Saat =====
-  readonly YEAR_SPAN = 30;
-  years: number[] = [];
-  private readonly today = new Date();
-  private readonly todayYear = this.today.getFullYear();
-  private readonly todayMonth = this.today.getMonth() + 1;
-  private readonly todayDay = this.today.getDate();
+  // ===== Tarih & Saat (PrimeNG) =====
+  eventDate: Date | null = null; // tarih + saat tek yerde
+  minDate = new Date();
+  maxDate = new Date(new Date().setFullYear(new Date().getFullYear() + 30));
+  eventTime: Date = new Date();
+  selectedTime: string | null = null; // "HH:mm" (ör: "14:30")
 
-  monthsAll = [
-    { id: 1, name: 'Ocak' }, { id: 2, name: 'Şubat' }, { id: 3, name: 'Mart' },
-    { id: 4, name: 'Nisan' }, { id: 5, name: 'Mayıs' }, { id: 6, name: 'Haziran' },
-    { id: 7, name: 'Temmuz' }, { id: 8, name: 'Ağustos' }, { id: 9, name: 'Eylül' },
-    { id: 10, name: 'Ekim' }, { id: 11, name: 'Kasım' }, { id: 12, name: 'Aralık' },
-  ];
-  selectedYear: number | null = null;
-  selectedMonth: number | null = null;
-  selectedDay: number | null = null;
-  selectedHour: number | null = null;
-  eventDate: string | null = null;
+
+  timeOptions = Array.from({length: 24*4}, (_,i)=>{
+    const h = String(Math.floor(i/4)).padStart(2,'0');
+    const m = String((i%4)*15).padStart(2,'0');
+    return `${h}:${m}`;
+  });
+
+  // ISO birleştirme örneği (gönderirken kullan)
+  get combinedIso(): string | null {
+    if (!this.eventDate || !this.selectedTime) return null;
+    const [hh, mm] = this.selectedTime.split(':').map(Number);
+    const d = new Date(this.eventDate);
+    d.setHours(hh, mm, 0, 0);
+    return d.toISOString();
+  }
+
+  // PrimeNG locale (TR)
+  tr = {
+    firstDayOfWeek: 1,
+    dayNames: ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'],
+    dayNamesShort: ['Paz','Pts','Sal','Çar','Per','Cum','Cts'],
+    dayNamesMin: ['Pz','Pt','Sa','Ça','Pe','Cu','Ct'],
+    monthNames: ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'],
+    monthNamesShort: ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'],
+    today: 'Bugün',
+    clear: 'Temizle',
+    dateFormat: 'yy-mm-dd'
+  };
 
   // ===== Şehir / İlçe =====
   cities: any[] = [];
@@ -57,14 +82,7 @@ export class GezilerIlan implements OnInit {
   sendErr = false;
 
   ngOnInit() {
-    this.loadYears();
     this.loadCities();
-  }
-
-  loadYears() {
-    for (let i = this.todayYear; i <= this.todayYear + this.YEAR_SPAN; i++) {
-      this.years.push(i);
-    }
   }
 
   loadCities() {
@@ -92,10 +110,16 @@ export class GezilerIlan implements OnInit {
   }
 
   private buildPayload() {
-    const hh = this.selectedHour != null ? String(this.selectedHour).padStart(2, '0') : '00';
-    const isoDateTime = this.eventDate ? `${this.eventDate}T${hh}:00:00` : null;
+    const d = this.eventDate;
 
-    // AuthService’den gelen kullanıcı bilgileri
+    const dateStr = d
+      ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+      : null;
+
+    const hh = d ? String(d.getHours()).padStart(2, '0') : '00';
+    const isoDateTime = this.combinedIso;
+    const timeString  = this.selectedTime ? this.selectedTime + ':00' : null;
+
     const userName = this.auth.currentUserName() ?? 'Kullanıcı';
     const userId = this.auth.currentUserId() ?? 0;
 
@@ -103,15 +127,15 @@ export class GezilerIlan implements OnInit {
       title: this.title.trim(),
       description: this.description.trim(),
       date: isoDateTime,
-      time: `${hh}:00:00`,
+      time: `${hh}:00:00`, // backend bekliyorsa kalsın
 
-      // 🔴 DB’de NOT NULL olan alanlar
+      // NOT NULL alanlar
       cityName: this.selectedCityName,
       district: this.selectedDistrictName,
-      userName: userName,
+      userName,
 
-      // opsiyonel id’ler
-      userId: userId,
+      // opsiyoneller
+      userId,
       cityId: this.selectedCityId ?? undefined,
       districtId: this.selectedDistrictId ?? undefined,
     };
@@ -145,7 +169,7 @@ export class GezilerIlan implements OnInit {
       this.description.trim().length > 0 &&
       this.selectedCityName != null &&
       this.selectedDistrictName != null &&
-      this.eventDate != null
+      this.eventDate instanceof Date
     );
   }
 
@@ -156,10 +180,6 @@ export class GezilerIlan implements OnInit {
     this.selectedCityName = null;
     this.selectedDistrictId = null;
     this.selectedDistrictName = null;
-    this.selectedYear = null;
-    this.selectedMonth = null;
-    this.selectedDay = null;
-    this.selectedHour = null;
     this.eventDate = null;
   }
 }
