@@ -17,16 +17,14 @@ export class Profil {
   mode = signal<Mode>('login');
   maxDate = new Date().toISOString().split('T')[0];
 
-  // UI durumları
   isSubmitting = signal(false);
   errorMsg = signal<string | null>(null);
   isLoggedIn = signal(false);
   userId = signal<number | null>(null);
 
-  // Login form
+  
   loginModel = { email: '', password: '' };
 
-  // Register form (city küçük harf!)
   registerModel = {
     firstName: '',
     lastName: '',
@@ -51,10 +49,9 @@ export class Profil {
     this.mode.set(mode);
   }
 
-  // ====== LOGIN ======
+
   onLogin() {
     this.errorMsg.set(null);
-
     const email = (this.loginModel.email || '').trim().toLowerCase();
     const password = this.loginModel.password;
 
@@ -70,7 +67,6 @@ export class Profil {
       this.errorMsg.set('Şifre 8–15 karakter olmalı.');
       return;
     }
-
     this.isSubmitting.set(true);
 
     this.auth.login({ email, password }).subscribe({
@@ -89,13 +85,10 @@ export class Profil {
 
 
   
-  // ====== REGISTER ======
   onRegister() {
     console.log('MODEL:', this.registerModel);
-
     this.errorMsg.set(null);
     const { firstName, lastName, username, email, password, birthDate, city } = this.registerModel;
-
     const firstNameTrim = (firstName || '').trim();
     const lastNameTrim  = (lastName  || '').trim();
     const userNameTrim  = (username  || '').trim();
@@ -126,18 +119,17 @@ export class Profil {
       this.errorMsg.set('Bulunduğunuz şehri girmek zorunlu.');
       return;
     }
-
     this.isSubmitting.set(true);
 
-    // .NET default camelCase: City -> "city", UserName -> "userName"
     this.auth.register({
       firstName: firstNameTrim,
       lastName:  lastNameTrim,
       username:  userNameTrim,
       email:     emailTrim,
       password,
-      birthDate,        // YYYY-MM-DD
+      birthDate,        
       city:      cityTrim
+
     }).subscribe({
       next: () => {
         this.isSubmitting.set(false);
@@ -151,13 +143,11 @@ export class Profil {
     });
   }
 
-  // ====== LOGOUT ======
+
   onLogout() {
     this.auth.logout();
-    // this.router.navigateByUrl('/profil');
   }
 
-  // === helpers ===
   private isValidEmail(e: string) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e || '');
   }
@@ -167,6 +157,7 @@ export class Profil {
   private isValidPassword(pw: string) {
     return !!pw && pw.length >= 8 && pw.length <= 15;
   }
+  
   private isValidBirthDate(d: string) {
     if (!d) return false;
     const today = new Date();
@@ -177,8 +168,8 @@ export class Profil {
       - ((today.getMonth() < bd.getMonth() || (today.getMonth() === bd.getMonth() && today.getDate() < bd.getDate())) ? 1 : 0);
     return age >= 13;
   }
+
   private isValidCity(c: string) {
     return c.length >= 2 && c.length <= 50;
-    // İstersen: return /^[a-zA-ZçğıöşüÇĞİÖŞÜ\s.-]{2,50}$/.test(c);
   }
 }

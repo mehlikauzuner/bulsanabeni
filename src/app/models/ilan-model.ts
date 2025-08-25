@@ -8,7 +8,6 @@ export interface IlanModel {
   userName?: string
 }
 
-/** Backend’ten beklenen tipler (listeleme için) */
 export interface City {
   id: number;
   name: string;

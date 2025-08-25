@@ -3,13 +3,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import {
-  ApiError,
-  LoginRequest,
-  LoginResponse,
-  RegisterRequest,
-  RegisterResponse
-} from '../models/auth-model.ts';
+import { ApiError, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '../models/auth-model';
+
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

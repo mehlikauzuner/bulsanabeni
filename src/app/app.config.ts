@@ -39,16 +39,3 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 };
 
 
-
-
-export const appConfig: ApplicationConfig = {
-  providers: [
-    provideHttpClient(withInterceptors([authInterceptor])),
-    provideRouter(routes),
-    { provide: LOCALE_ID, useValue: 'tr-TR' },
-    { provide: MAT_DATE_LOCALE, useValue: 'tr-TR' },
-    { provide: MAT_DATE_FORMATS, useValue: TR_DATE_FORMATS},
-    
-  ],
-
-};

@@ -1,4 +1,3 @@
-// src/app/models/auth-model.ts
 export interface LoginRequest {
   email: string;
   password: string;
@@ -20,7 +19,7 @@ export interface RegisterRequest {
   username: string;
   email: string;
   password: string;
-  birthDate: string; // yyyy-mm-dd
+  birthDate: string; 
   city:string;
 }
 
@@ -36,7 +35,7 @@ export interface RegisterResponse {
 
 export interface UserSearch {
   id: number;
-  userName: string;   // backend'deki JSON'la birebir aynı
+  userName: string;   
   city: string | null;
 }
 

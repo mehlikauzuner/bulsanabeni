@@ -6,11 +6,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule }     from '@angular/material/select';
 import { MatIconModule }       from '@angular/material/icon';
-
-
-
 import { GezilerService } from '../../../../../../services/geziler-service';
 import { AuthService } from '../../../../../../services/auth-service';
+
+
+type City    = { id: number; name: string };
+type District= { id: number; name: string };
 
 @Component({
   selector: 'app-geziler-ilan',
@@ -20,33 +21,28 @@ import { AuthService } from '../../../../../../services/auth-service';
   templateUrl: './ilan.html',
   styleUrls: ['./ilan.css'],
 })
+
+
 export class GezilerIlan implements OnInit {
   constructor(
     private geziler: GezilerService,
     private auth: AuthService
   ) {}
 
-  // ===== Başlık / Açıklama =====
   readonly maxTitleLen = 200;
   readonly maxDescLen = 500;
+ 
   title = '';
   description = '';
 
-  // ===== Tarih & Saat (PrimeNG) =====
-  eventDate: Date | null = null; // tarih + saat tek yerde
-  minDate = new Date();
-  maxDate = new Date(new Date().setFullYear(new Date().getFullYear() + 30));
-  eventTime: Date = new Date();
-  selectedTime: string | null = null; // "HH:mm" (ör: "14:30")
+  eventDate: Date | null = null;
+  selectedTime: string | null = null; 
+
+ readonly timeOptions = Array.from({ length: 96 }, (_, i) =>
+    `${String(Math.floor(i / 4)).padStart(2, '0')}:${String((i % 4) * 15).padStart(2, '0')}`
+  );
 
 
-  timeOptions = Array.from({length: 24*4}, (_,i)=>{
-    const h = String(Math.floor(i/4)).padStart(2,'0');
-    const m = String((i%4)*15).padStart(2,'0');
-    return `${h}:${m}`;
-  });
-
-  // ISO birleştirme örneği (gönderirken kullan)
   get combinedIso(): string | null {
     if (!this.eventDate || !this.selectedTime) return null;
     const [hh, mm] = this.selectedTime.split(':').map(Number);
@@ -55,30 +51,16 @@ export class GezilerIlan implements OnInit {
     return d.toISOString();
   }
 
-  // PrimeNG locale (TR)
-  tr = {
-    firstDayOfWeek: 1,
-    dayNames: ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'],
-    dayNamesShort: ['Paz','Pts','Sal','Çar','Per','Cum','Cts'],
-    dayNamesMin: ['Pz','Pt','Sa','Ça','Pe','Cu','Ct'],
-    monthNames: ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'],
-    monthNamesShort: ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'],
-    today: 'Bugün',
-    clear: 'Temizle',
-    dateFormat: 'yy-mm-dd'
-  };
 
-  // ===== Şehir / İlçe =====
-  cities: any[] = [];
-  districts: any[] = [];
+  cities: City[] = [];
+  districts: District[] = [];
   selectedCityId: number | null = null;
   selectedCityName: string | null = null;
   selectedDistrictId: number | null = null;
   selectedDistrictName: string | null = null;
 
-  // ===== Flags =====
   sending = false;
-  sendOk = false;
+  sendOk  = false;
   sendErr = false;
 
   ngOnInit() {
@@ -109,69 +91,53 @@ export class GezilerIlan implements OnInit {
     this.selectedDistrictName = dist ? dist.name : null;
   }
 
-  private buildPayload() {
-    const d = this.eventDate;
+ private buildPayload() {
+  const userName = this.auth.currentUserName() ?? 'Kullanıcı';
+  const userId   = this.auth.currentUserId() ?? 0;
 
-    const dateStr = d
-      ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
-      : null;
-
-    const hh = d ? String(d.getHours()).padStart(2, '0') : '00';
-    const isoDateTime = this.combinedIso;
-    const timeString  = this.selectedTime ? this.selectedTime + ':00' : null;
-
-    const userName = this.auth.currentUserName() ?? 'Kullanıcı';
-    const userId = this.auth.currentUserId() ?? 0;
-
-    return {
-      title: this.title.trim(),
-      description: this.description.trim(),
-      date: isoDateTime,
-      time: `${hh}:00:00`, // backend bekliyorsa kalsın
-
-      // NOT NULL alanlar
-      cityName: this.selectedCityName,
-      district: this.selectedDistrictName,
-      userName,
-
-      // opsiyoneller
-      userId,
-      cityId: this.selectedCityId ?? undefined,
-      districtId: this.selectedDistrictId ?? undefined,
-    };
-  }
+  return {
+    title: this.title.trim(),
+    description: this.description.trim(),
+    date: this.combinedIso,
+    time: this.selectedTime ? this.selectedTime + ':00:00' : null,
+    cityName: this.selectedCityName,
+    district: this.selectedDistrictName,
+    userName,
+    userId,
+    cityId: this.selectedCityId ?? undefined,
+    districtId: this.selectedDistrictId ?? undefined,
+  };
+}
 
   submitIlan() {
-    if (!this.formValid()) return;
+  if (!this.formValid()) return;
 
-    const payload = this.buildPayload();
-    this.sending = true;
-    this.sendOk = false;
-    this.sendErr = false;
+  this.sending = true;
+  this.sendOk = this.sendErr = false;
 
-    this.geziler.createIlan(payload).subscribe({
-      next: () => {
-        this.sending = false;
-        this.sendOk = true;
-        this.resetForm();
-      },
-      error: err => {
-        console.error('İlan gönderilemedi', err);
-        this.sending = false;
-        this.sendErr = true;
-      }
-    });
-  }
+  this.geziler.createIlan(this.buildPayload()).subscribe({
+    next: () => {
+      this.sending = false;
+      this.sendOk = true;
+      this.resetForm();
+    },
+    error: err => {
+      console.error('İlan gönderilemedi', err);
+      this.sending = false;
+      this.sendErr = true;
+    }
+  });
+}
 
-  formValid(): boolean {
-    return (
-      this.title.trim().length > 0 &&
-      this.description.trim().length > 0 &&
-      this.selectedCityName != null &&
-      this.selectedDistrictName != null &&
-      this.eventDate instanceof Date
-    );
-  }
+formValid(): boolean {
+  return !!(
+    this.title.trim() &&
+    this.description.trim() &&
+    this.selectedCityName &&
+    this.selectedDistrictName &&
+    this.eventDate
+  );
+}
 
   resetForm() {
     this.title = '';

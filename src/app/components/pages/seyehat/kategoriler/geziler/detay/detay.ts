@@ -18,24 +18,26 @@ export class GezilerDetay implements OnInit {
     private geziler: GezilerService
   ) {}
 
-  // ---- State ----
+
   ilan: DetayModel | null = null;
   loading = false;
   error: string | null = null;
 
-  // Bildirim bayrakları
+  
   sending = false;
   sendOk = false;
   sendErr: string | null = null;
 
-  // ---- Görünüm yardımcıları ----
+  
   get ownerName(): string {
     return this.ilan ? (this.ilan.userName ?? '—') : 'Kullanıcı';
   }
+
   get ownerInitial(): string {
-    const name = this.ownerName?.trim() || 'U';
+    const name = this.ownerName?.trim() || '👻';
     return name.charAt(0).toUpperCase();
   }
+
   get dateText(): string {
     if (!this.ilan?.date) return '—';
     const d = new Date(this.ilan.date);
@@ -43,11 +45,13 @@ export class GezilerDetay implements OnInit {
       ? this.ilan.date
       : d.toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
   }
+
   get timeText(): string {
     const t = this.ilan?.time ?? '';
     if (!t) return '—';
     return t.slice(0, 5);
   }
+
   get locationText(): string {
     const c = this.ilan?.city || '';
     const d = this.ilan?.district || '';
@@ -56,7 +60,7 @@ export class GezilerDetay implements OnInit {
     return c || d;
   }
 
-  // ---- Lifecycle ----
+
   ngOnInit(): void {
     const raw = this.route.snapshot.paramMap.get('id');
     const id = raw ? parseInt(raw, 10) : NaN;
@@ -67,7 +71,7 @@ export class GezilerDetay implements OnInit {
     this.fetch(id);
   }
 
-  // ---- Data ----
+  
   private fetch(id: number) {
     this.loading = true;
     this.error = null;
@@ -83,7 +87,7 @@ export class GezilerDetay implements OnInit {
     });
   }
 
-  // ---- “Seni buldum” ----
+  
   onSeniBuldum() {
     if (!this.ilan?.id) return;
 
@@ -91,12 +95,11 @@ export class GezilerDetay implements OnInit {
     this.sendOk = false;
     this.sendErr = null;
 
-    // Önerilen: sadece ilanId gönder (receiver backend'de ilan sahibinden bulunur)
+  
     this.geziler.notifyFound(this.ilan.id).subscribe({
       next: () => {
         this.sending = false;
         this.sendOk = true;
-        console.log('[GezilerDetay] Bildirim gönderildi.');
       },
       error: (err) => {
         console.error('[GezilerDetay] Bildirim hatası:', err);
@@ -105,9 +108,5 @@ export class GezilerDetay implements OnInit {
       }
     });
 
-    /* Eğer backend explicitly { ilanId, receiverUserId } bekliyorsa, üstteki yerine:
-    const payload = { ilanId: this.ilan.id, receiverUserId: this.ilan.userId };
-    this.geziler.notifyFound(payload).subscribe({ ...aynı next/error... });
-    */
   }
 }

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs/operators';
-import { BadgeDto, ReviewDto, ProfilDetailDto } from '../../../../models/kullanici-model';
+import { BadgeDto, ReviewDto, ProfilDetailDto, CommentDto, CommentCreate } from '../../../../models/kullanici-model';
 import { ProfilDetailService } from '../../../../services/kullanici-service';
 import { AuthService } from '../../../../services/auth-service';
 
@@ -19,16 +19,16 @@ export class Kullanici implements OnInit {
   userId = 0;  // profil sahibinin id'si
   meId  = 0;   // giriş yapan kullanıcı id'si
 
-  // mesaj alanı
+
   messageText = '';
   isSending = false;
 
-  // sayfa durumu
+
   isLoading = true;
   error: string | null = null;
   activeTab: TabKey = 'rozetler';
 
-  // View model
+  
   user: ProfilDetailDto = {
     id: 0,
     username: '',
@@ -40,19 +40,22 @@ export class Kullanici implements OnInit {
     birthDate: null,
     bio: null
   };
+
   badges: BadgeDto[] = [];
   reviews: ReviewDto[] = [];
 
-  // UI durumları
-  sendOk = false;          // başarı bildirimi
-  showComposer = true;     // yazma kutusu görünür mü
+  
+  sendOk = false;         
+  showComposer = true;    
   private successTimer: any = null;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private profil: ProfilDetailService,
-    private auth: AuthService
+    private auth: AuthService,
+    private commentsService: ProfilDetailService
+
   ) {}
 
   ngOnInit(): void {
@@ -72,20 +75,28 @@ export class Kullanici implements OnInit {
   });
   }
 
-  private loadUser(id: number): void {
-    this.isLoading = true;
-    this.error = null;
+private loadUser(id: number): void {
+  this.isLoading = true;
+  this.error = null;
 
-    this.profil.getById(id)
-      .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe({
-        next: (u: ProfilDetailDto) => { this.user = u; },
-        error: (err) => {
-          console.error('getById error', err);
-          this.error = 'Kullanıcı bulunamadı.';
+  this.profil.getById(id)
+    .pipe(finalize(() => (this.isLoading = false)))
+    .subscribe({
+      next: (u: ProfilDetailDto) => {
+        this.user = u;
+
+        // 🔽 EKLEDİĞİMİZ KISIM: Eğer aktif sekme "yorumlar" ise, yorumları yükle
+        if (this.activeTab === 'yorumlar') {
+          this.loadComments(id);
         }
-      });
-  }
+      },
+      error: (err) => {
+        console.error('getById error', err);
+        this.error = 'Kullanıcı bulunamadı.';
+      }
+    });
+}
+
 
   get displayName(): string {
     const u: any = this.user as any;
@@ -97,9 +108,12 @@ export class Kullanici implements OnInit {
   setTab(tab: TabKey): void {
     this.activeTab = tab;
     if (tab === 'mesaj') {
-      this.showComposer = true;  // Mesaj sekmesine dönünce kutu açılsın
-      this.sendOk = false;       // eski başarı tostu kapansın
+      this.showComposer = true;  
+      this.sendOk = false;       
     }
+     if (tab === 'yorumlar') {
+    this.loadComments(this.userId);
+  }
   }
 
   onMessageInput(ev: Event): void {
@@ -111,19 +125,19 @@ export class Kullanici implements OnInit {
     if (!text || !this.meId || !this.userId) return;
 
     this.isSending = true;
-
     this.profil.send({
       senderId: this.meId,
       receiverId: this.userId,
       content: text,
       createdAt: new Date().toISOString()
     })
+
     .pipe(finalize(() => (this.isSending = false)))
     .subscribe({
       next: () => {
         this.messageText = '';
-        this.showComposer = false;   // kutuyu kapat
-        this.sendOk = true;          // 🎉 göster
+        this.showComposer = false;  
+        this.sendOk = true;          
         if (this.successTimer) clearTimeout(this.successTimer);
         this.successTimer = setTimeout(() => (this.sendOk = false), 3000);
       },
@@ -145,6 +159,69 @@ export class Kullanici implements OnInit {
       this.sendMessage();
     }
   }
+
+comments: CommentDto[] = [];
+isCommentsLoading = false;
+
+commentText = '';
+isCommentSending = false;
+commentSendOk = false;
+private commentTimer: any = null;
+
+private loadComments(userId: number): void {
+  this.isCommentsLoading = true;
+  this.commentsService.getByTargetUserId(userId)
+    .pipe(finalize(() => this.isCommentsLoading = false))
+    .subscribe({
+      next: (list) => this.comments = list,
+      error: (err) => console.error('comments load error', err)
+    });
+}
+
+onCommentInput(ev: Event): void {
+  this.commentText = (ev.target as HTMLTextAreaElement).value ?? '';
+}
+
+sendComment(): void {
+  const text = (this.commentText || '').trim();
+  if (!text || !this.meId || !this.userId) return;
+
+  const body: CommentCreate = {
+    targetUserId: this.userId,
+    authorUserId: this.meId,
+    authorName: this.displayName || 'Kullanıcı',
+    content: text
+  };
+
+  this.isCommentSending = true;
+  this.commentsService.create(body)
+    .pipe(finalize(() => this.isCommentSending = false))
+    .subscribe({
+      next: (created /*: CommentDto*/) => {
+        // Backend CommentDto dönerse başa ekleyelim
+        if (created && typeof created === 'object' && 'id' in created) {
+          this.comments.unshift(created as CommentDto);
+        } else {
+          // Sadece "OK" dönerse, tekrar yükle
+          this.loadComments(this.userId);
+        }
+        this.commentText = '';
+        this.commentSendOk = true;
+        if (this.commentTimer) clearTimeout(this.commentTimer);
+        this.commentTimer = setTimeout(() => (this.commentSendOk = false), 2500);
+      },
+      error: (err) => console.error('comment post error', err)
+    });
+}
+
+onCommentEnter(ev: KeyboardEvent): void {
+  if (ev.ctrlKey || ev.metaKey) {
+    ev.preventDefault();
+    this.sendComment();
+  }
+}
+
+
 
   goBack(): void {
     if (history.length > 1) history.back();

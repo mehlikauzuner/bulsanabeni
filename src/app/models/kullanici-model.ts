@@ -36,7 +36,7 @@ export interface MessageDto {
   receiverId: number;
   receiverName?: string;
   content: string;
-  createdAt: string; // Date de olabilir
+  createdAt: string; 
 }
 
 export interface MessageCreate {
@@ -44,4 +44,20 @@ export interface MessageCreate {
   receiverId: number;
   content: string;
   createdAt: string;
+}
+
+export interface CommentCreate {
+  targetUserId: number;
+  authorUserId: number;
+  authorName: string;
+  content: string;
+}
+
+export interface CommentDto {
+  id: number;
+  targetUserId: number;
+  authorUserId: number;
+  authorName: string;
+  content: string;
+  createdAt: string; 
 }

@@ -1,6 +1,6 @@
 
 export interface DetayModel { 
-   id: number;
+  id: number;
   userId: number;
   userName: string;
   title: string;

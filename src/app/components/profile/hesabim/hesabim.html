@@ -6,23 +6,31 @@
     <aside class="col-12 col-lg-3 left-rail">
       <div class="card shadow-sm baby-left-card">
         <div class="card-body text-center">
-          <div class="avatar mb-3" [attr.data-initials]="(user.fullName || 'U').charAt(0)">
-            @if (user.fotoUrl) {
-              <img [src]="user.fotoUrl" alt="Profil" />
-            }
-          </div>
-          <h5 class="mb-1">{{ user.fullName }}</h5>
-          <div class="text-muted small mb-2">{{ user.email }}</div>
 
-          <div class="row text-start small">
-            <div class="col-12 mb-1"><strong>Şehir:</strong> {{ user.sehir }}</div>
-            <div class="col-12 mb-1"><strong>Yaş:</strong> {{ user.yas }}</div>
-            <div class="col-12 mb-1">
-              <strong>Ortalama Puan:</strong>
-              <span class="stars">{{ user.puan | number:'1.1-1' }}</span>
+          @if (user) {
+            <div class="avatar mb-3" [attr.data-initials]="(user.fullName || 'U').charAt(0)">
+              @if (user.fotoUrl) {
+                <img [src]="user.fotoUrl" alt="Profil" />
+              }
             </div>
-            <div class="col-12 mb-1"><strong>Rozet:</strong> {{ user.rozetSayisi }}</div>
-          </div>
+            <h5 class="mb-1">{{ user.fullName }}</h5>
+            <div class="text-muted small mb-2">{{ user.email }}</div>
+
+            <div class="row text-start small">
+              <div class="col-12 mb-1"><strong>Şehir:</strong> {{ user.sehir }}</div>
+              <div class="col-12 mb-1"><strong>Yaş:</strong> {{ user.yas }}</div>
+              <div class="col-12 mb-1">
+                <strong>Ortalama Puan:</strong>
+                <span class="stars">{{ user.puan | number:'1.1-1' }}</span>
+              </div>
+              <div class="col-12 mb-1"><strong>Rozet:</strong> {{ user.rozetSayisi }}</div>
+            </div>
+          } @else if (userLoading) {
+            <div class="text-muted">Profil yükleniyor…</div>
+          } @else {
+            <div class="text-muted">Profil bulunamadı.</div>
+          }
+
         </div>
       </div>
     </aside>
@@ -68,7 +76,9 @@
           <div class="card-body">
             <h6 class="mb-3">Bildirimler</h6>
 
-            @if (notifications && notifications.length) {
+            @if (notiLoading) {
+              <div class="text-muted">Yükleniyor…</div>
+            } @else if (notifications && notifications.length) {
               <ul class="list-group list-group-flush">
                 @for (n of notifications; track $index) {
                   <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -84,71 +94,65 @@
         </div>
       }
 
-    <!-- Mesajlar -->
-@if (active==='mesajlar') {
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <h6 class="mb-3">Mesajlar</h6>
+      <!-- Mesajlar -->
+      @if (active==='mesajlar') {
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h6 class="mb-3">Mesajlar</h6>
 
-      <!-- Yükleniyor skeleton -->
-      @if (msgLoading) {
-        <ul class="list-group list-group-flush">
-          @for (i of [1,2,3]; track $index) {
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <div class="d-flex align-items-center gap-3 w-100">
-                <div class="msg-avatar skeleton">&nbsp;</div>
-                <div class="flex-grow-1">
-                  <div class="skeleton-line w-75 mb-1"></div>
-                  <div class="skeleton-line w-50"></div>
-                </div>
-                <span class="badge bg-light text-muted">…</span>
-              </div>
-            </li>
-          }
-        </ul>
-      } @else if (messages && messages.length) {
-        <ul class="list-group list-group-flush">
-          @for (m of messages; track m.id) {
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <div class="d-flex align-items-center gap-3">
-                <div class="msg-avatar">
-                  {{ (m.senderName || 'U').charAt(0) }}
-                </div>
-                <div class="msg-text">
-                  <div class="line-1">
-                   <a class="fw-semibold link-dark text-decoration-none"
-                     [routerLink]="['/profil/hesabim/kullanici', m.senderId]">
-                      {{ m.senderName || ('Kullanıcı #' + m.senderId) }}
-                   </a>
+            @if (msgLoading) {
+              <ul class="list-group list-group-flush">
+                @for (i of [1,2,3]; track $index) {
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3 w-100">
+                      <div class="msg-avatar skeleton">&nbsp;</div>
+                      <div class="flex-grow-1">
+                        <div class="skeleton-line w-75 mb-1"></div>
+                        <div class="skeleton-line w-50"></div>
+                      </div>
+                      <span class="badge bg-light text-muted">…</span>
+                    </div>
+                  </li>
+                }
+              </ul>
+            } @else if (messages && messages.length) {
+              <ul class="list-group list-group-flush">
+                @for (m of messages; track m.id) {
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="msg-avatar">
+                        {{ (m.senderName || 'U').charAt(0) }}
+                      </div>
+                      <div class="msg-text">
+                        <div class="line-1">
+                          <a class="fw-semibold link-dark text-decoration-none"
+                             [routerLink]="['/profil/hesabim/kullanici', m.senderId]">
+                            {{ m.senderName || ('Kullanıcı #' + m.senderId) }}
+                          </a>
+                          <span class="text-muted">—</span>
+                          <span class="text-muted msg-preview">{{ m.content }}</span>
+                        </div>
+                        <div class="small text-muted">{{ fromNow(m.createdAt) }}</div>
+                      </div>
+                    </div>
 
-
-                    <span class="text-muted">—</span>
-                    <span class="text-muted msg-preview">{{ m.content }}</span>
-                  </div>
-                  <div class="small text-muted">{{ fromNow(m.createdAt) }}</div>
-                </div>
-              </div>
-
-              <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-light text-muted d-none d-sm-inline">{{ fromNow(m.createdAt) }}</span>
-                <button type="button" class="btn btn-outline-primary btn-sm"
-                   [routerLink]="['/profil/hesabim/kullanici', m.senderId]"
-                   [queryParams]="{ tab: 'mesaj' }">
-                   Cevap ver
-                </button>
-
-
-              </div>
-            </li>
-          }
-        </ul>
-      } @else {
-        <div class="text-muted">Gelen mesajın yok.</div>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge bg-light text-muted d-none d-sm-inline">{{ fromNow(m.createdAt) }}</span>
+                      <button type="button" class="btn btn-outline-primary btn-sm"
+                              [routerLink]="['/profil/hesabim/kullanici', m.senderId]"
+                              [queryParams]="{ tab: 'mesaj' }">
+                        Cevap ver
+                      </button>
+                    </div>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <div class="text-muted">Gelen mesajın yok.</div>
+            }
+          </div>
+        </div>
       }
-    </div>
-  </div>
-}
-
 
       <!-- Rozetler -->
       @if (active==='rozetler') {
@@ -237,10 +241,9 @@
                   <li class="list-group-item d-flex justify-content-between align-items-center">
                     <span><strong>{{ u.userName }}</strong> — <span class="text-muted">{{ u.city }}</span></span>
                     <button class="btn btn-outline-primary"
-        [routerLink]="['/profil/hesabim/kullanici', u.id]">
-  Profili Gör
-</button>
-
+                            [routerLink]="['/profil/hesabim/kullanici', u.id]">
+                      Profili Gör
+                    </button>
                   </li>
                 }
               </ul>
@@ -256,29 +259,37 @@
         <div class="card shadow-sm">
           <div class="card-body">
             <h6 class="mb-3">Ayarlar</h6>
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">Ad Soyad</label>
-                <input class="form-control" [(ngModel)]="user.fullName" />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">E-posta</label>
-                <input class="form-control" [(ngModel)]="user.email" />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Şehir</label>
-                <input class="form-control" [(ngModel)]="user.sehir" />
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Yaş</label>
-                <input type="number" class="form-control" [(ngModel)]="user.yas" />
-              </div>
-            </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-              <small class="text-muted">Değişiklikler backend gelince kaydedilecek (mock)</small>
-              <button class="btn btn-outline-danger" (click)="logout()">Çıkış Yap</button>
-            </div>
+            @if (user) {
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Ad Soyad</label>
+                  <input class="form-control" [(ngModel)]="user.fullName" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">E-posta</label>
+                  <input class="form-control" [(ngModel)]="user.email" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Şehir</label>
+                  <input class="form-control" [(ngModel)]="user.sehir" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Yaş</label>
+                  <input type="number" class="form-control" [(ngModel)]="user.yas" />
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <small class="text-muted">Değişiklikler backend gelince kaydedilecek (mock)</small>
+                <button class="btn btn-outline-danger" (click)="logout()">Çıkış Yap</button>
+              </div>
+            } @else if (userLoading) {
+              <div class="text-muted">Profil yükleniyor…</div>
+            } @else {
+              <div class="text-muted">Profil bulunamadı.</div>
+            }
+
           </div>
         </div>
       }
