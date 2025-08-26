@@ -61,3 +61,15 @@ export interface CommentDto {
   content: string;
   createdAt: string; 
 }
+
+export interface RatingSummaryDto { avg: number; count: number; }
+export interface RatingCreate { targetUserId: number; score: number;
+  raterId : number;
+ }
+export interface RatingDto {
+  id: number;
+  targetUserId: number;
+  raterId: number;
+  score: number;
+  createdAt?: string;
+}

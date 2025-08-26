@@ -1,28 +1,109 @@
-/* === MESAJLAR BLOĞU === */
+/* =========================
+   GENEL SAYFA YAPI
+========================= */
+.hesabim-page .left-rail .card.baby-left-card {
+  border-radius: 16px;
+}
+.hesabim-page .card {
+  border-color: #eef2f7;
+  border-radius: 14px;
+}
+.hesabim-page .card .card-body > h6 {
+  font-weight: 600;
+}
+
+/* =========================
+   AVATAR
+========================= */
+.hesabim-page .avatar{
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg,#e9efff,#f3f4f6);
+  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+  border: 1px solid #e5e7eb;
+}
+.hesabim-page .avatar img{
+  width:100%; height:100%; object-fit: cover; display:block;
+}
+.hesabim-page .avatar-fallback{
+  font-weight: 700; font-size: 32px; color:#334155;
+}
+
+/* =========================
+   PROFIL ISTATISTIKLERI
+========================= */
+.hesabim-page .stats{
+  display:grid; grid-template-columns: repeat(3, 1fr);
+  gap:8px; margin-top:12px;
+}
+.hesabim-page .stat{
+  background:#fff; border:1px solid #e5e7eb; border-radius:12px;
+  padding:8px 10px; display:flex; gap:8px; align-items:center;
+  box-shadow: 0 2px 10px rgba(0,0,0,.03);
+  justify-content: center;
+}
+.hesabim-page .stat-icon{ font-size:18px; line-height:1; }
+@media (max-width: 576px){
+  .hesabim-page .stats{ grid-template-columns: 1fr; }
+}
+
+/* =========================
+   SEKME (NAV PILLS)
+========================= */
+.hesabim-page .baby-nav .nav-link{
+  border-radius: 999px;
+  padding: .45rem .85rem;
+  font-weight: 600;
+  color: #2563eb;
+}
+.hesabim-page .baby-nav .nav-link:hover{
+  background: #eef2ff;
+}
+.hesabim-page .baby-nav .nav-link.active{
+  background: #e0e7ff;
+  color: #1e40af;
+}
+
+/* =========================
+   BOS DURUM / PLACEHOLDER
+========================= */
+.hesabim-page .placeholder-card .card{
+  border-style: dashed;
+  border-color:#e5e7eb;
+  background: #fafcff;
+}
+
+/* =========================
+   MESAJLAR BLOĞU
+========================= */
 .hesabim-page .msg-avatar{
   width: 36px; height: 36px; border-radius: 50%;
   background:#efe7ff; color:#6a00ff; font-weight:700;
   display:flex; align-items:center; justify-content:center;
   flex: 0 0 36px;
 }
-
 .hesabim-page .list-group.list-group-flush .list-group-item{
   border-color:#f0f3f7;
   padding:.65rem .75rem;
+  transition: background .15s ease;
 }
 .hesabim-page .list-group.list-group-flush .list-group-item:hover{
   background:#f6faff;
 }
 
+/* mesaj satırı ilk satır hizası */
 .hesabim-page .msg-text .line-1{
   display:flex; align-items:center; gap:.4rem;
 }
+
 .hesabim-page .msg-preview{
   max-width:44ch;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   color:#6b7280;
 }
-
 .hesabim-page .msg-ago{
   color:#88909a; font-size:.85rem;
 }
@@ -42,11 +123,27 @@
 .hesabim-page .w-75{ width:75%; }
 .hesabim-page .w-50{ width:50%; }
 
-/* Kart başlık boşlukları */
-.hesabim-page .card > .card-body > h6{ font-weight:600; }
-
 /* Küçük ekran düzeni */
 @media (max-width: 576px){
   .hesabim-page .msg-preview{ max-width:26ch; }
   .hesabim-page .btn.btn-outline-primary.btn-sm{ padding:.25rem .5rem; }
 }
+
+/* =========================
+   ROZET KARTLARI
+========================= */
+.hesabim-page .badge-card{
+  border-radius: 14px;
+  border: 1px solid #e6edf6;
+}
+.hesabim-page .badge-card .card-body{
+  display:flex; align-items:center; gap:.75rem;
+}
+.hesabim-page .badge-icon{
+  width:40px; height:40px; border-radius:12px;
+  background:#fff7ed; color:#f59e0b;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; box-shadow: inset 0 0 0 1px #fde68a;
+}
+.hesabim-page .badge-text .small{ color:#6b7280; }
+

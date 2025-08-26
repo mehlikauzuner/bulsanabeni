@@ -9,7 +9,7 @@ import { MessageDto } from '../../../models/kullanici-model';
 import { MessagesService } from '../../../services/message-service';
 import { UserSearch } from '../../../models/auth-model';
 
-type Tab = 'bildirimler' | 'mesajlar' | 'rozetler' | 'yorumlar' | 'ayarlar' | 'ara';
+type Tab = 'bildirimler 🔔' | 'mesajlar 💬' | 'rozetler 🏅'  | 'ayarlar⚙️' | 'ara🔍';
 
 @Component({
   selector: 'app-hesabim',
@@ -19,7 +19,17 @@ type Tab = 'bildirimler' | 'mesajlar' | 'rozetler' | 'yorumlar' | 'ayarlar' | 'a
   styleUrls: ['./hesabim.css']
 })
 export class Hesabim {
+
+   readonly TABS = {
+    BILDIRIM: 'bildirimler 🔔' as Tab,
+    MESAJ:     'mesajlar 💬' as Tab,
+    ROZET:     'rozetler 🏅' as Tab,
+    AYAR:      'ayarlar⚙️'  as Tab,
+    ARA:       'ara🔍'       as Tab,
+  };
+
   active: Tab | null = null;
+
 
   isLoggedIn = signal(false);
   currentUserId = signal<number | null>(null);
@@ -60,7 +70,7 @@ export class Hesabim {
         this.userLoaded = false;
         this.loadProfile();
 
-        if (this.active === 'mesajlar') {
+        if (this.active === 'mesajlar 💬') {
           this.msgLoaded = false;
           this.loadInbox();
         }
@@ -151,33 +161,54 @@ export class Hesabim {
   msgLoading = false;
   msgLoaded = false;
 
-  private loadInbox() {
-    const uid = this.currentUserId();
-    if (!uid) return;
+ private loadInbox() {
+  const uid = this.currentUserId();
+  if (!uid) return;
 
-    this.msgLoading = true;
-    this.messagesService.getInbox(uid).subscribe({
-      next: (res) => {
-        this.messages = res ?? [];
-        this.msgLoading = false;
-        this.msgLoaded = true;
-      },
-      error: (err) => {
-        console.error('inbox error:', err);
-        this.messages = [];
-        this.msgLoading = false;
-        this.msgLoaded = true;
+  this.msgLoading = true;
+  this.messagesService.getInbox(uid).subscribe({
+    next: (res) => {
+      const data = (res ?? []).slice();
+      data.sort((a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      
+      const limitPerSender = 2;
+      const counts = new Map<number, number>();
+      const filtered: MessageDto[] = [];
+
+      for (const m of data) {
+        const c = counts.get(m.senderId) ?? 0;
+        if (c < limitPerSender) {
+          filtered.push(m);
+          counts.set(m.senderId, c + 1);
+        }
       }
-    });
-  }
 
-  toggleTab(t: Tab) {
+    
+      this.messages = filtered;
+
+      this.msgLoading = false;
+      this.msgLoaded = true;
+    },
+    error: (err) => {
+      console.error('inbox error:', err);
+      this.messages = [];
+      this.msgLoading = false;
+      this.msgLoaded = true;
+    }
+  });
+}
+
+
+   toggleTab(t: Tab) {
     this.active = (this.active === t) ? null : t;
 
-    if (this.active === 'bildirimler' && !this.notiLoaded) {
+    if (this.active === this.TABS.BILDIRIM && !this.notiLoaded) {
       this.loadNotifications();
     }
-    if (this.active === 'mesajlar' && !this.msgLoaded) {
+    if (this.active === this.TABS.MESAJ && !this.msgLoaded) {
       this.loadInbox();
     }
   }
@@ -200,36 +231,24 @@ export class Hesabim {
     { ad: 'Organizatör', aciklama: '5 ilan açtın' },
   ];
 
-  yorumlar = [
-    { yazar: 'Ayşe', puan: 5, metin: 'Harikaydı, tavsiye ederim!', tarih: '3 gün önce' },
-  ];
+ 
 
-  newComment = '';
-  newRating = 5;
-  addComment() {
-    if (this.isOwnProfile()) return;
-    const txt = this.newComment.trim();
-    if (!txt) return;
-    this.yorumlar.unshift({
-      yazar: 'Bir Kullanıcı',
-      puan: this.newRating,
-      metin: txt,
-      tarih: 'şimdi'
-    });
-    this.newComment = '';
-    this.newRating = 5;
-  }
+
 
   q = '';
   results: UserSearch[] = [];
 
   onQuery() {
-    const k = (this.q ?? '').trim();
-    this.userService.SearchUser(k, 1, 20).subscribe({
-      next: (users) => this.results = users ?? [],
-      error: () => this.results = []
-    });
-  }
+  const k = (this.q ?? '').trim();
+  const me = this.currentUserId();
+  this.userService.SearchUser(k, 1, 20).subscribe({
+    next: (users) => {
+      this.results = (users ?? []).filter(u => u.id !== me);
+    },
+    error: () => this.results = []
+  });
+}
+
 
   openProfile(id:number){
     this.router.navigate(['/profil/hesabim/kullanici', id]);

@@ -8,23 +8,26 @@
         <div class="card-body text-center">
 
           @if (user) {
-            <div class="avatar mb-3" [attr.data-initials]="(user.fullName || 'U').charAt(0)">
+            <!-- Avatar (foto varsa img, yoksa harf) -->
+            <div class="avatar mb-3">
               @if (user.fotoUrl) {
                 <img [src]="user.fotoUrl" alt="Profil" />
+              } @else {
+                <div class="avatar-fallback">
+                  {{ (user.fullName || 'U').charAt(0) }}
+                </div>
               }
             </div>
+
             <h5 class="mb-1">{{ user.fullName }}</h5>
             <div class="text-muted small mb-2">{{ user.email }}</div>
 
-            <div class="row text-start small">
-              <div class="col-12 mb-1"><strong>Şehir:</strong> {{ user.sehir }}</div>
-              <div class="col-12 mb-1"><strong>Yaş:</strong> {{ user.yas }}</div>
-              <div class="col-12 mb-1">
-                <strong>Ortalama Puan:</strong>
-                <span class="stars">{{ user.puan | number:'1.1-1' }}</span>
-              </div>
-              <div class="col-12 mb-1"><strong>Rozet:</strong> {{ user.rozetSayisi }}</div>
-            </div>
+            <!-- İstatistik kutuları -->
+            <section class="stats mt-3">
+              <div class="stat"><div class="stat-icon">🎂</div><div>{{ user.yas }}</div></div>
+              <div class="stat"><div class="stat-icon">⭐</div><div>{{ user.puan | number:'1.1-1' }}</div></div>
+              <div class="stat"><div class="stat-icon">🏅</div><div>{{ user.rozetSayisi }}</div></div>
+            </section>
           } @else if (userLoading) {
             <div class="text-muted">Profil yükleniyor…</div>
           } @else {
@@ -40,26 +43,23 @@
       <!-- Sekme barı -->
       <ul class="nav nav-pills baby-nav mb-3">
         <li class="nav-item">
-          <button class="nav-link" [class.active]="active==='bildirimler'" (click)="toggleTab('bildirimler')">Bildirimler</button>
+          <button class="nav-link" [class.active]="active===TABS.BILDIRIM" (click)="toggleTab(TABS.BILDIRIM)">🔔 Bildirimler</button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" [class.active]="active==='mesajlar'" (click)="toggleTab('mesajlar')">Mesajlar</button>
+          <button class="nav-link" [class.active]="active===TABS.MESAJ" (click)="toggleTab(TABS.MESAJ)">💬 Mesajlar</button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" [class.active]="active==='rozetler'" (click)="toggleTab('rozetler')">Rozetler</button>
+          <button class="nav-link" [class.active]="active===TABS.ROZET" (click)="toggleTab(TABS.ROZET)">🏅 Rozetler</button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" [class.active]="active==='yorumlar'" (click)="toggleTab('yorumlar')">Yorumlar</button>
-        </li>
-        <li class="nav-item">
-          <button class="nav-link" [class.active]="active==='ara'" (click)="toggleTab('ara')">Kullanıcı Ara</button>
+          <button class="nav-link" [class.active]="active===TABS.ARA" (click)="toggleTab(TABS.ARA)">🔍 Kullanıcı Ara</button>
         </li>
         <li class="nav-item ms-auto">
-          <button class="nav-link" [class.active]="active==='ayarlar'" (click)="toggleTab('ayarlar')">Ayarlar</button>
+          <button class="nav-link" [class.active]="active===TABS.AYAR" (click)="toggleTab(TABS.AYAR)">⚙️ Ayarlar</button>
         </li>
       </ul>
 
-      <!-- Başlangıçta boş durum -->
+      <!-- Başlangıç boş durum -->
       @if (!active) {
         <div class="placeholder-card">
           <div class="card shadow-sm">
@@ -71,14 +71,13 @@
       }
 
       <!-- Bildirimler -->
-      @if (active === 'bildirimler') {
+      @if (active===TABS.BILDIRIM) {
         <div class="card shadow-sm">
           <div class="card-body">
             <h6 class="mb-3">Bildirimler</h6>
-
             @if (notiLoading) {
               <div class="text-muted">Yükleniyor…</div>
-            } @else if (notifications && notifications.length) {
+            } @else if (notifications.length > 0) {
               <ul class="list-group list-group-flush">
                 @for (n of notifications; track $index) {
                   <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -94,68 +93,55 @@
         </div>
       }
 
-      <!-- Mesajlar -->
-      @if (active==='mesajlar') {
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h6 class="mb-3">Mesajlar</h6>
+     <!-- Mesajlar -->
+@if (active===TABS.MESAJ) {
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h6 class="mb-3">Mesajlar</h6>
 
-            @if (msgLoading) {
-              <ul class="list-group list-group-flush">
-                @for (i of [1,2,3]; track $index) {
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-3 w-100">
-                      <div class="msg-avatar skeleton">&nbsp;</div>
-                      <div class="flex-grow-1">
-                        <div class="skeleton-line w-75 mb-1"></div>
-                        <div class="skeleton-line w-50"></div>
-                      </div>
-                      <span class="badge bg-light text-muted">…</span>
-                    </div>
-                  </li>
-                }
-              </ul>
-            } @else if (messages && messages.length) {
-              <ul class="list-group list-group-flush">
-                @for (m of messages; track m.id) {
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-3">
-                      <div class="msg-avatar">
-                        {{ (m.senderName || 'U').charAt(0) }}
-                      </div>
-                      <div class="msg-text">
-                        <div class="line-1">
-                          <a class="fw-semibold link-dark text-decoration-none"
-                             [routerLink]="['/profil/hesabim/kullanici', m.senderId]">
-                            {{ m.senderName || ('Kullanıcı #' + m.senderId) }}
-                          </a>
-                          <span class="text-muted">—</span>
-                          <span class="text-muted msg-preview">{{ m.content }}</span>
-                        </div>
-                        <div class="small text-muted">{{ fromNow(m.createdAt) }}</div>
-                      </div>
-                    </div>
+      @if (msgLoading) {
+        <div class="text-muted">Yükleniyor…</div>
+      } @else if (messages.length > 0) {
+        <ul class="list-group list-group-flush">
+          @for (m of messages; track m.id) {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-3 flex-grow-1">
+                <div class="msg-avatar">{{ (m.senderName || 'U').charAt(0) }}</div>
 
-                    <div class="d-flex align-items-center gap-2">
-                      <span class="badge bg-light text-muted d-none d-sm-inline">{{ fromNow(m.createdAt) }}</span>
-                      <button type="button" class="btn btn-outline-primary btn-sm"
-                              [routerLink]="['/profil/hesabim/kullanici', m.senderId]"
-                              [queryParams]="{ tab: 'mesaj' }">
-                        Cevap ver
-                      </button>
-                    </div>
-                  </li>
-                }
-              </ul>
-            } @else {
-              <div class="text-muted">Gelen mesajın yok.</div>
-            }
-          </div>
-        </div>
+                <div class="flex-grow-1">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <a class="fw-semibold link-dark text-decoration-none"
+                       [routerLink]="['/profil/hesabim/kullanici', m.senderId]">
+                      {{ m.senderName || ('Kullanıcı #' + m.senderId) }}
+                    </a>
+                    <div class="small text-muted ms-3">{{ fromNow(m.createdAt) }}</div>
+                  </div>
+
+                  <!-- ÖNEMLİ KISIM: Mesaj içeriği -->
+                  <div class="text-muted small msg-snippet">
+                    {{ m.content || '—' }}
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn btn-outline-primary btn-sm ms-3"
+                      [routerLink]="['/profil/hesabim/kullanici', m.senderId]"
+                      [queryParams]="{ tab:'mesaj' }">
+                Cevap ver
+              </button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <div class="text-muted">Gelen mesajın yok.</div>
       }
+    </div>
+  </div>
+}
+
 
       <!-- Rozetler -->
-      @if (active==='rozetler') {
+      @if (active===TABS.ROZET) {
         <div class="row g-3">
           @for (r of rozetler; track $index) {
             <div class="col-sm-6 col-lg-4">
@@ -173,69 +159,13 @@
         </div>
       }
 
-      <!-- Yorumlar -->
-      @if (active==='yorumlar') {
-        @if (!isOwnProfile) {
-          <div class="card shadow-sm mb-3">
-            <div class="card-body">
-              <h6 class="mb-3">Yorum Yaz</h6>
-              <div class="row g-2 align-items-center">
-                <div class="col-sm-3">
-                  <label class="form-label mb-0">Puan</label>
-                  <select class="form-select" [(ngModel)]="newRating">
-                    <option [ngValue]="5">★★★★★ (5)</option>
-                    <option [ngValue]="4">★★★★☆ (4)</option>
-                    <option [ngValue]="3">★★★☆☆ (3)</option>
-                    <option [ngValue]="2">★★☆☆☆ (2)</option>
-                    <option [ngValue]="1">★☆☆☆☆ (1)</option>
-                  </select>
-                </div>
-                <div class="col-sm-7">
-                  <label class="form-label mb-0">Yorum</label>
-                  <input class="form-control" [(ngModel)]="newComment" placeholder="Kısa bir yorum yaz..." />
-                </div>
-                <div class="col-sm-2 d-grid">
-                  <label class="form-label mb-0 invisible">Gönder</label>
-                  <button class="btn btn-primary" (click)="addComment()">Gönder</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        }
-
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h6 class="mb-3">Gelen Yorumlar</h6>
-            @for (y of yorumlar; track $index) {
-              <div class="review">
-                <div class="d-flex align-items-center gap-2">
-                  <div class="fw-semibold">{{ y.yazar }}</div>
-                  <div class="starline">★★★★★</div>
-                  <span class="text-muted small">{{ y.tarih }}</span>
-                </div>
-                <div class="mt-1">{{ y.metin }}</div>
-              </div>
-            }
-          </div>
-        </div>
-      }
-
       <!-- Kullanıcı Ara -->
-      @if (active==='ara') {
+      @if (active===TABS.ARA) {
         <div class="card shadow-sm">
           <div class="card-body">
             <h6 class="mb-3">Kullanıcı Ara</h6>
-
-            <div class="mb-3">
-              <input
-                class="form-control"
-                [(ngModel)]="q"
-                (input)="onQuery()"
-                (keyup.enter)="onQuery()"
-                placeholder="İsim veya şehir ara..." />
-            </div>
-
-            @if (results && results.length > 0) {
+            <input class="form-control mb-3" [(ngModel)]="q" (input)="onQuery()" placeholder="İsim veya şehir ara..."/>
+            @if (results.length > 0) {
               <ul class="list-group list-group-flush">
                 @for (u of results; track u.id) {
                   <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -255,45 +185,30 @@
       }
 
       <!-- Ayarlar -->
-      @if (active==='ayarlar') {
+      @if (active===TABS.AYAR) {
         <div class="card shadow-sm">
           <div class="card-body">
             <h6 class="mb-3">Ayarlar</h6>
-
             @if (user) {
               <div class="row g-3">
                 <div class="col-md-6">
                   <label class="form-label">Ad Soyad</label>
-                  <input class="form-control" [(ngModel)]="user.fullName" />
+                  <input class="form-control" [(ngModel)]="user.fullName"/>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">E-posta</label>
-                  <input class="form-control" [(ngModel)]="user.email" />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Şehir</label>
-                  <input class="form-control" [(ngModel)]="user.sehir" />
-                </div>
-                <div class="col-md-3">
-                  <label class="form-label">Yaş</label>
-                  <input type="number" class="form-control" [(ngModel)]="user.yas" />
+                  <input class="form-control" [(ngModel)]="user.email"/>
                 </div>
               </div>
-
-              <div class="d-flex justify-content-between align-items-center mt-3">
-                <small class="text-muted">Değişiklikler backend gelince kaydedilecek (mock)</small>
+              <div class="d-flex justify-content-end mt-3">
                 <button class="btn btn-outline-danger" (click)="logout()">Çıkış Yap</button>
               </div>
-            } @else if (userLoading) {
-              <div class="text-muted">Profil yükleniyor…</div>
             } @else {
               <div class="text-muted">Profil bulunamadı.</div>
             }
-
           </div>
         </div>
       }
-
     </main>
   </div>
 </div>

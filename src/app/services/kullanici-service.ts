@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CommentCreate, CommentDto, MessageCreate, MessageDto, ProfilDetailDto } from '../models/kullanici-model';
+import { CommentCreate, CommentDto, MessageCreate, MessageDto, ProfilDetailDto, RatingCreate, RatingDto, RatingSummaryDto } from '../models/kullanici-model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -10,6 +10,7 @@ export class ProfilDetailService {
   private readonly profilApi = 'https://localhost:44345/api/ProfilDetail';
   private readonly MessageApi = 'https://localhost:44345/api/Messages';
   private readonly CommentApi = 'https://localhost:44345/api/Comment';
+  private readonly RatingApi = "https://localhost:44345/api/Rating"
   
 
   getById(id: number): Observable<ProfilDetailDto> {
@@ -24,7 +25,17 @@ export class ProfilDetailService {
     const params = new HttpParams().set('targetUserId', targetUserId);
     return this.http.get<CommentDto[]>(`${this.CommentApi}/GetByTargetUserId`, { params });
   }
-create(body: CommentCreate): Observable<CommentDto> {
+createComment(body: CommentCreate): Observable<CommentDto> {
     return this.http.post<CommentDto>(`${this.CommentApi}/Create`, body);
 }
+
+ // --- Rating ---
+  getRatingSummary(targetUserId: number): Observable<RatingSummaryDto> {
+    const params = new HttpParams().set('targetUserId', String(targetUserId));
+    return this.http.get<RatingSummaryDto>(`${this.RatingApi}/GetSummary`, { params });
+  }
+
+  createRating(body: RatingCreate): Observable<RatingDto> {
+    return this.http.post<RatingDto>(`${this.RatingApi}/Create`, body);
+  }
 }

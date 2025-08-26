@@ -15,19 +15,23 @@
       <div class="avatar"><span class="initial">{{ initialLetter }}</span></div>
       <div class="username-pill">{{ displayName }}</div>
       <div class="city">{{ user.city }}</div>
-      <div class="rating"><span>★</span> {{ user.ratingAvg ?? 0 }} <small>({{ user.ratingCount ?? 0 }})</small></div>
+      <div class="rating">
+        <span>★</span> {{ user.ratingAvg ?? 0 }}
+        <small>({{ user.ratingCount ?? 0 }})</small>
+      </div>
     </div>
 
     <!-- Tabs -->
     <nav class="tabs">
       <button [class.active]="activeTab==='rozetler'" (click)="setTab('rozetler')">Rozetler</button>
-      <button [class.active]="activeTab==='yorumlar'" (click)="setTab('yorumlar')">Yorumlar</button>
-      <button [class.active]="activeTab==='mesaj'"     (click)="setTab('mesaj')">Mesaj Gönder</button>
+      <button [class.active]="activeTab==='yorumlar'" (click)="setTab('yorumlar')">Yorumlar &amp; Puanlama</button>
+      <button [class.active]="activeTab==='mesaj'" (click)="setTab('mesaj')">Mesaj Gönder</button>
     </nav>
 
     <!-- İçerik -->
     <section class="content">
-      <!-- Rozetler -->
+
+      <!-- ROZETLER -->
       <div *ngIf="activeTab==='rozetler'">
         <div class="badge-row">
           <div class="badge" *ngFor="let b of badges" [title]="b.name">
@@ -37,61 +41,80 @@
         </div>
       </div>
 
-<!-- YORUMLAR SEKME İÇERİĞİ -->
-<div *ngIf="activeTab === 'yorumlar'" class="mt-3">
+      <!-- YORUMLAR & PUANLAMA -->
+      <div *ngIf="activeTab==='yorumlar'" class="mt-3">
 
-  <!-- Yorum yaz kutusu -->
-  <div class="card mb-3">
-    <div class="card-body">
-      <label class="form-label fw-semibold">Yorum yaz</label>
-      <textarea class="form-control" rows="3"
-                [disabled]="isCommentSending"
-                (input)="onCommentInput($event)"
-                (keydown.control.enter)="sendComment()"
-                placeholder="Düşünceni yaz (Ctrl/Cmd + Enter ile gönder)">
-      </textarea>
+        <!-- PUAN VERME (kendine kapalı) -->
+        <div *ngIf="meId !== userId" class="comment-card mb-3">
+          <div class="card-body d-flex flex-wrap align-items-center gap-3">
+            <div class="fw-semibold me-2">Bu kullanıcıyı puanla:</div>
 
-      <div class="d-flex align-items-center gap-2 mt-2">
-        <button class="btn btn-primary"
-                [disabled]="isCommentSending || !commentText.trim()"
-                (click)="sendComment()">
-          Gönder
-        </button>
-        <span *ngIf="commentSendOk" class="text-success small">Yorum gönderildi.</span>
-      </div>
-    </div>
-  </div>
+            <div class="stars" role="radiogroup" aria-label="Puan">
+              <button type="button"
+                      class="star-btn"
+                      *ngFor="let s of [1,2,3,4,5]"
+                      [class.on]="s <= myScore"
+                      (click)="setScore(s)"
+                      [attr.aria-pressed]="s <= myScore">★</button>
+            </div>
 
-  <!-- Yorum listesi -->
-  <div *ngIf="isCommentsLoading" class="text-muted">Yorumlar yükleniyor…</div>
-  <div *ngIf="!isCommentsLoading && comments.length === 0" class="text-muted">
-    Henüz yorum yok.
-  </div>
+            <button class="btn btn-success ms-auto"
+                    [disabled]="isRatingSending || myScore===0"
+                    (click)="sendRating()">
+              Puanı Gönder
+            </button>
 
-  <div class="list-group">
-    <div class="list-group-item bg-transparent border-0 p-0 mb-3"
-         *ngFor="let c of comments">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <strong>{{ c.authorName }}</strong>
-            <small class="text-muted">{{ c.createdAt | date:'short' }}</small>
-          </div>
-          <div class="mt-2">
-            {{ c.content }}
+            <span class="text-muted small ms-2">
+              Ortalama: {{ (user.ratingAvg || 0) | number:'1.1-2' }} ({{ user.ratingCount || 0 }})
+            </span>
           </div>
         </div>
+
+        <!-- YORUM YAZ (kendine kapalı) -->
+        <div *ngIf="meId !== userId" class="comment-card mb-3">
+          <div class="card-body">
+            <label class="form-label fw-semibold">Yorum yaz</label>
+            <textarea class="form-control" rows="3"
+                      [disabled]="isCommentSending"
+                      (input)="onCommentInput($event)"
+                      (keydown.control.enter)="sendComment()"
+                      placeholder="Düşünceni yaz (Ctrl/Cmd + Enter ile gönder)"></textarea>
+
+            <div class="d-flex align-items-center gap-2 mt-2">
+              <button class="btn btn-primary"
+                      [disabled]="isCommentSending || !commentText.trim()"
+                      (click)="sendComment()">
+                Gönder
+              </button>
+              <span *ngIf="commentSendOk" class="text-success small">Yorum gönderildi.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- YORUM LİSTESİ -->
+        <div *ngIf="isCommentsLoading" class="text-muted">Yorumlar yükleniyor…</div>
+        <div *ngIf="!isCommentsLoading && comments.length === 0" class="text-muted">Henüz yorum yok.</div>
+
+        <div class="list-group" *ngIf="!isCommentsLoading && comments.length > 0">
+          <div class="list-group-item bg-transparent border-0 p-0 mb-3"
+               *ngFor="let c of comments">
+            <div class="comment-card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>{{ c.authorName }}</strong>
+                  <small class="text-muted">{{ c.createdAt | date:'short' }}</small>
+                </div>
+                <div class="mt-2">{{ c.content }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
-    </div>
-  </div>
 
-</div>
-
-
-
-      <!-- Mesaj -->
+      <!-- MESAJ (kendine kapalı) -->
       <div *ngIf="activeTab==='mesaj'">
-        <div *ngIf="showComposer" class="message-box">
+        <div *ngIf="meId !== userId && showComposer" class="message-box">
           <textarea
             id="mesajTextarea"
             [value]="messageText"
@@ -106,12 +129,13 @@
           </button>
         </div>
 
-        <button *ngIf="sendOk && !showComposer"
+        <button *ngIf="meId !== userId && sendOk && !showComposer"
                 class="primary"
                 (click)="newMessage()">
           🎉 Mesajınız gönderildi
         </button>
       </div>
+
     </section>
   </section>
 </div>

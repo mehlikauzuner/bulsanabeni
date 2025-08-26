@@ -20,7 +20,7 @@ export class UserService {
     return this.http.get<any[]>('https://localhost:44345/api/UserSearch/UserSearch', { params });
    }
 
-  // user-service.ts
+   
 getProfileDetail(id: number) {
   return this.http.get<ProfilDetailDto>(`https://localhost:44345/api/ProfilDetail/${id}`);
 }
