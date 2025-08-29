@@ -4,6 +4,9 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { DetayModel } from '../../../../../../models/detay-model';
 import { GezilerService } from '../../../../../../services/geziler-service';
+import { ProfilDetailService } from '../../../../../../services/kullanici-service';
+import { AuthService } from '../../../../../../services/auth-service';
+import { BadgeAwardResultDto, EventAttendanceCreateDto, UserBadgeDto } from '../../../../../../models/kullanici-model';
 
 @Component({
   selector: 'app-geziler-detay',
@@ -15,7 +18,10 @@ import { GezilerService } from '../../../../../../services/geziler-service';
 export class GezilerDetay implements OnInit {
   constructor(
     private route: ActivatedRoute,
-    private geziler: GezilerService
+    private geziler: GezilerService,
+    private profile: ProfilDetailService,
+  private auth: AuthService
+
   ) {}
 
 
@@ -28,6 +34,20 @@ export class GezilerDetay implements OnInit {
   sendOk = false;
   sendErr: string | null = null;
 
+  newlyAwarded: UserBadgeDto[] = [];
+
+
+  get hasNewBadges(): boolean {
+  return (this.newlyAwarded?.length ?? 0) > 0;
+}
+
+
+  private getCurrentUserId(): number | null {
+  const v = (this.auth as any).currentUserId?.() ?? (this.auth as any).currentUserId ?? null;
+  if (v == null) return null;
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
   
   get ownerName(): string {
     return this.ilan ? (this.ilan.userName ?? '—') : 'Kullanıcı';
@@ -108,5 +128,26 @@ export class GezilerDetay implements OnInit {
       }
     });
 
-  }
-}
+     this.newlyAwarded = [];          
+  this.geziler.notifyFound(this.ilan.id).subscribe({
+    next: () => {
+      const userId = this.getCurrentUserId();  
+      if (!userId) { this.sending=false; this.sendErr='Kullanıcı kimliği bulunamadı (giriş yapınız).'; return; }
+
+      const body: EventAttendanceCreateDto = { userId, eventId: this.ilan!.id }; 
+
+      this.profile.attendAndAward(body).subscribe({   
+        next: (res: BadgeAwardResultDto) => {
+          this.newlyAwarded = res?.newlyAwarded || [];
+          this.sending = false;
+          this.sendOk = true;
+        },
+        error: (err) => {
+          this.sending = false;
+          this.sendErr = err?.error?.message || `Rozet ödüllendirme başarısız (HTTP ${err?.status ?? '??'}).`;
+        }
+      });
+    },
+  
+  });
+  }}

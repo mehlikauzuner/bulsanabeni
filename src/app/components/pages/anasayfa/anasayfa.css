@@ -1,0 +1,154 @@
+/* Tüm sayfayı siyah yap */
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #000;      /* tam siyah */
+  color: #e5e7eb;        /* yazılar gri */
+}
+
+/* Varsayılan renk değişkenleri */
+:root {
+  --bg: #000;     
+  --card: #0f172a;
+  --muted: #6b7280;
+  --text: #e5e7eb;
+  --brand: #22d3ee;
+}
+
+/* Hero alanı */
+.hero {
+  background: #000;      /* düz siyah */
+  color: var(--text);
+  padding: 56px 16px;
+}
+
+.hero-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  align-items: center;
+}
+
+@media (min-width: 960px) {
+  .hero-inner {
+    grid-template-columns: 1.1fr 1fr; /* yazı | globe */
+    gap: 48px;
+  }
+}
+
+.hero-copy .title {
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.1;
+  margin: 0 0 8px;
+  letter-spacing: .2px;
+}
+
+.hero-copy .subtitle {
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--muted);
+  margin: 0 0 20px;
+}
+
+/* Butonlar */
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, #06b6d4, #60a5fa);
+  color: white;
+  box-shadow: 0 10px 24px rgba(6, 182, 212, 0.28);
+}
+.btn.primary:hover { transform: translateY(-1px); }
+
+.btn.ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+.btn.ghost:hover {
+  border-color: rgba(148, 163, 184, 0.6);
+  transform: translateY(-1px);
+}
+
+/* Globe alanı */
+.globe-wrap {
+  width: min(520px, 100%);
+  margin: 0 auto;
+  aspect-ratio: 1 / 1;   /* kare alan */
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  background: #000;      /* siyah */
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06),
+              0 20px 60px rgba(2, 6, 23, 0.5);
+}
+
+/* Lottie’nin canvas/svg’si alanı doldursun */
+.globe-wrap ::ng-deep canvas,
+.globe-wrap ::ng-deep svg {
+  width: 100% !important;
+  height: 100% !important;
+  background: #000 !important;   /* canvas da siyah */
+}
+
+/* Özellikler bandı */
+.feature-band {
+  background: #000;   /* siyah */
+  border-top: 1px solid rgba(148,163,184,0.15);
+  padding: 28px 16px 48px;
+  color: var(--text);
+
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+@media (min-width: 900px) {
+  .feature-band {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.feature {
+  background: var(--card);
+  border: 1px solid rgba(148,163,184,0.15);
+  border-radius: 16px;
+  padding: 16px 18px;
+}
+
+.feature h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.feature p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+/* svg renderer kullanıyorsan */
+.globe-wrap ::ng-deep svg [fill="#ffffff"] {
+  fill: transparent !important;
+}
+

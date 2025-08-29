@@ -2,12 +2,16 @@
   <div class="card">
     <h1 class="title">{{ mode() === 'login' ? 'PROFİL' : 'KAYIT OL' }}</h1>
 
+        
+
     @if (errorMsg()) {
       <p class="alert">{{ errorMsg() }}</p>
     }
 
    @if (mode() === 'login') {
   <form (ngSubmit)="onLogin()" #loginForm="ngForm" novalidate autocomplete="on">
+
+    
 
     <!-- E-POSTA -->
     <label class="field" [class.invalid]="email_login.invalid && (email_login.dirty || email_login.touched)">
@@ -229,3 +233,6 @@
         </div>
       </form>
     }
+
+
+    

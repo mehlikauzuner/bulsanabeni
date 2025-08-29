@@ -5,9 +5,10 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth-service';
 import { NotificationService } from '../../../services/notification-service';
 import { UserService } from '../../../services/user-service';
-import { MessageDto } from '../../../models/kullanici-model';
+import { MessageDto, UserBadgeDto } from '../../../models/kullanici-model';
 import { MessagesService } from '../../../services/message-service';
 import { UserSearch } from '../../../models/auth-model';
+import { ProfilDetailService } from '../../../services/kullanici-service';
 
 type Tab = 'bildirimler 🔔' | 'mesajlar 💬' | 'rozetler 🏅'  | 'ayarlar⚙️' | 'ara🔍';
 
@@ -35,6 +36,13 @@ export class Hesabim {
   currentUserId = signal<number | null>(null);
   profileOwnerId = signal<number | null>(null);
 
+
+badges: UserBadgeDto[] = [];
+badgesLoading = false;
+badgesLoaded = false;
+badgesError: string | null = null;
+
+
   isOwnProfile = computed(() => {
     const me = this.currentUserId();
     const owner = this.profileOwnerId();
@@ -47,7 +55,9 @@ export class Hesabim {
     private router: Router,
     private noti: NotificationService,
     private userService: UserService,
-    private messagesService: MessagesService
+    private messagesService: MessagesService,
+    private profil: ProfilDetailService 
+
   ) {}
 
   ngOnInit() {
@@ -201,17 +211,45 @@ export class Hesabim {
   });
 }
 
+private loadBadgesForOwner() {
+  const ownerId = this.profileOwnerId();
+  if (!ownerId) return;
 
-   toggleTab(t: Tab) {
-    this.active = (this.active === t) ? null : t;
+  this.badgesLoading = true;
+  this.badgesError = null;
 
-    if (this.active === this.TABS.BILDIRIM && !this.notiLoaded) {
-      this.loadNotifications();
+  this.profil.getUserBadges(ownerId).subscribe({
+    next: (res) => {
+      this.badges = res || [];
+      this.badgesLoading = false;
+      this.badgesLoaded = true;
+    },
+    error: (err) => {
+      console.error('[Hesabım] getUserBadges hata:', err);
+      this.badges = [];
+      this.badgesError = err?.error?.message || 'Rozetler alınamadı.';
+      this.badgesLoading = false;
+      this.badgesLoaded = true;
     }
-    if (this.active === this.TABS.MESAJ && !this.msgLoaded) {
-      this.loadInbox();
-    }
+  });
+}
+
+
+
+toggleTab(t: Tab) {
+  this.active = (this.active === t) ? null : t;
+
+  if (this.active === this.TABS.BILDIRIM && !this.notiLoaded) {
+    this.loadNotifications();
   }
+  if (this.active === this.TABS.MESAJ && !this.msgLoaded) {
+    this.loadInbox();
+  }
+  if (this.active === this.TABS.ROZET && !this.badgesLoaded) {
+    this.loadBadgesForOwner();           
+  }
+}
+
 
   fromNow(iso: string): string {
     const d = new Date(iso);
@@ -225,14 +263,6 @@ export class Hesabim {
     if (days === 1) return 'dün';
     return `${days} gün`;
   }
-
-  rozetler = [
-    { ad: 'İlk Etkinlik', aciklama: 'İlk etkinliğini tamamladın' },
-    { ad: 'Organizatör', aciklama: '5 ilan açtın' },
-  ];
-
- 
-
 
 
   q = '';

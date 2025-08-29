@@ -1,6 +1,3 @@
-<pre style="position:fixed;bottom:80px;right:16px;color:#fff;opacity:.6">
-  sendOk={{sendOk}} tab={{activeTab}}
-</pre>
 
 <div class="page">
   <section class="card">
@@ -31,15 +28,42 @@
     <!-- İçerik -->
     <section class="content">
 
-      <!-- ROZETLER -->
-      <div *ngIf="activeTab==='rozetler'">
-        <div class="badge-row">
-          <div class="badge" *ngFor="let b of badges" [title]="b.name">
-            <div class="icon">{{ b.icon }}</div>
-            <div class="label">{{ b.name }}</div>
+<!-- ROZETLER -->
+@if (activeTab === 'rozetler') {
+  <div class="inner-card"> <!-- ✅ kutu -->
+    @if (isBadgesLoading) {
+      <div class="text-muted">Rozetler yükleniyor…</div>
+    } @else {
+      @if (badgesError) {
+        <div class="text-danger">{{ badgesError }}</div>
+      } @else {
+        @if (!badges || badges.length === 0) {
+          <div class="empty">Henüz rozet yok.</div>
+        } @else {
+          <div class="badge-row in-card">
+            @for (b of badges; track b.code) {
+              <div class="badge"
+                   [title]="b?.description || (b?.name || b?.badgeName || b?.code)">
+                <div class="icon">
+                  @if (b?.iconUrl) {
+                    <img [src]="b.iconUrl" alt="rozet" />
+                  } @else {
+                    <span>{{ (b?.code || b?.name || b?.badgeName || '?').slice(0,2) }}</span>
+                  }
+                </div>
+                <div class="label">{{ b?.name || b?.badgeName || b?.code }}</div>
+                @if (b?.awardedAt) {
+                  <small class="sub">{{ b.awardedAt | date:'short' }}</small>
+                }
+              </div>
+            }
           </div>
-        </div>
-      </div>
+        }
+      }
+    }
+  </div>
+}
+
 
       <!-- YORUMLAR & PUANLAMA -->
       <div *ngIf="activeTab==='yorumlar'" class="mt-3">

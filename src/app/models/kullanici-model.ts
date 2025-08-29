@@ -73,3 +73,29 @@ export interface RatingDto {
   score: number;
   createdAt?: string;
 }
+
+// --- Rozetler ---
+export interface UserBadgeDto {
+  code: string;
+  name?: string;        
+  badgeName?: string;   
+  description?: string;
+  iconUrl?: string;
+  awardedAt?: string;
+}
+
+export interface BadgeAwardResultDto {
+  userId: number;
+  newlyAwarded: UserBadgeDto[];
+}
+
+export interface EventModel {
+  id: number;
+  categoryId: number;
+  title?: string; 
+}
+
+export interface EventAttendanceCreateDto {
+  userId: number;
+  eventId: number;
+}

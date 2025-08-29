@@ -67,12 +67,33 @@
       {{ sending ? 'Gönderiliyor…' : '💬 Seni buldum' }}
     </button>
 
-    @if (sendOk) {
-      <div class="msg ok">Bildirim gönderildi ✅</div>
+    <!-- ===== İşlem Sonrası Mesajlar ===== -->
+    @if (sendErr) {
+      <div class="msg err" aria-live="assertive">{{ sendErr }}</div>
     }
 
-    @if (sendErr) {
-      <div class="msg err">{{ sendErr }}</div>
+    @if (sendOk && !sendErr && !hasNewBadges) {
+      <div class="msg ok" aria-live="polite">Bildirim gönderildi ✅</div>
+    }
+
+    <!-- ===== Yeni Kazanılan Rozetler ===== -->
+    @if (hasNewBadges) {
+      <div class="pill pill-sp mt-2">Yeni Rozetlerin</div>
+      <div class="title-panel">
+        <div class="badges-list">
+          @for (b of newlyAwarded; track b.code) {
+            <div class="badge-item">
+              @if (b.iconUrl) {
+                <img [src]="b.iconUrl" alt="rozet" width="20" height="20" />
+              }
+              <span class="badge-text">{{ b.name || b.badgeName || b.code }}</span>
+              @if (b.awardedAt) {
+                <small class="badge-time">({{ b.awardedAt | date:'short' }})</small>
+              }
+            </div>
+          }
+        </div>
+      </div>
     }
   }
 </div>

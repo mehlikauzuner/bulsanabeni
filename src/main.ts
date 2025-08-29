@@ -8,6 +8,9 @@ import { authInterceptor } from './app/app.config';
 import { importProvidersFrom } from '@angular/core';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { provideLottieOptions } from 'ngx-lottie';
+import player from 'lottie-web'
+
 
 export const TR_DATE_FORMATS = {
   parse: { dateInput: 'DD.MM.YYYY' },
@@ -22,6 +25,7 @@ export const TR_DATE_FORMATS = {
 bootstrapApplication(App, {
   providers: [
     provideAnimations(),
+    provideLottieOptions({player: () => player  }),
     provideRouter(routes),
     importProvidersFrom(TimepickerModule.forRoot()),
     provideHttpClient(

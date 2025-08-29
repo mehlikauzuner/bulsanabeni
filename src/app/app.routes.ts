@@ -41,6 +41,7 @@ import { CruiseIlan } from './components/pages/seyehat/kategoriler/cruise/ilan/i
 import { GezilerDetay } from './components/pages/seyehat/kategoriler/geziler/detay/detay';
 import { Hesabim } from './components/profile/hesabim/hesabim';
 import { Kullanici } from './components/pages/profil/kullanici/kullanici';
+import { Anasayfa } from './components/pages/anasayfa/anasayfa';
 
 
 
@@ -55,6 +56,7 @@ export const routes: Routes = [
   
  // Seyehat ana sayfa (turuncu dropdown)
   { path: 'seyehat', component: Seyehat },
+  { path: 'anasayfa', component: Anasayfa },
 
   // Seyehat alt sayfalar (kırmızı dropdown)
   { path: 'seyehat/cruise', component: Cruise },

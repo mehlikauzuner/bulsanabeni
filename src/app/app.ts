@@ -11,12 +11,20 @@ defineLocale('tr', trLocale);
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, Footer],
+  imports: [RouterOutlet, Navbar, Footer,],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
 export class App {
   protected readonly title = signal('bulbeni');
-  
+  isHomePage = false;
+
+  constructor(private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.isHomePage = event.urlAfterRedirects === '/' || event.urlAfterRedirects.startsWith('/home');
+      }
+    });
+  }  
 
 }

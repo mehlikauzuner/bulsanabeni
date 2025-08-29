@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs/operators';
-import { BadgeDto, ReviewDto, ProfilDetailDto, CommentDto, CommentCreate } from '../../../../models/kullanici-model';
+import { BadgeDto, ReviewDto, ProfilDetailDto, CommentDto, CommentCreate, UserBadgeDto } from '../../../../models/kullanici-model';
 import { ProfilDetailService } from '../../../../services/kullanici-service';
 import { AuthService } from '../../../../services/auth-service';
 
@@ -42,9 +42,13 @@ export class Kullanici implements OnInit {
     birthDate: null,
     bio: null
   };
-
-  badges: BadgeDto[] = [];
+  
   reviews: ReviewDto[] = [];
+  badges: UserBadgeDto[] = [];
+
+isBadgesLoading = false;
+badgesError: string | null = null;
+private badgesLoadedOnce = false;
 
   sendOk = false;
   showComposer = true;
@@ -125,6 +129,7 @@ export class Kullanici implements OnInit {
   if (tab === 'yorumlar') {
     this.loadComments(this.userId);
     this.loadSummary(this.userId);
+    this.loadBadges(this.userId);
   }
 }
 
@@ -254,6 +259,21 @@ export class Kullanici implements OnInit {
       error: (err) => console.error('rating post error', err)
     });
 }
+
+private loadBadges(userId: number) {
+  this.isBadgesLoading = true;
+  this.badgesError = null;
+
+  this.profil.getUserBadges(userId).subscribe({
+    next: (res) => { this.badges = res || []; this.isBadgesLoading = false; },
+    error: (err) => {
+      console.error('[Profil] getUserBadges hata:', err);
+      this.badgesError = err?.error?.message || 'Rozetler alınamadı.';
+      this.isBadgesLoading = false;
+    }
+  });
+}
+
 
 
   goBack(): void {

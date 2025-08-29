@@ -192,4 +192,34 @@
 .btn-primary{ background: linear-gradient(180deg,#3e6cc1,#2b5aa8); color:#fff; }
 .btn-success, .send-btn{ background: linear-gradient(180deg,#1fa37a,#178d67); color:#fff; }
 .btn:disabled, .send-btn[disabled]{ opacity:.6; cursor:not-allowed; }
+/* İçerik içindeki alt kart/kutu */
+.inner-card{
+  background: #213f69;                     /* kartın koyu zemin rengi */
+  border: 1px solid rgba(255,255,255,.08); /* hafif kenar */
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.18);
+}
+
+/* Boş durum metni kutu içinde sola hizalansın */
+.inner-card .empty{ color:#cfe3ff; opacity:.75; }
+
+/* Rozetler kutu içindeyken biraz daha sık yerleşsin */
+.badge-row.in-card{ justify-content: flex-start; gap: 10px; }
+
+/* Rozet kartı kutunun temasına uysun */
+.badge{
+  width: 120px;
+  background: #1d3b62;                     /* önceki #20426e yerine */
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: grid; place-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,.18) inset;
+}
+.badge .icon img{ width:22px; height:22px; border-radius:50%; object-fit:cover; }
+.badge .label{ font-size:12px; opacity:.95; margin-top:4px; }
+.badge .sub{ color:#cfe3ff; opacity:.7; margin-top:2px; }
+
 
