@@ -8,7 +8,7 @@ import { DetayModel } from '../models/detay-model';
 export class GezilerService {
 
   private readonly gezilerApi  = 'https://localhost:44345/api/Geziler';
-  private readonly citiesApi   = 'https://localhost:44345/api/Cities';
+  private readonly citiesApi   = 'https://localhost:44345/api/Cities/Get';
   private readonly districtsApi= 'https://localhost:44345/api/Districts';
   private readonly notificationApi = 'https://localhost:44345/api/Notification'; 
   

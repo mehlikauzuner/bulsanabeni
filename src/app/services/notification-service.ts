@@ -13,5 +13,9 @@ export class NotificationService {
     const params = new HttpParams().set('userId', String(userId));
     return this.http.get<any>(`${this.api}/GetMyNotifications`, { params });
   }
+
+   add(dto: { ilanId: number; message?: string }) {
+    return this.http.post(`${this.api}/add`, dto);
+  }
   
 }

@@ -2,11 +2,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { finalize } from 'rxjs/operators';
+
 import { DetayModel } from '../../../../../../models/detay-model';
 import { GezilerService } from '../../../../../../services/geziler-service';
 import { ProfilDetailService } from '../../../../../../services/kullanici-service';
 import { AuthService } from '../../../../../../services/auth-service';
-import { BadgeAwardResultDto, EventAttendanceCreateDto, UserBadgeDto } from '../../../../../../models/kullanici-model';
+import { UserBadgeDto } from '../../../../../../models/kullanici-model';
 
 @Component({
   selector: 'app-geziler-detay',
@@ -16,39 +18,35 @@ import { BadgeAwardResultDto, EventAttendanceCreateDto, UserBadgeDto } from '../
   styleUrls: ['./detay.css'],
 })
 export class GezilerDetay implements OnInit {
+  userBadges: UserBadgeDto[] = [];
+  newlyAwarded: UserBadgeDto[] = []; // kullanmıyorsan silebilirsin
+
   constructor(
     private route: ActivatedRoute,
     private geziler: GezilerService,
     private profile: ProfilDetailService,
-  private auth: AuthService
-
+    private auth: AuthService
   ) {}
-
 
   ilan: DetayModel | null = null;
   loading = false;
   error: string | null = null;
 
-  
   sending = false;
   sendOk = false;
   sendErr: string | null = null;
 
-  newlyAwarded: UserBadgeDto[] = [];
-
-
   get hasNewBadges(): boolean {
-  return (this.newlyAwarded?.length ?? 0) > 0;
-}
-
+    return (this.newlyAwarded?.length ?? 0) > 0;
+  }
 
   private getCurrentUserId(): number | null {
-  const v = (this.auth as any).currentUserId?.() ?? (this.auth as any).currentUserId ?? null;
-  if (v == null) return null;
-  const n = Number(v);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
-  
+    const v = (this.auth as any).currentUserId?.() ?? (this.auth as any).currentUserId ?? null;
+    if (v == null) return null;
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? n : null;
+  }
+
   get ownerName(): string {
     return this.ilan ? (this.ilan.userName ?? '—') : 'Kullanıcı';
   }
@@ -80,7 +78,6 @@ export class GezilerDetay implements OnInit {
     return c || d;
   }
 
-
   ngOnInit(): void {
     const raw = this.route.snapshot.paramMap.get('id');
     const id = raw ? parseInt(raw, 10) : NaN;
@@ -91,7 +88,6 @@ export class GezilerDetay implements OnInit {
     this.fetch(id);
   }
 
-  
   private fetch(id: number) {
     this.loading = true;
     this.error = null;
@@ -107,7 +103,6 @@ export class GezilerDetay implements OnInit {
     });
   }
 
-  
   onSeniBuldum() {
     if (!this.ilan?.id) return;
 
@@ -115,39 +110,26 @@ export class GezilerDetay implements OnInit {
     this.sendOk = false;
     this.sendErr = null;
 
-  
-    this.geziler.notifyFound(this.ilan.id).subscribe({
-      next: () => {
-        this.sending = false;
-        this.sendOk = true;
-      },
-      error: (err) => {
-        console.error('[GezilerDetay] Bildirim hatası:', err);
-        this.sending = false;
-        this.sendErr = err?.error?.message || `Bildirim gönderilemedi (HTTP ${err?.status ?? '??'}).`;
-      }
-    });
-
-     this.newlyAwarded = [];          
-  this.geziler.notifyFound(this.ilan.id).subscribe({
-    next: () => {
-      const userId = this.getCurrentUserId();  
-      if (!userId) { this.sending=false; this.sendErr='Kullanıcı kimliği bulunamadı (giriş yapınız).'; return; }
-
-      const body: EventAttendanceCreateDto = { userId, eventId: this.ilan!.id }; 
-
-      this.profile.attendAndAward(body).subscribe({   
-        next: (res: BadgeAwardResultDto) => {
-          this.newlyAwarded = res?.newlyAwarded || [];
-          this.sending = false;
+    // **TEK** notifyFound çağrısı
+    this.geziler.notifyFound(this.ilan.id)
+      .pipe(finalize(() => this.sending = false))
+      .subscribe({
+        next: () => {
           this.sendOk = true;
+
+          // (opsiyonel) rozetleri yenile
+          const userId = this.getCurrentUserId();
+          if (userId) {
+            this.profile.getUserBadges(userId).subscribe({
+              next: (badges) => this.userBadges = badges ?? [],
+              error: () => { /* liste alınamazsa sessiz geç */ }
+            });
+          }
         },
         error: (err) => {
-          this.sending = false;
-          this.sendErr = err?.error?.message || `Rozet ödüllendirme başarısız (HTTP ${err?.status ?? '??'}).`;
+          console.error('[GezilerDetay] Bildirim hatası:', err);
+          this.sendErr = err?.error?.message || `Bildirim gönderilemedi (HTTP ${err?.status ?? '??'}).`;
         }
       });
-    },
-  
-  });
-  }}
+  }
+}

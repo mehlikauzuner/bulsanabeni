@@ -42,17 +42,13 @@ export class ProfilDetailService {
 
 
    getUserBadges(userId: number): Observable<UserBadgeDto[]> {
-    return this.http.get<UserBadgeDto[]>(`${this.RozetApi}/Badge/user/${userId}`);
-  }
+  return this.http.get<UserBadgeDto[]>(`${this.RozetApi}/Badge/user/${userId}`);
+}
+
 
   getEventsByCategory(categoryId: number): Observable<EventModel[]> {
     const params = new HttpParams().set('categoryId', String(categoryId));
     return this.http.get<EventModel[]>(`${this.RozetApi}/Event`, { params });
   }
-
-  attendAndAward(body: EventAttendanceCreateDto): Observable<BadgeAwardResultDto> {
-    return this.http.post<BadgeAwardResultDto>(`${this.RozetApi}/EventAttendance`, body);
-  }
-
   
 }
