@@ -1,0 +1,4 @@
+.admin-shell { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; padding: 12px; border-right: 1px solid #eee; }
+.sidebar a { display: block; padding: 6px 0; text-decoration: none; }
+.content { flex: 1; padding: 12px; }

@@ -1,0 +1,44 @@
+<h2>Comments</h2>
+
+<div class="toolbar">
+  <input type="number"
+         placeholder="TargetUserId"
+         [value]="targetUserIdInput"
+         (input)="targetUserIdInput = $any($event.target).value">
+  <button (click)="searchByTarget()">Ara</button>
+  <button (click)="refresh()">Yenile</button>
+</div>
+
+@if (info) { <div class="ok">{{ info }}</div> }
+@if (error) { <div class="err">{{ error }}</div> }
+
+@if (loading) {
+  <div>Yükleniyor...</div>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Author</th>
+        <th>TargetUser</th>
+        <th>Tarih</th>
+        <th>İçerik</th>
+        <th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody>
+     @for (c of rows; track $index) {
+        <tr>
+          <td>{{ c.id }}</td>
+          <td>{{ c.authorName }} (#{{ c.authorUserId }})</td>
+          <td>#{{ c.targetUserId }}</td>
+          <td>{{ c.createdAt | date:'short' }}</td>
+          <td>{{ c.content }}</td>
+          <td><button (click)="deleteComment(c)">Sil</button></td>
+        </tr>
+      } @empty {
+        <tr><td colspan="6">Kayıt bulunamadı</td></tr>
+      }
+    </tbody>
+  </table>
+}

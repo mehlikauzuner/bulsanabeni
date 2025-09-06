@@ -1,0 +1,48 @@
+<h2>Users</h2>
+
+<div class="toolbar">
+  <button (click)="fetch()">Yenile</button>
+</div>
+
+@if (info) { <div class="ok">{{ info }}</div> }
+@if (error) { <div class="err">{{ error }}</div> }
+
+@if (loading) {
+  <div>Yükleniyor...</div>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>UserName</th>
+        <th>Email</th>
+        <th>City</th>
+        <th>BirthDate</th>
+        <th>Status</th>
+        <th>FirstName</th>
+        <th>LastName</th>
+        <th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (u of rows; track u.id) {
+        <tr>
+          <td>{{ u.id }}</td>
+          <td>{{ u.userName }}</td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.city }}</td>
+          <td>{{ shortDate(u.birthDate) }}</td>
+          <td>{{ u.status ? 'Aktif' : 'Pasif' }}</td>
+          <td>{{ u.firstName }}</td>
+          <td>{{ u.lastName }}</td>
+          <td>
+            <button (click)="editUser(u)">Düzenle</button>
+            <button (click)="deleteUser(u)">Sil</button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="9">Kayıt bulunamadı</td></tr>
+      }
+    </tbody>
+  </table>
+}

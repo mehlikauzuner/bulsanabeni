@@ -1,0 +1,5 @@
+.toolbar { display:flex; gap:8px; margin:8px 0; }
+.ok { color:#065f46; margin:6px 0; }
+.err { color:#b91c1c; margin:6px 0; }
+table { width:100%; border-collapse:collapse; margin-top:8px; }
+th,td { border:1px solid #eee; padding:6px; text-align:left; }

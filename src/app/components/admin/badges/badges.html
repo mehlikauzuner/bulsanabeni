@@ -1,0 +1,44 @@
+<h2>Badges</h2>
+
+<div class="toolbar">
+  <button (click)="addBadge()">+ Ekle</button>
+  <button (click)="removeFromUser()">Rozeti Kullanıcıdan Kaldır</button>
+  <button (click)="fetch()">Yenile</button>
+</div>
+
+@if (info) { <div class="ok">{{ info }}</div> }
+@if (error) { <div class="err">{{ error }}</div> }
+
+@if (loading) {
+  <div>Yükleniyor...</div>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Code</th>
+        <th>BadgeName</th>
+        <th>CriteriaType</th>
+        <th>Threshold</th>
+        <th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (b of rows; track b.id) {
+        <tr>
+          <td>{{ b.id }}</td>
+          <td>{{ b.code }}</td>
+          <td>{{ b.badgeName }}</td>
+          <td>{{ b.criteriaType }}</td>
+          <td>{{ b.threshold }}</td>
+          <td>
+            <button (click)="editBadge(b)">Düzenle</button>
+            <button (click)="deleteBadge(b)">Sil</button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="6">Kayıt bulunamadı</td></tr>
+      }
+    </tbody>
+  </table>
+}

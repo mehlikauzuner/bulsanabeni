@@ -1,0 +1,48 @@
+<h2>Geziler</h2>
+
+<div class="toolbar">
+  <button (click)="fetch()">Yenile</button>
+</div>
+
+@if (info) { <div class="ok">{{ info }}</div> }
+@if (error) { <div class="err">{{ error }}</div> }
+
+@if (loading) {
+  <div>Yükleniyor...</div>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>UserName</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Date</th>
+        <th>City</th>
+        <th>District</th>
+        <th>CreatedBy</th>
+        <th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (g of rows; track g.id ?? $index) {
+        <tr>
+          <td>{{ g.id ?? '-' }}</td>
+          <td>{{ g.userName }}</td>
+          <td>{{ g.title }}</td>
+          <td>{{ g.description }}</td>
+          <td>{{ shortDate(g.date) }}</td>
+          <td>{{ g.cityName }}</td>
+          <td>{{ g.district }}</td>
+          <td>{{ g.createdBy || '-' }}</td>
+          <td>
+            <button (click)="edit(g)" [disabled]="!g.id">Düzenle</button>
+            <button (click)="remove(g)" [disabled]="!g.id">Sil</button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="9">Kayıt bulunamadı</td></tr>
+      }
+    </tbody>
+  </table>
+}

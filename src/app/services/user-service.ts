@@ -26,4 +26,5 @@ getProfileDetail(id: number) {
 }
 
 
+
 }

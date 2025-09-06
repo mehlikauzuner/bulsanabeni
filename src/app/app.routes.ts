@@ -42,6 +42,14 @@ import { GezilerDetay } from './components/pages/seyehat/kategoriler/geziler/det
 import { Hesabim } from './components/profile/hesabim/hesabim';
 import { Kullanici } from './components/pages/profil/kullanici/kullanici';
 import { Anasayfa } from './components/pages/anasayfa/anasayfa';
+import { Admin } from './components/admin/admin';
+import { AdminBadges } from './components/admin/badges/badges';
+import { AdminCategories } from './components/admin/categories/categories';
+import { AdminComments } from './components/admin/comments/comments';
+import { AdminEvents } from './components/admin/etkinliks/etkinliks';
+import { AdminUsers } from './components/admin/users/users';
+import { AdminRatings } from './components/admin/ratings/ratings';
+import { AdminGeziler } from './components/admin/gezilers/gezilers';
 
 
 
@@ -111,7 +119,24 @@ export const routes: Routes = [
     ],
   },
 
-  
+ {
+    path: 'admin',
+    component: Admin,
+    children: [
+      { path: '', redirectTo: 'badges', pathMatch: 'full' },
+      { path: 'badges', component: AdminBadges },
+      { path: 'categories', component: AdminCategories },
+      { path: 'comments', component: AdminComments},
+      { path: 'events', component: AdminEvents },
+      { path: 'users', component: AdminUsers },
+      { path: 'ratings', component: AdminRatings },
+      { path: 'geziler', component: AdminGeziler }
+
+
+      // diğerleri sonra: categories, comments, event-attendance, events, ratings, users...
+    ]
+  } ,
+
 { path: 'profil/hesabim', component: Hesabim},
 { path: 'profil/hesabim/kullanici/:id', component: Kullanici }
 

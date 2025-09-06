@@ -1,0 +1,43 @@
+<h2>Ratings</h2>
+
+<div class="toolbar">
+  <button (click)="pickTarget()">Target Seç</button>
+  <button (click)="add()">+ Ekle</button>
+  <button (click)="fetch()">Yenile</button>
+</div>
+
+@if (selectedTargetId !== null) {
+  <div class="info">TargetUserId: <b>{{ selectedTargetId }}</b></div>
+}
+
+@if (info) { <div class="ok">{{ info }}</div> }
+@if (error) { <div class="err">{{ error }}</div> }
+
+@if (loading) {
+  <div>Yükleniyor...</div>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>TargetUserId</th>
+        <th>RaterId</th>
+        <th>Score</th>
+        <th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (r of rows; track $index) {
+        <tr>
+          <td>{{ r.targetUserId }}</td>
+          <td>{{ r.raterId }}</td>
+          <td>{{ r.score }}</td>
+          <td>
+            <button (click)="deleteByUser(r)">Sil</button>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="4">Kayıt bulunamadı</td></tr>
+      }
+    </tbody>
+  </table>
+}
